@@ -90,4 +90,48 @@ body {
   .auth-hero {
     padding: 2rem 0;
   }
+}
+
+/* RTL Support */
+.rtl {
+  text-align: right;
+}
+
+.rtl .navbar-nav {
+  padding-right: 0;
+}
+
+.rtl .ms-auto {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
+.rtl .me-2 {
+  margin-right: 0 !important;
+  margin-left: 0.5rem !important;
+}
+
+.rtl .dropdown-menu-end {
+  right: auto;
+  left: 0;
+}
+
+/* Language switcher styles */
+.language-switcher .dropdown-item {
+  display: flex;
+  align-items: center;
+}
+
+.language-switcher .dropdown-item.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.flag-icon {
+  margin-right: 0.5rem;
+}
+
+.rtl .flag-icon {
+  margin-right: 0;
+  margin-left: 0.5rem;
 } 
