@@ -73,6 +73,34 @@ export const ar = {
 <span data-i18n="newFeature">New Feature</span>
 ```
 
+### Working with Nested Translation Keys
+
+The system supports nested objects in translation files using dot notation:
+
+```javascript
+// en.js
+export const en = {
+  departments: {
+    engineering: "Engineering",
+    computerScience: "Computer Science",
+  },
+};
+```
+
+```html
+<!-- Access nested keys using dot notation -->
+<option data-i18n="departments.engineering">Engineering</option>
+```
+
+In JavaScript, you can access nested translations using the same dot notation:
+
+```javascript
+// Get a nested translation
+const department = i18n.translate("departments.engineering");
+```
+
+This approach helps organize related translations into logical groups.
+
 ## RTL Support
 
 The system automatically switches to RTL layout when Arabic is selected by:

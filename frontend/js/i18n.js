@@ -23,6 +23,9 @@ class I18nManager {
         this.translations[lang] = module[lang];
       }
 
+      // Make the i18n instance available globally for non-module scripts
+      window.i18n = this;
+
       // Apply current language
       this.applyLanguage(this.currentLanguage);
       this.initialized = true;
@@ -55,12 +58,14 @@ class I18nManager {
     const elements = document.querySelectorAll("[data-i18n]");
     elements.forEach((element) => {
       const key = element.getAttribute("data-i18n");
-      if (this.translations[lang] && this.translations[lang][key]) {
+      const translation = this.getNestedTranslation(lang, key);
+
+      if (translation) {
         // Handle different element types
         if (element.tagName === "INPUT" && element.type === "placeholder") {
-          element.placeholder = this.translations[lang][key];
+          element.placeholder = translation;
         } else {
-          element.textContent = this.translations[lang][key];
+          element.textContent = translation;
         }
       } else {
         console.warn(
@@ -71,23 +76,44 @@ class I18nManager {
   }
 
   /**
+   * Get a nested translation using dot notation
+   * @param {string} lang - Language code
+   * @param {string} key - Translation key with optional dot notation (e.g., "departments.engineering")
+   * @returns {string|null} - Translated string or null if not found
+   */
+  getNestedTranslation(lang, key) {
+    if (!key || !this.translations[lang]) return null;
+
+    // Handle nested keys with dot notation
+    if (key.includes(".")) {
+      const keys = key.split(".");
+      let result = this.translations[lang];
+
+      for (const k of keys) {
+        if (result && typeof result === "object" && k in result) {
+          result = result[k];
+        } else {
+          return null;
+        }
+      }
+
+      return result;
+    }
+
+    // Handle simple keys
+    return this.translations[lang][key] || null;
+  }
+
+  /**
    * Get a translation string for the current language
    * @param {string} key - Translation key
    * @returns {string} - Translated string or the key if translation not found
    */
   translate(key) {
-    if (
-      this.translations[this.currentLanguage] &&
-      this.translations[this.currentLanguage][key]
-    ) {
-      return this.translations[this.currentLanguage][key];
-    } else if (
-      this.translations[this.defaultLanguage] &&
-      this.translations[this.defaultLanguage][key]
-    ) {
-      return this.translations[this.defaultLanguage][key];
-    }
-    return key;
+    const translation =
+      this.getNestedTranslation(this.currentLanguage, key) ||
+      this.getNestedTranslation(this.defaultLanguage, key);
+    return translation || key;
   }
 
   /**
