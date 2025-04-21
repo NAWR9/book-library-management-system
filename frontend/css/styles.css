@@ -1,0 +1,93 @@
+:root {
+  --primary: #4a2c82; /* University purple */
+  --secondary: #ffc107; /* University gold */
+  --dark: #1d1d1d;
+  --light: #f8f9fa;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f5f5f5;
+}
+
+.navbar-custom {
+  background-color: var(--primary);
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+  color: white;
+}
+
+.navbar-custom .nav-link:hover {
+  color: var(--secondary);
+}
+
+.auth-hero {
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+              url('../img/library-bg.png');
+  background-size: cover;
+  background-position: center;
+  color: white;
+  padding: 4rem 0;
+  margin-bottom: 2rem;
+}
+
+.auth-card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.auth-card .card-header {
+  background-color: var(--primary);
+  color: white;
+  border-radius: 10px 10px 0 0;
+  padding: 1.5rem;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: #3a2268;
+  border-color: #3a2268;
+}
+
+.auth-link {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.auth-link:hover {
+  color: #3a2268;
+  text-decoration: underline;
+}
+
+.error-feedback {
+  display: none;
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.form-control.is-invalid ~ .error-feedback {
+  display: block;
+}
+
+.alert-message {
+  display: none;
+}
+
+.university-logo {
+  max-height: 60px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .auth-hero {
+    padding: 2rem 0;
+  }
+} 

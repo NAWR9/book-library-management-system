@@ -4,10 +4,21 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 
+// Import routes
+const authRoutes = require("./routes/authRoutes");
+
 const app = express();
 
+// CORS configuration
+const corsOptions = {
+  origin: "*", // Allow requests from any origin during development
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,6 +33,9 @@ mongoose
   })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
+
+// API Routes
+app.use("/api/auth", authRoutes);
 
 // Basic route
 app.get("/api/health", (req, res) => {
