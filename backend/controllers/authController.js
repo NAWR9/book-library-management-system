@@ -13,7 +13,7 @@ const generateToken = (id) => {
 // @access  Public
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, department, phoneNumber } = req.body;
 
     // Check if user already exists
     const userExists = await User.findOne({ email });
@@ -30,6 +30,8 @@ exports.register = async (req, res) => {
       email,
       password,
       role: role || "user", // Default to user if role not provided
+      department: department,
+      phoneNumber: phoneNumber,
     });
 
     // Generate token
@@ -44,6 +46,8 @@ exports.register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        department: user.department,
+        phoneNumber: user.phoneNumber,
         createdAt: user.createdAt,
       },
     });
@@ -101,6 +105,8 @@ exports.login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        department: user.department,
+        phoneNumber: user.phoneNumber,
         createdAt: user.createdAt,
       },
     });

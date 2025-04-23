@@ -12,7 +12,9 @@
     "name": "John Doe",
     "email": "john@example.com",
     "password": "password123",
-    "role": "user" // Optional, defaults to "user"
+    "role": "user", // Optional, defaults to "user"
+    "department": "Computer Science", // Optional
+    "phoneNumber": "05084368**" // Optional
   }
   ```
 - **Response:**
@@ -25,6 +27,8 @@
       "name": "John Doe",
       "email": "john@example.com",
       "role": "user",
+      "department": "Computer Science",
+      "phoneNumber": "05084368**",
       "createdAt": "timestamp"
     }
   }
@@ -51,6 +55,8 @@
       "name": "John Doe",
       "email": "john@example.com",
       "role": "user",
+      "department": "Computer Science",
+      "phoneNumber": "05084368**",
       "createdAt": "timestamp"
     }
   }
@@ -74,8 +80,8 @@
       "email": "john@example.com",
       "role": "user",
       "profilePicture": null,
-      "phoneNumber": null,
-      "department": null,
+      "department": "Computer Science",
+      "phoneNumber": "05084368**",
       "borrowedBooks": [],
       "createdAt": "timestamp"
     }
