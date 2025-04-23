@@ -21,7 +21,7 @@ export const ar = {
   searchBooks: "ابحث عن كتب في فهرسنا.",
   search: "بحث",
   profile: "الملف الشخصي",
-  updateAccount: "تحديث معلومات حسابك.",
+  updateAccount: "تحديث معلومات حسابك",
   editProfile: "تعديل الملف الشخصي",
 
   // Login page
@@ -31,6 +31,7 @@ export const ar = {
   emailLabel: "البريد الإلكتروني",
   emailError: "يرجى إدخال عنوان بريد إلكتروني صحيح.",
   passwordLabel: "كلمة المرور",
+  newPassword: "كلمة المرور الجديدة",
   passwordError: "كلمة المرور مطلوبة.",
   loginButton: "تسجيل الدخول",
   noAccount: "ليس لديك حساب؟",

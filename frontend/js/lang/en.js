@@ -32,6 +32,7 @@ export const en = {
   emailLabel: "Email",
   emailError: "Please enter a valid email address.",
   passwordLabel: "Password",
+  newPassword: "New Password",
   passwordError: "Password is required.",
   loginButton: "Login",
   noAccount: "Don't have an account?",
