@@ -358,4 +358,45 @@ class Auth {
       submitBtn.disabled = false;
     }
   }
+    async updateProfile(profileData) {
+      try {
+        this.showLoader();
+    
+        const response = await fetch(`${this.baseUrl}/profile`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.token}`,
+          },
+          body: JSON.stringify(profileData),
+        });
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to update profile");
+        }
+    
+        const updatedUser = await response.json();
+    
+        // Update local storage with new user data
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        this.user = updatedUser;
+    
+        this.showMessage("success", "Profile updated successfully!");
+    
+        // Redirect to the dashboard after a short delay
+        setTimeout(() => {
+          window.location.href = "./dashboard.html";
+        }, 2000);
+      } catch (error) {
+        console.error("Profile update error:", error);
+        this.showMessage("error", error.message || "Failed to update profile");
+      } finally {
+        this.hideLoader();
+      }
+    }
+  
+
 }
+
+
