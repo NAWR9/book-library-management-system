@@ -18,11 +18,13 @@ router.get("/profile", protect, getProfile);
 router.put("/profile", protect, async (req, res) => {
   try {
     const { name, password, phoneNumber, department } = req.body;
-    
+
     const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     // Update fields
@@ -40,12 +42,9 @@ router.put("/profile", protect, async (req, res) => {
       phoneNumber: user.phoneNumber,
       department: user.department,
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({ success: false, message: "Error updating profile" });
   }
 });
 
-
-
 module.exports = router;
-

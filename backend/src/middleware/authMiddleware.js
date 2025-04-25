@@ -29,7 +29,7 @@ exports.protect = async (req, res, next) => {
     // Attach user to request object
     req.user = await User.findById(decoded.id);
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({
       success: false,
       message: "Not authorized to access this route",
