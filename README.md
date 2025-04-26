@@ -38,20 +38,47 @@ A web-based library management system built with Node.js, Express, and MongoDB.
 
 ```
 book-library-management-system/
-├── frontend/
-│   ├── index.html
-│   ├── css/
-│   └── js/
 ├── backend/
-│   ├── server.js
-│   ├── package.json
 │   ├── .env
-│   ├── config/
-│   ├── routes/
-│   ├── controllers/
-│   ├── middleware/
-│   └── models/
-└── README.md
+│   ├── README.md
+│   ├── package-lock.json
+│   ├── package.json
+│   └── src/
+│       ├── controllers/
+│       │   └── authController.js
+│       ├── middleware/
+│       │   └── authMiddleware.js
+│       ├── models/
+│       │   └── User.js
+│       ├── routes/
+│       │   └── authRoutes.js
+│       └── server.js
+├── frontend/
+│   ├── components/
+│   │   └── navbar.html
+│   ├── css/
+│   │   └── styles.css
+│   ├── img/
+│   │   ├── library-bg.png
+│   │   └── university-logo.png
+│   ├── js/
+│   │   ├── auth.js
+│   │   ├── i18n.js
+│   │   └── lang/
+│   │       ├── ar.js
+│   │       └── en.js
+│   ├── dashboard.html
+│   ├── index.html
+│   ├── login.html
+│   ├── profile.html
+│   └── register.html
+├── eslint.config.mjs
+├── .prettierrc
+├── .prettierignore
+├── package.json
+├── package-lock.json
+├── README.md
+└── README-i18n.md
 ```
 
 ## Prerequisites
