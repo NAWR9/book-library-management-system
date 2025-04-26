@@ -1,6 +1,7 @@
 /**
  * Authentication class for handling user registration, login, and session management
  */
+// eslint-disable-next-line no-unused-vars
 class Auth {
   constructor() {
     this.baseUrl = "http://localhost:3000/api/auth";
@@ -12,7 +13,6 @@ class Auth {
       this.updateNavbar(true);
     }
   }
-
   /**
    * Register a new user
    * @param {string} name - User's full name
@@ -50,7 +50,7 @@ class Auth {
           errorMessage =
             errorData.message ||
             `Error: ${response.status} ${response.statusText}`;
-        } catch (e) {
+        } catch {
           // If not JSON, use text or status
           errorMessage =
             errorText || `Error: ${response.status} ${response.statusText}`;
@@ -77,7 +77,7 @@ class Auth {
       // Show success message
       this.showMessage(
         "success",
-        "Registration successful! Redirecting to dashboard..."
+        "Registration successful! Redirecting to dashboard...",
       );
 
       // Update navbar and redirect
@@ -91,7 +91,7 @@ class Auth {
       console.error("Registration error:", error);
       this.showMessage(
         "error",
-        error.message || "Unable to connect to server. Please try again later."
+        error.message || "Unable to connect to server. Please try again later.",
       );
     } finally {
       this.hideLoader();
@@ -129,7 +129,7 @@ class Auth {
           errorMessage =
             errorData.message ||
             `Error: ${response.status} ${response.statusText}`;
-        } catch (e) {
+        } catch {
           // If not JSON, use text or status
           errorMessage =
             errorText || `Error: ${response.status} ${response.statusText}`;
@@ -156,7 +156,7 @@ class Auth {
       // Show success message
       this.showMessage(
         "success",
-        "Login successful! Redirecting to dashboard..."
+        "Login successful! Redirecting to dashboard...",
       );
 
       // Update navbar and redirect
@@ -170,7 +170,7 @@ class Auth {
       console.error("Login error:", error);
       this.showMessage(
         "error",
-        error.message || "Unable to connect to server. Please try again later."
+        error.message || "Unable to connect to server. Please try again later.",
       );
     } finally {
       this.hideLoader();
@@ -258,7 +258,7 @@ class Auth {
 
     // Email validation
     const emailInput = document.getElementById("email");
-    const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(emailInput.value)) {
       this.setInvalid(emailInput);
       isValid = false;

@@ -6,7 +6,7 @@
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   background-color: #f5f5f5;
 }
 
@@ -24,8 +24,9 @@ body {
 }
 
 .auth-hero {
-  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-              url('../img/library-bg.png');
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+    url("../img/library-bg.png");
   background-size: cover;
   background-position: center;
   color: white;
@@ -134,4 +135,4 @@ body {
 .rtl .flag-icon {
   margin-right: 0;
   margin-left: 0.5rem;
-} 
+}

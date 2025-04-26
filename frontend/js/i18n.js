@@ -69,7 +69,7 @@ class I18nManager {
         }
       } else {
         console.warn(
-          `Translation key '${key}' not found for language '${lang}'`
+          `Translation key '${key}' not found for language '${lang}'`,
         );
       }
     });
