@@ -1,6 +1,6 @@
 ﻿# Book Library Management System
 
-A web-based library management system built with Node.js, Express, and MongoDB.
+A Web-based library management system built with Node.js, Express, and MongoDB.
 
 ## Technologies
 
