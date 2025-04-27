@@ -33,10 +33,46 @@
           <a class="nav-link" href="/register" data-i18n="register">Register</a>
         </li>
         <li class="nav-item d-none" id="dashboardNavItem">
-          <a class="nav-link" href="/dashboard" data-i18n="dashboard">Dashboard</a>
+          <a class="nav-link" href="/dashboard" data-i18n="dashboard"
+            >Dashboard</a
+          >
         </li>
         <li class="nav-item d-none" id="logoutNavItem">
-          <a class="nav-link" href="#" id="logoutBtn" data-i18n="logout">Logout</a>
+          <a class="nav-link" href="#" id="logoutBtn" data-i18n="logout"
+            >Logout</a
+          >
+        </li>
+
+        <!-- Language Switcher -->
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle"
+            href="#"
+            id="languageDropdown"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            data-i18n="language"
+          >
+            Language
+          </a>
+          <ul
+            class="dropdown-menu dropdown-menu-end language-switcher"
+            aria-labelledby="languageDropdown"
+          >
+            <li>
+              <button class="dropdown-item" data-lang="en">
+                <span class="flag-icon">🇺🇸</span>
+                <span data-i18n="english">English</span>
+              </button>
+            </li>
+            <li>
+              <button class="dropdown-item" data-lang="ar">
+                <span class="flag-icon">🇸🇦</span>
+                <span data-i18n="arabic">Arabic</span>
+              </button>
+            </li>
+          </ul>
         </li>
       </ul>
     </div>

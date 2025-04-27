@@ -10,6 +10,11 @@ export const en = {
   dashboard: "Dashboard",
   logout: "Logout",
 
+  // Homepage
+  welcomeToSystem: "Welcome to Library Management System",
+  systemDescription:
+    "This is a web-based system for managing books and library operations.",
+
   // Dashboard page
   welcome: "Welcome",
   welcomeToDashboard: "Welcome to Your Dashboard",
@@ -24,6 +29,13 @@ export const en = {
   profile: "Profile",
   updateAccount: "Update your account information.",
   editProfile: "Edit Profile",
+
+  // Auth
+  loading: "Loading...",
+  loginSuccess: "Login successful! Redirecting to dashboard...",
+  registerSuccess: "Registration successful! Redirecting to dashboard...",
+  profileUpdateSuccess: "Profile updated successfully!",
+  serverConnectError: "Unable to connect to server. Please try again later.",
 
   // Login page
   welcomeToLibrary: "Welcome to University Library",

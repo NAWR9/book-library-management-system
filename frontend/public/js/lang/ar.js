@@ -10,6 +10,10 @@ export const ar = {
   dashboard: "لوحة التحكم",
   logout: "تسجيل الخروج",
 
+  // Homepage
+  welcomeToSystem: "مرحبًا بك في نظام إدارة المكتبة",
+  systemDescription: "هذا نظام إلكتروني لإدارة الكتب وعمليات المكتبة.",
+
   // Dashboard page
   welcome: "مرحبًا",
   welcomeToDashboard: "مرحبًا بك في لوحة التحكم",
@@ -23,6 +27,13 @@ export const ar = {
   profile: "الملف الشخصي",
   updateAccount: "تحديث معلومات حسابك",
   editProfile: "تعديل الملف الشخصي",
+
+  // Auth
+  loading: "جارٍ التحميل...",
+  loginSuccess: "تم تسجيل الدخول بنجاح! جاري التحويل إلى لوحة التحكم...",
+  registerSuccess: "تم التسجيل بنجاح! جاري التحويل إلى لوحة التحكم...",
+  profileUpdateSuccess: "تم تحديث الملف الشخصي بنجاح!",
+  serverConnectError: "تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقًا.",
 
   // Login page
   welcomeToLibrary: "مرحبًا بك في مكتبة الجامعة",

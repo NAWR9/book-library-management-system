@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const expressLayouts = require("express-ejs-layouts");
 
 // Import routes
 const authRoutes = require("./backend/src/routes/authRoutes");
@@ -21,11 +22,13 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(expressLayouts);
 
 // Set up static folder
 app.use(express.static(path.join(__dirname, "frontend/public")));
 
-// Set up EJS
+// Set up EJS with layouts
+app.set("layout", "layout");
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "frontend/views"));
 
@@ -45,23 +48,26 @@ app.get("/api/health", (req, res) => {
 
 // Frontend routes (EJS views)
 app.get("/", (req, res) => {
-  res.render("pages/index", { title: "Home" });
+  res.render("pages/index", { title: "Home", pageScript: "index" });
 });
 
 app.get("/login", (req, res) => {
-  res.render("pages/login", { title: "Login" });
+  res.render("pages/login", { title: "Login", pageScript: "login" });
 });
 
 app.get("/register", (req, res) => {
-  res.render("pages/register", { title: "Register" });
+  res.render("pages/register", { title: "Register", pageScript: "register" });
 });
 
 app.get("/dashboard", (req, res) => {
-  res.render("pages/dashboard", { title: "Dashboard" });
+  res.render("pages/dashboard", {
+    title: "Dashboard",
+    pageScript: "dashboard",
+  });
 });
 
 app.get("/profile", (req, res) => {
-  res.render("pages/profile", { title: "Profile" });
+  res.render("pages/profile", { title: "Profile", pageScript: "profile" });
 });
 
 // Start server

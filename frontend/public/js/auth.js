@@ -1,7 +1,7 @@
+import i18n from "./i18n.js";
 /**
  * Authentication class for handling user registration, login, and session management
  */
-// eslint-disable-next-line no-unused-vars
 class Auth {
   constructor() {
     this.baseUrl = "http://localhost:3000/api/auth";
@@ -77,7 +77,8 @@ class Auth {
       // Show success message
       this.showMessage(
         "success",
-        "Registration successful! Redirecting to dashboard...",
+        i18n.translate("registerSuccess") ||
+          "Registration successful! Redirecting to dashboard...",
       );
 
       // Update navbar and redirect
@@ -91,7 +92,9 @@ class Auth {
       console.error("Registration error:", error);
       this.showMessage(
         "error",
-        error.message || "Unable to connect to server. Please try again later.",
+        error.message ||
+          i18n.translate("serverConnectError") ||
+          "Unable to connect to server. Please try again later.",
       );
     } finally {
       this.hideLoader();
@@ -156,7 +159,8 @@ class Auth {
       // Show success message
       this.showMessage(
         "success",
-        "Login successful! Redirecting to dashboard...",
+        i18n.translate("loginSuccess") ||
+          "Login successful! Redirecting to dashboard...",
       );
 
       // Update navbar and redirect
@@ -195,13 +199,28 @@ class Auth {
   }
 
   /**
-   * Check if user is logged in
-   * @returns {boolean} - Whether user is logged in
+   * Check if the current token is expired
+   * @returns {boolean} - Whether token is expired or invalid
    */
-  isLoggedIn() {
-    return !!this.token;
+  isTokenExpired() {
+    if (!this.token) return true;
+
+    try {
+      const payload = JSON.parse(atob(this.token.split(".")[1]));
+      return payload.exp < Date.now() / 1000;
+    } catch (e) {
+      console.error("Error checking token expiration:", e);
+      return true; // If token can't be parsed, consider it expired
+    }
   }
 
+  /**
+   * Check if user is logged in and token is valid
+   * @returns {boolean} - Whether user is logged in with valid token
+   */
+  isLoggedIn() {
+    return !!this.token && !this.isTokenExpired();
+  }
   /**
    * Get current user info
    * @returns {object|null} - User object or null if not logged in
@@ -339,7 +358,8 @@ class Auth {
     const submitBtn = document.querySelector('button[type="submit"]');
     if (submitBtn) {
       submitBtn.innerHTML =
-        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' +
+        (i18n.translate("loading") || "Loading...");
       submitBtn.disabled = true;
     }
   }
@@ -351,9 +371,16 @@ class Auth {
     const submitBtn = document.querySelector('button[type="submit"]');
     if (submitBtn) {
       if (submitBtn.closest("#loginForm")) {
-        submitBtn.innerHTML = "Login";
+        submitBtn.innerHTML = i18n.translate("loginButton") || "Login";
+        submitBtn.setAttribute("data-i18n", "loginButton");
       } else if (submitBtn.closest("#registerForm")) {
-        submitBtn.innerHTML = "Create Account";
+        submitBtn.innerHTML =
+          i18n.translate("createAccount") || "Create Account";
+        submitBtn.setAttribute("data-i18n", "createAccount");
+      } else {
+        submitBtn.innerHTML =
+          i18n.translate("updateAccount") || "Update Profile";
+        submitBtn.setAttribute("data-i18n", "updateAccount");
       }
       submitBtn.disabled = false;
     }
@@ -396,3 +423,5 @@ class Auth {
     }
   }
 }
+
+export default Auth;

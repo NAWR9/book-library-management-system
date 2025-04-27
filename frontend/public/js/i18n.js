@@ -28,10 +28,10 @@ class I18nManager {
 
       // Apply current language
       this.applyLanguage(this.currentLanguage);
-      this.initialized = true;
 
-      // Create language switcher if it doesn't exist
-      this.createLanguageSwitcher();
+      this.setupLanguageSwitcher();
+
+      this.initialized = true;
     } catch (error) {
       console.error("Error initializing translations:", error);
     }
@@ -128,6 +128,8 @@ class I18nManager {
 
     this.applyLanguage(lang);
 
+    document.dispatchEvent(new Event("languageChanged"));
+
     // Update language switcher
     const languageSwitchers = document.querySelectorAll(".language-switcher");
     languageSwitchers.forEach((switcher) => {
@@ -160,60 +162,35 @@ class I18nManager {
   }
 
   /**
-   * Create language switcher UI
+   * Set up event listeners for language switcher buttons
    */
-  createLanguageSwitcher() {
-    // Check if language switcher already exists
-    if (document.querySelector(".language-switcher")) {
-      return;
-    }
+  setupLanguageSwitcher() {
+    // Select all buttons with data-lang attribute
+    const buttons = document.querySelectorAll("[data-lang]");
 
-    // Create the language switcher
-    const navbarNav = document.querySelector("#navbarNav .navbar-nav");
-    if (!navbarNav) return;
-
-    const langItem = document.createElement("li");
-    langItem.className = "nav-item dropdown";
-
-    langItem.innerHTML = `
-      <a class="nav-link dropdown-toggle" href="#" id="languageDropdown" role="button" 
-         data-bs-toggle="dropdown" aria-expanded="false" data-i18n="language">
-        Language
-      </a>
-      <ul class="dropdown-menu dropdown-menu-end language-switcher" aria-labelledby="languageDropdown">
-        <li>
-          <button class="dropdown-item ${
-            this.currentLanguage === "en" ? "active" : ""
-          }" 
-                  data-lang="en">
-            <span class="flag-icon">🇺🇸</span> 
-            <span data-i18n="english">English</span>
-          </button>
-        </li>
-        <li>
-          <button class="dropdown-item ${
-            this.currentLanguage === "ar" ? "active" : ""
-          }" 
-                  data-lang="ar">
-            <span class="flag-icon">🇸🇦</span> 
-            <span data-i18n="arabic">Arabic</span>
-          </button>
-        </li>
-      </ul>
-    `;
-
-    navbarNav.appendChild(langItem);
-
-    // Translate the language switcher text
-    this.applyLanguage(this.currentLanguage);
-
-    // Add event listeners to language switcher buttons
-    const buttons = document.querySelectorAll(".language-switcher button");
     buttons.forEach((button) => {
-      button.addEventListener("click", (e) => {
-        const lang = e.currentTarget.getAttribute("data-lang");
-        this.changeLanguage(lang);
-      });
+      // Remove any existing listeners (to avoid duplicates)
+      button.replaceWith(button.cloneNode(true));
+
+      // Get the fresh reference after replacement
+      const newButton = document.querySelector(
+        `[data-lang="${button.getAttribute("data-lang")}"]`,
+      );
+
+      // Add click event listener
+      if (newButton) {
+        newButton.addEventListener("click", () => {
+          const lang = newButton.getAttribute("data-lang");
+          this.changeLanguage(lang);
+        });
+
+        // Highlight current language
+        if (newButton.getAttribute("data-lang") === this.currentLanguage) {
+          newButton.classList.add("active");
+        } else {
+          newButton.classList.remove("active");
+        }
+      }
     });
   }
 }
