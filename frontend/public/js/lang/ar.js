@@ -67,7 +67,7 @@ export const ar = {
   loginHere: "سجل دخولك هنا",
 
   // Footer
-  copyright: "© 2023 مكتبة الجامعة. جميع الحقوق محفوظة.",
+  copyright: "© 2025 مكتبة الجامعة. جميع الحقوق محفوظة.",
 
   // Language selector
   language: "اللغة",

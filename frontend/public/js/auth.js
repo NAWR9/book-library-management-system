@@ -85,7 +85,7 @@ class Auth {
 
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {
-        window.location.href = "./dashboard.html";
+        window.location.href = "./dashboard";
       }, 2000);
     } catch (error) {
       console.error("Registration error:", error);
@@ -164,7 +164,7 @@ class Auth {
 
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {
-        window.location.href = "./dashboard.html";
+        window.location.href = "./dashboard";
       }, 2000);
     } catch (error) {
       console.error("Login error:", error);
@@ -191,7 +191,7 @@ class Auth {
     this.updateNavbar(false);
 
     // Redirect to login page
-    window.location.href = "./login.html";
+    window.location.href = "./login";
   }
 
   /**
@@ -386,7 +386,7 @@ class Auth {
 
       // Redirect to the dashboard after a short delay
       setTimeout(() => {
-        window.location.href = "./dashboard.html";
+        window.location.href = "./dashboard";
       }, 2000);
     } catch (error) {
       console.error("Profile update error:", error);

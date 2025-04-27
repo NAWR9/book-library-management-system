@@ -5,7 +5,7 @@ import eslintConfigPrettier from "eslint-config-prettier";
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   {
-    files: ["backend/src/**/*.js"],
+    files: ["server.js", "backend/src/**/*.js"],
     languageOptions: {
       sourceType: "commonjs",
       globals: {

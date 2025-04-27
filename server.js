@@ -5,13 +5,13 @@ const cors = require("cors");
 const path = require("path");
 
 // Import routes
-const authRoutes = require("./routes/authRoutes");
+const authRoutes = require("./backend/src/routes/authRoutes");
 
 const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: "*", // Allow requests from any origin during development
+  origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
@@ -22,29 +22,46 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from the frontend directory
-app.use(express.static(path.join(__dirname, "../frontend")));
+// Set up static folder
+app.use(express.static(path.join(__dirname, "frontend/public")));
+
+// Set up EJS
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "frontend/views"));
 
 // MongoDB Connection
 mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // API Routes
 app.use("/api/auth", authRoutes);
 
-// Basic route
+// Health check route
 app.get("/api/health", (req, res) => {
   res.json({ status: "Server is running" });
 });
 
-// Serve index.html from the frontend directory
+// Frontend routes (EJS views)
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+  res.render("pages/index", { title: "Home" });
+});
+
+app.get("/login", (req, res) => {
+  res.render("pages/login", { title: "Login" });
+});
+
+app.get("/register", (req, res) => {
+  res.render("pages/register", { title: "Register" });
+});
+
+app.get("/dashboard", (req, res) => {
+  res.render("pages/dashboard", { title: "Dashboard" });
+});
+
+app.get("/profile", (req, res) => {
+  res.render("pages/profile", { title: "Profile" });
 });
 
 // Start server

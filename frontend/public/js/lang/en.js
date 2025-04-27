@@ -68,7 +68,7 @@ export const en = {
   loginHere: "Login here",
 
   // Footer
-  copyright: "© 2023 University Library. All rights reserved.",
+  copyright: "© 2025 University Library. All rights reserved.",
 
   // Language selector
   language: "Language",
