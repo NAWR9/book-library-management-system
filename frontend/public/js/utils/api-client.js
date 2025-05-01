@@ -10,23 +10,17 @@ export async function checkApiConnection() {
   const statusEl = document.getElementById("api-status");
   if (!statusEl) return null;
 
-  const i18n = window.i18n;
-
   try {
     const response = await fetch("http://localhost:3000/api/health");
 
     if (response.ok) {
-      statusEl.textContent =
-        i18n?.translate?.("serverOnline") || "Server connection: Online";
+      statusEl.textContent = "Server connection: Online";
       statusEl.className = "text-success";
       const data = await response.json();
       console.log("Server status:", data);
       return { status: "online", data };
     } else {
-      const message =
-        (i18n?.translate?.("serverError") || "Server connection: Error -") +
-        " " +
-        response.status;
+      const message = `Server connection: Error - ${response.status}`;
       statusEl.textContent = message;
       statusEl.className = "text-warning";
       return { status: "error", code: response.status };
@@ -34,7 +28,6 @@ export async function checkApiConnection() {
   } catch (err) {
     console.error("API connection error:", err);
     statusEl.textContent =
-      i18n?.translate?.("serverOffline") ||
       "Server connection: Offline - API server appears to be down";
     statusEl.className = "text-danger";
     return { status: "offline", error: err };

@@ -1,13 +1,9 @@
 /**
  * Dashboard page functionality
  */
-import i18n from "../i18n.js";
 import Auth from "../auth.js";
 
-document.addEventListener("DOMContentLoaded", async function () {
-  // Initialize translations
-  await i18n.init();
-
+document.addEventListener("DOMContentLoaded", function () {
   // Initialize the Auth class
   const auth = new Auth();
 
@@ -18,30 +14,12 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
 
   const user = auth.getUser();
-
-  // Update welcome message initially
-  if (user) {
-    updateWelcomeMessage(user);
+  // Append user name to welcome message
+  const welcomeEl = document.getElementById("welcome-message");
+  if (welcomeEl && user) {
+    welcomeEl.textContent = `${welcomeEl.textContent}, ${user.name}!`;
   }
-
-  // Listen for language changes
-  document.addEventListener("languageChanged", () => {
-    if (user) {
-      updateWelcomeMessage(user);
-    }
-  });
 
   // Update navbar
   auth.updateNavbar(true);
-
-  /**
-   * Updates welcome message with user name and current language
-   * @param {Object} user - User object with name property
-   */
-  function updateWelcomeMessage(user) {
-    const welcomeElement = document.getElementById("welcome-message");
-    if (welcomeElement) {
-      welcomeElement.textContent = `${i18n.translate("welcome")}, ${user.name}!`;
-    }
-  }
 });

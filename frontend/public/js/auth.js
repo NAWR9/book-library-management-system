@@ -1,4 +1,3 @@
-import i18n from "./i18n.js";
 /**
  * Authentication class for handling user registration, login, and session management
  */
@@ -77,8 +76,7 @@ class Auth {
       // Show success message
       this.showMessage(
         "success",
-        i18n.translate("registerSuccess") ||
-          "Registration successful! Redirecting to dashboard...",
+        "Registration successful! Redirecting to dashboard...",
       );
 
       // Update navbar and redirect
@@ -92,9 +90,7 @@ class Auth {
       console.error("Registration error:", error);
       this.showMessage(
         "error",
-        error.message ||
-          i18n.translate("serverConnectError") ||
-          "Unable to connect to server. Please try again later.",
+        error.message || "Unable to connect to server. Please try again later.",
       );
     } finally {
       this.hideLoader();
@@ -159,8 +155,7 @@ class Auth {
       // Show success message
       this.showMessage(
         "success",
-        i18n.translate("loginSuccess") ||
-          "Login successful! Redirecting to dashboard...",
+        "Login successful! Redirecting to dashboard...",
       );
 
       // Update navbar and redirect
@@ -358,8 +353,7 @@ class Auth {
     const submitBtn = document.querySelector('button[type="submit"]');
     if (submitBtn) {
       submitBtn.innerHTML =
-        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' +
-        (i18n.translate("loading") || "Loading...");
+        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
       submitBtn.disabled = true;
     }
   }
@@ -370,18 +364,7 @@ class Auth {
   hideLoader() {
     const submitBtn = document.querySelector('button[type="submit"]');
     if (submitBtn) {
-      if (submitBtn.closest("#loginForm")) {
-        submitBtn.innerHTML = i18n.translate("loginButton") || "Login";
-        submitBtn.setAttribute("data-i18n", "loginButton");
-      } else if (submitBtn.closest("#registerForm")) {
-        submitBtn.innerHTML =
-          i18n.translate("createAccount") || "Create Account";
-        submitBtn.setAttribute("data-i18n", "createAccount");
-      } else {
-        submitBtn.innerHTML =
-          i18n.translate("updateAccount") || "Update Profile";
-        submitBtn.setAttribute("data-i18n", "updateAccount");
-      }
+      // Restore default state
       submitBtn.disabled = false;
     }
   }

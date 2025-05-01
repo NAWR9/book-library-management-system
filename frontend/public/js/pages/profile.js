@@ -1,10 +1,9 @@
 /**
  * Profile page functionality
  */
-import i18n from "../i18n.js";
 import Auth from "../auth.js";
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", function () {
   const auth = new Auth();
 
   // Redirect to login if not logged in
@@ -51,7 +50,4 @@ document.addEventListener("DOMContentLoaded", async function () {
         department,
       });
     });
-
-  // Initialize translations
-  await i18n.init();
 });

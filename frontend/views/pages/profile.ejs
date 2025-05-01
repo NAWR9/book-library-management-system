@@ -8,7 +8,7 @@
         <div class="card-header text-center">
           <h2 class="mb-0">
             <i class="fas fa-user-circle me-2"></i
-            ><span data-i18n="profileTitle">Your Profile</span>
+            ><span><%= t('profile.profileTitle') %></span>
           </h2>
         </div>
         <div class="card-body p-4">
@@ -27,9 +27,7 @@
           <!-- Profile Form -->
           <form id="profileForm">
             <div class="mb-3">
-              <label for="name" class="form-label" data-i18n="fullNameLabel"
-                >Full Name</label
-              >
+              <label for="name" class="form-label"><%= t('register.fullNameLabel') %></label>
               <input
                 type="text"
                 class="form-control"
@@ -39,9 +37,7 @@
               />
             </div>
             <div class="mb-3">
-              <label for="email" class="form-label" data-i18n="emailLabel"
-                >Email</label
-              >
+              <label for="email" class="form-label"><%= t('login.emailLabel') %></label>
               <input
                 type="email"
                 class="form-control"
@@ -50,18 +46,11 @@
                 required
                 readonly
               />
-              <small class="text-muted" data-i18n="emailCannotChange"
-                >Email cannot be changed.</small
-              >
+              <small class="text-muted"><%= t('profile.emailCannotChange') %></small>
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label
-                  for="phoneNumber"
-                  class="form-label"
-                  data-i18n="phoneNumberLabel"
-                  >Phone Number</label
-                >
+                <label for="phoneNumber" class="form-label"><%= t('register.phoneNumberLabel') %></label>
                 <input
                   type="tel"
                   class="form-control"
@@ -70,41 +59,27 @@
                 />
               </div>
               <div class="col-md-6 mb-3">
-                <label
-                  for="department"
-                  class="form-label"
-                  data-i18n="departmentLabel"
-                  >Department</label
-                >
+                <label for="department" class="form-label"><%= t('register.departmentLabel') %></label>
                 <select class="form-select" id="department" name="department">
-                  <option value="">Select Department</option>
-                  <option value="Computer Science">Computer Science</option>
-                  <option value="Engineering">Engineering</option>
-                  <option value="Business">Business</option>
-                  <option value="Arts">Arts</option>
-                  <option value="Medicine">Medicine</option>
-                  <option value="Law">Law</option>
+                  <option value=""><%= t('register.selectDepartment') %></option>
+                  <option value="engineering"><%= t('register.departments.engineering') %></option>
+                  <option value="computerScience"><%= t('register.departments.computerScience') %></option>
+                  <option value="business"><%= t('register.departments.business') %></option>
+                  <option value="arts"><%= t('register.departments.arts') %></option>
+                  <option value="medicine"><%= t('register.departments.medicine') %></option>
+                  <option value="law"><%= t('register.departments.law') %></option>
                 </select>
               </div>
             </div>
             <div class="d-grid">
-              <button
-                type="submit"
-                class="btn btn-primary btn-lg"
-                data-i18n="updateAccount"
-              >
-                Update Profile
+              <button type="submit" class="btn btn-primary btn-lg">
+                <%= t('profile.updateProfile') %>
               </button>
             </div>
           </form>
 
           <div class="mt-4 text-center">
-            <a
-              href="./dashboard"
-              class="text-decoration-none"
-              data-i18n="backToDashboard"
-              >Back to Dashboard</a
-            >
+            <a href="./dashboard" class="text-decoration-none"><%= t('dashboard.backToDashboard') %></a>
           </div>
         </div>
       </div>

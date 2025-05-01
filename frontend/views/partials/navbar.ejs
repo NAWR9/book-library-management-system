@@ -21,26 +21,22 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" href="/" data-i18n="home">Home</a>
+          <a class="nav-link" href="/"><%= t('navbar.home') %></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/books" data-i18n="books">Books</a>
+          <a class="nav-link" href="/books"><%= t('navbar.books') %></a>
         </li>
         <li class="nav-item" id="loginNavItem">
-          <a class="nav-link" href="/login" data-i18n="login">Login</a>
+          <a class="nav-link" href="/login"><%= t('navbar.login') %></a>
         </li>
         <li class="nav-item" id="registerNavItem">
-          <a class="nav-link" href="/register" data-i18n="register">Register</a>
+          <a class="nav-link" href="/register"><%= t('navbar.register') %></a>
         </li>
         <li class="nav-item d-none" id="dashboardNavItem">
-          <a class="nav-link" href="/dashboard" data-i18n="dashboard"
-            >Dashboard</a
-          >
+          <a class="nav-link" href="/dashboard"><%= t('navbar.dashboard') %></a>
         </li>
         <li class="nav-item d-none" id="logoutNavItem">
-          <a class="nav-link" href="#" id="logoutBtn" data-i18n="logout"
-            >Logout</a
-          >
+          <a class="nav-link" href="#" id="logoutBtn"><%= t('navbar.logout') %></a>
         </li>
 
         <!-- Language Switcher -->
@@ -52,9 +48,8 @@
             role="button"
             data-bs-toggle="dropdown"
             aria-expanded="false"
-            data-i18n="language"
           >
-            Language
+            <%= t('navbar.language') %>
           </a>
           <ul
             class="dropdown-menu dropdown-menu-end language-switcher"
@@ -63,13 +58,13 @@
             <li>
               <button class="dropdown-item" data-lang="en">
                 <span class="flag-icon">🇺🇸</span>
-                <span data-i18n="english">English</span>
+                <span><%= t('languages.english') %></span>
               </button>
             </li>
             <li>
               <button class="dropdown-item" data-lang="ar">
                 <span class="flag-icon">🇸🇦</span>
-                <span data-i18n="arabic">Arabic</span>
+                <span><%= t('languages.arabic') %></span>
               </button>
             </li>
           </ul>

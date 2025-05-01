@@ -1,15 +1,11 @@
 /**
  * Login page functionality
  */
-import i18n from "../i18n.js";
 import Auth from "../auth.js";
 
 import { checkApiConnection } from "../utils/api-client.js";
 
 document.addEventListener("DOMContentLoaded", async function () {
-  // Initialize translations
-  await i18n.init();
-
   // Initialize the Auth class
   const auth = new Auth();
 
