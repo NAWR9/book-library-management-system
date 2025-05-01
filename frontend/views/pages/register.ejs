@@ -1,0 +1,147 @@
+<%- contentFor('body') %>
+
+<!-- Hero Section -->
+<header class="auth-hero text-center">
+  <div class="container">
+    <h1 data-i18n="joinLibrary">Join University Library</h1>
+    <p class="lead" data-i18n="createAccountDesc">
+      Create an account to access our extensive collection of academic resources
+    </p>
+  </div>
+</header>
+
+<!-- Registration Form -->
+<main class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <!-- API Status -->
+      <div class="text-center mb-3">
+        <small id="api-status" class="text-muted" data-i18n="apiStatus">
+          Checking server connection...
+        </small>
+      </div>
+
+      <div class="card auth-card">
+        <div class="card-header text-center">
+          <h2 class="mb-0">
+            <i class="fas fa-user-plus me-2"></i
+            ><span data-i18n="registerTitle">Register</span>
+          </h2>
+        </div>
+        <div class="card-body p-4">
+          <!-- Alert Message -->
+          <div
+            class="alert alert-danger alert-message mb-3"
+            id="errorMessage"
+            role="alert"
+          ></div>
+          <div
+            class="alert alert-success alert-message mb-3"
+            id="successMessage"
+            role="alert"
+          ></div>
+
+          <!-- Registration Form -->
+          <form id="registerForm">
+            <div class="mb-3">
+              <label for="name" class="form-label" data-i18n="fullNameLabel"
+                >Full Name</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                required
+              />
+              <div class="error-feedback" data-i18n="nameError">
+                Please enter your name.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label" data-i18n="emailLabel"
+                >Email</label
+              >
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                required
+              />
+              <div class="error-feedback" data-i18n="emailError">
+                Please enter a valid email address.
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label" data-i18n="passwordLabel"
+                >Password</label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                required
+              />
+              <div class="error-feedback" data-i18n="passwordError">
+                Password must be at least 8 characters.
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label
+                  for="phoneNumber"
+                  class="form-label"
+                  data-i18n="phoneNumberLabel"
+                  >Phone Number</label
+                >
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label
+                  for="department"
+                  class="form-label"
+                  data-i18n="departmentLabel"
+                  >Department</label
+                >
+                <select class="form-select" id="department" name="department">
+                  <option value="">Select Department</option>
+                  <option value="Computer Science">Computer Science</option>
+                  <option value="Engineering">Engineering</option>
+                  <option value="Business">Business</option>
+                  <option value="Arts">Arts</option>
+                  <option value="Medicine">Medicine</option>
+                  <option value="Law">Law</option>
+                </select>
+              </div>
+            </div>
+            <div class="d-grid">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                data-i18n="createAccount"
+              >
+                Create Account
+              </button>
+            </div>
+          </form>
+
+          <div class="text-center mt-3">
+            <p>
+              <span data-i18n="haveAccount">Already have an account?</span>
+              <a href="./login" class="auth-link" data-i18n="loginHere"
+                >Login here</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

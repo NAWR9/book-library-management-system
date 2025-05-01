@@ -1,0 +1,113 @@
+<%- contentFor('body') %>
+
+<!-- Profile Content -->
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card">
+        <div class="card-header text-center">
+          <h2 class="mb-0">
+            <i class="fas fa-user-circle me-2"></i
+            ><span data-i18n="profileTitle">Your Profile</span>
+          </h2>
+        </div>
+        <div class="card-body p-4">
+          <!-- Alert Message -->
+          <div
+            class="alert alert-danger alert-message mb-3"
+            id="errorMessage"
+            role="alert"
+          ></div>
+          <div
+            class="alert alert-success alert-message mb-3"
+            id="successMessage"
+            role="alert"
+          ></div>
+
+          <!-- Profile Form -->
+          <form id="profileForm">
+            <div class="mb-3">
+              <label for="name" class="form-label" data-i18n="fullNameLabel"
+                >Full Name</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="email" class="form-label" data-i18n="emailLabel"
+                >Email</label
+              >
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                required
+                readonly
+              />
+              <small class="text-muted" data-i18n="emailCannotChange"
+                >Email cannot be changed.</small
+              >
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label
+                  for="phoneNumber"
+                  class="form-label"
+                  data-i18n="phoneNumberLabel"
+                  >Phone Number</label
+                >
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label
+                  for="department"
+                  class="form-label"
+                  data-i18n="departmentLabel"
+                  >Department</label
+                >
+                <select class="form-select" id="department" name="department">
+                  <option value="">Select Department</option>
+                  <option value="Computer Science">Computer Science</option>
+                  <option value="Engineering">Engineering</option>
+                  <option value="Business">Business</option>
+                  <option value="Arts">Arts</option>
+                  <option value="Medicine">Medicine</option>
+                  <option value="Law">Law</option>
+                </select>
+              </div>
+            </div>
+            <div class="d-grid">
+              <button
+                type="submit"
+                class="btn btn-primary btn-lg"
+                data-i18n="updateAccount"
+              >
+                Update Profile
+              </button>
+            </div>
+          </form>
+
+          <div class="mt-4 text-center">
+            <a
+              href="./dashboard"
+              class="text-decoration-none"
+              data-i18n="backToDashboard"
+              >Back to Dashboard</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

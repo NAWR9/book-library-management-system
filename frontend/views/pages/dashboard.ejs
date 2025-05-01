@@ -1,0 +1,67 @@
+<%- contentFor('body') %>
+
+<!-- Dashboard Content -->
+<main class="container py-5">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="mb-4" data-i18n="welcomeToDashboard">
+        Welcome to Your Dashboard
+      </h1>
+      <div class="alert alert-success">
+        <h4 id="welcome-message">Welcome!</h4>
+        <p data-i18n="welcomeSuccess">
+          You have successfully logged in to the University Library system.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-4 mb-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-book me-2"></i
+            ><span data-i18n="myBooks">My Books</span>
+          </h5>
+          <p class="card-text" data-i18n="manageBooks">
+            View and manage your borrowed books.
+          </p>
+          <a href="#" class="btn btn-primary" data-i18n="viewBooks"
+            >View Books</a
+          >
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-search me-2"></i
+            ><span data-i18n="findBooks">Find Books</span>
+          </h5>
+          <p class="card-text" data-i18n="searchBooks">
+            Search for books in our catalog.
+          </p>
+          <a href="#" class="btn btn-primary" data-i18n="search">Search</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4 mb-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-user-cog me-2"></i
+            ><span data-i18n="profile">Profile</span>
+          </h5>
+          <p class="card-text" data-i18n="updateAccount">
+            Update your account information.
+          </p>
+          <a href="profile" class="btn btn-primary" data-i18n="editProfile"
+            >Edit Profile</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

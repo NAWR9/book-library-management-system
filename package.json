@@ -2,12 +2,10 @@
   "name": "book-library-management-system",
   "version": "1.0.0",
   "description": "A web-based library management system built with Node.js, Express, and MongoDB.",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "npm run start:backend",
-    "start:backend": "cd backend && npm run start",
-    "dev": "npm run dev:backend",
-    "dev:backend": "cd backend && npm run dev",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "husky",
@@ -21,7 +19,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@eslint/js": "^9.25.1",
     "eslint": "^9.25.1",
@@ -30,5 +28,15 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
     "prettier": "^3.5.3"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.14.0"
   }
 }
