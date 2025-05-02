@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
 const expressLayouts = require("express-ejs-layouts");
+const jwt = require("jsonwebtoken");
 
 // Import routes
 const authRoutes = require("./backend/src/routes/authRoutes");
@@ -60,11 +61,29 @@ i18next
 
 app.use(cookieParser());
 app.use(i18nextMiddleware.handle(i18next));
+// i18n locals and user detection
 app.use((req, res, next) => {
   res.locals.t = req.t;
   res.locals.htmlLang = req.language;
   res.locals.rtl = req.language === "ar";
+  res.locals.user = null;
+  const token = req.cookies.token;
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = decoded;
+      res.locals.user = decoded;
+    } catch {
+      res.clearCookie("token");
+    }
+  }
   next();
+});
+
+// logout clears token cookie
+app.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.redirect("/");
 });
 
 // MongoDB Connection
@@ -90,6 +109,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
+  if (res.locals.user) return res.redirect("/dashboard");
   res.render("pages/login", {
     title: req.t("titles.login"),
     pageScript: "login",
@@ -97,6 +117,10 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  // Public registration page
+  if (res.locals.user) {
+    return res.redirect("/dashboard");
+  }
   res.render("pages/register", {
     title: req.t("titles.register"),
     pageScript: "register",
@@ -104,6 +128,7 @@ app.get("/register", (req, res) => {
 });
 
 app.get("/dashboard", (req, res) => {
+  if (!res.locals.user) return res.redirect("/login");
   res.render("pages/dashboard", {
     title: req.t("titles.dashboard"),
     pageScript: "dashboard",
@@ -111,6 +136,7 @@ app.get("/dashboard", (req, res) => {
 });
 
 app.get("/profile", (req, res) => {
+  if (!res.locals.user) return res.redirect("/login");
   res.render("pages/profile", {
     title: req.t("titles.profile"),
     pageScript: "profile",

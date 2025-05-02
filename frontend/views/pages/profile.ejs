@@ -27,7 +27,9 @@
           <!-- Profile Form -->
           <form id="profileForm">
             <div class="mb-3">
-              <label for="name" class="form-label"><%= t('register.fullNameLabel') %></label>
+              <label for="name" class="form-label"
+                ><%= t('register.fullNameLabel') %></label
+              >
               <input
                 type="text"
                 class="form-control"
@@ -37,7 +39,9 @@
               />
             </div>
             <div class="mb-3">
-              <label for="email" class="form-label"><%= t('login.emailLabel') %></label>
+              <label for="email" class="form-label"
+                ><%= t('login.emailLabel') %></label
+              >
               <input
                 type="email"
                 class="form-control"
@@ -46,11 +50,27 @@
                 required
                 readonly
               />
-              <small class="text-muted"><%= t('profile.emailCannotChange') %></small>
+              <small class="text-muted"
+                ><%= t('profile.emailCannotChange') %></small
+              >
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label"
+                ><%= t('login.newPassword') %></label
+              >
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                minlength="6"
+              />
             </div>
             <div class="row">
               <div class="col-md-6 mb-3">
-                <label for="phoneNumber" class="form-label"><%= t('register.phoneNumberLabel') %></label>
+                <label for="phoneNumber" class="form-label"
+                  ><%= t('register.phoneNumberLabel') %></label
+                >
                 <input
                   type="tel"
                   class="form-control"
@@ -59,15 +79,31 @@
                 />
               </div>
               <div class="col-md-6 mb-3">
-                <label for="department" class="form-label"><%= t('register.departmentLabel') %></label>
+                <label for="department" class="form-label"
+                  ><%= t('register.departmentLabel') %></label
+                >
                 <select class="form-select" id="department" name="department">
-                  <option value=""><%= t('register.selectDepartment') %></option>
-                  <option value="engineering"><%= t('register.departments.engineering') %></option>
-                  <option value="computerScience"><%= t('register.departments.computerScience') %></option>
-                  <option value="business"><%= t('register.departments.business') %></option>
-                  <option value="arts"><%= t('register.departments.arts') %></option>
-                  <option value="medicine"><%= t('register.departments.medicine') %></option>
-                  <option value="law"><%= t('register.departments.law') %></option>
+                  <option value="">
+                    <%= t('register.selectDepartment') %>
+                  </option>
+                  <option value="engineering">
+                    <%= t('register.departments.engineering') %>
+                  </option>
+                  <option value="computerScience">
+                    <%= t('register.departments.computerScience') %>
+                  </option>
+                  <option value="business">
+                    <%= t('register.departments.business') %>
+                  </option>
+                  <option value="arts">
+                    <%= t('register.departments.arts') %>
+                  </option>
+                  <option value="medicine">
+                    <%= t('register.departments.medicine') %>
+                  </option>
+                  <option value="law">
+                    <%= t('register.departments.law') %>
+                  </option>
                 </select>
               </div>
             </div>
@@ -79,7 +115,9 @@
           </form>
 
           <div class="mt-4 text-center">
-            <a href="./dashboard" class="text-decoration-none"><%= t('dashboard.backToDashboard') %></a>
+            <a href="./dashboard" class="text-decoration-none"
+              ><%= t('dashboard.backToDashboard') %></a
+            >
           </div>
         </div>
       </div>

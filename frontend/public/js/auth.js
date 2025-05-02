@@ -26,9 +26,8 @@ class Auth {
 
       const response = await fetch(`${this.baseUrl}/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
           email,
@@ -38,54 +37,25 @@ class Auth {
         }),
       });
 
-      // Check if response is ok before trying to parse JSON
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage;
-
-        try {
-          // Try to parse as JSON
-          const errorData = JSON.parse(errorText);
-          errorMessage =
-            errorData.message ||
-            `Error: ${response.status} ${response.statusText}`;
-        } catch {
-          // If not JSON, use text or status
-          errorMessage =
-            errorText || `Error: ${response.status} ${response.statusText}`;
-        }
-
-        throw new Error(errorMessage);
+      const { success, message, token, user } = await response.json();
+      if (!success) {
+        throw new Error(message || "Registration failed");
       }
-
-      // Check if response is empty
-      const responseText = await response.text();
-      if (!responseText) {
-        throw new Error("Server returned an empty response");
-      }
-
-      // Parse JSON only if we have content
-      const data = responseText ? JSON.parse(responseText) : {};
 
       // Store token and user data
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      this.token = data.token;
-      this.user = data.user;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      this.token = token;
+      this.user = user;
 
       // Show success message
-      this.showMessage(
-        "success",
-        "Registration successful! Redirecting to dashboard...",
-      );
+      this.showMessage("success", message);
 
       // Update navbar and redirect
       this.updateNavbar(true);
 
       // Redirect to dashboard after 2 seconds
-      setTimeout(() => {
-        window.location.href = "./dashboard";
-      }, 2000);
+      setTimeout(() => (window.location.href = "./dashboard"), 2000);
     } catch (error) {
       console.error("Registration error:", error);
       this.showMessage(
@@ -108,6 +78,7 @@ class Auth {
 
       const response = await fetch(`${this.baseUrl}/login`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -117,54 +88,25 @@ class Auth {
         }),
       });
 
-      // Check if response is ok before trying to parse JSON
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage;
-
-        try {
-          // Try to parse as JSON
-          const errorData = JSON.parse(errorText);
-          errorMessage =
-            errorData.message ||
-            `Error: ${response.status} ${response.statusText}`;
-        } catch {
-          // If not JSON, use text or status
-          errorMessage =
-            errorText || `Error: ${response.status} ${response.statusText}`;
-        }
-
-        throw new Error(errorMessage);
+      const { success, message, token, user } = await response.json();
+      if (!success) {
+        throw new Error(message || "Login failed");
       }
-
-      // Check if response is empty
-      const responseText = await response.text();
-      if (!responseText) {
-        throw new Error("Server returned an empty response");
-      }
-
-      // Parse JSON only if we have content
-      const data = responseText ? JSON.parse(responseText) : {};
 
       // Store token and user data
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      this.token = data.token;
-      this.user = data.user;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      this.token = token;
+      this.user = user;
 
       // Show success message
-      this.showMessage(
-        "success",
-        "Login successful! Redirecting to dashboard...",
-      );
+      this.showMessage("success", message);
 
       // Update navbar and redirect
       this.updateNavbar(true);
 
       // Redirect to dashboard after 2 seconds
-      setTimeout(() => {
-        window.location.href = "./dashboard";
-      }, 2000);
+      setTimeout(() => (window.location.href = "./dashboard"), 2000);
     } catch (error) {
       console.error("Login error:", error);
       this.showMessage(
@@ -353,7 +295,8 @@ class Auth {
     const submitBtn = document.querySelector('button[type="submit"]');
     if (submitBtn) {
       submitBtn.innerHTML =
-        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+        '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' +
+        window.i18nMessages.loading;
       submitBtn.disabled = true;
     }
   }
@@ -364,7 +307,14 @@ class Auth {
   hideLoader() {
     const submitBtn = document.querySelector('button[type="submit"]');
     if (submitBtn) {
-      // Restore default state
+      // Restore default state and label
+      if (submitBtn.closest("#loginForm")) {
+        submitBtn.innerHTML = window.i18nMessages.loginButton;
+      } else if (submitBtn.closest("#registerForm")) {
+        submitBtn.innerHTML = window.i18nMessages.createAccount;
+      } else {
+        submitBtn.innerHTML = window.i18nMessages.updateProfile;
+      }
       submitBtn.disabled = false;
     }
   }
@@ -374,6 +324,7 @@ class Auth {
 
       const response = await fetch(`${this.baseUrl}/profile`, {
         method: "PUT",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${this.token}`,

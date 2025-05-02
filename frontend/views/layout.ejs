@@ -27,16 +27,43 @@
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <% if (locals.pageScript) { %>
-    <script type="module" src="./js/pages/<%= pageScript %>.js"></script>
+    <% if (pageScript) { %>
+      <script type="application/json" id="i18n-data">
+        <%- JSON.stringify({
+          // Auth messages
+          loading: t('auth.loading'),
+          loginSuccess: t('auth.loginSuccess'),
+          registerSuccess: t('auth.registerSuccess'),
+          serverConnectError: t('auth.serverConnectError'),
+          userExists: t('auth.userExists'),
+          provideBoth: t('auth.provideBoth'),
+          invalidCredentials: t('auth.invalidCredentials'),
+          profileUpdateSuccess: t('auth.profileUpdateSuccess'),
+          errorUpdatingProfile: t('auth.errorUpdatingProfile'),
+          // Button labels
+          loginButton: t('login.loginButton'),
+          createAccount: t('register.createAccount'),
+          updateProfile: t('profile.updateProfile'),
+          // API status messages
+          serverOnline: t('api.serverOnline'),
+          serverOffline: t('api.serverOffline'),
+          serverError: t('api.serverError'),
+        }) %>
+      </script>
+      <script>
+        window.i18nMessages = JSON.parse(
+          document.getElementById('i18n-data').textContent
+        );
+      </script>
+      <script type="module" src="./js/pages/<%= pageScript %>.js"></script>
     <% } %>
     <!-- Language switcher script -->
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.language-switcher button[data-lang]').forEach(function(btn) {
-          btn.addEventListener('click', function() {
-            var lang = this.getAttribute('data-lang');
-            var url = new URL(window.location.href);
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.language-switcher button[data-lang]').forEach((btn) => {
+          btn.addEventListener('click', function () {
+            const lang = this.getAttribute('data-lang');
+            const url = new URL(window.location.href);
             url.searchParams.set('lang', lang);
             window.location.href = url.toString();
           });

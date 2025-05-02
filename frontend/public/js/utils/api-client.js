@@ -14,21 +14,20 @@ export async function checkApiConnection() {
     const response = await fetch("http://localhost:3000/api/health");
 
     if (response.ok) {
-      statusEl.textContent = "Server connection: Online";
+      statusEl.textContent = window.i18nMessages.serverOnline;
       statusEl.className = "text-success";
       const data = await response.json();
       console.log("Server status:", data);
       return { status: "online", data };
     } else {
-      const message = `Server connection: Error - ${response.status}`;
+      const message = `${window.i18nMessages.serverError} ${response.status}`;
       statusEl.textContent = message;
       statusEl.className = "text-warning";
       return { status: "error", code: response.status };
     }
   } catch (err) {
     console.error("API connection error:", err);
-    statusEl.textContent =
-      "Server connection: Offline - API server appears to be down";
+    statusEl.textContent = window.i18nMessages.serverOffline;
     statusEl.className = "text-danger";
     return { status: "offline", error: err };
   }

@@ -5,15 +5,9 @@ import Auth from "../auth.js";
 
 import { checkApiConnection } from "../utils/api-client.js";
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", function () {
   // Initialize the Auth class
   const auth = new Auth();
-
-  // Check if user is already logged in
-  if (auth.isLoggedIn()) {
-    window.location.href = "./dashboard";
-    return;
-  }
 
   // Check API server connection
   checkApiConnection();
