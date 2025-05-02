@@ -273,7 +273,6 @@ class Auth {
   async updateProfile(profileData) {
     try {
       this.showLoader();
-
       const response = await fetch(`${this.baseUrl}/profile`, {
         method: "PUT",
         credentials: "include",
@@ -283,27 +282,18 @@ class Auth {
         },
         body: JSON.stringify(profileData),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update profile");
-      }
-
-      const updatedUser = await response.json();
-
-      // Update local storage with new user data
+      const { success, message, user: updatedUser } = await response.json();
+      if (!success) throw new Error(message || "Failed to update profile");
       localStorage.setItem("user", JSON.stringify(updatedUser));
       this.user = updatedUser;
-
-      this.showMessage("success", "Profile updated successfully!");
-
-      // Redirect to the dashboard after a short delay
-      setTimeout(() => {
-        window.location.href = "./dashboard";
-      }, 2000);
+      this.showMessage("success", message);
+      window.location.href = "./dashboard";
     } catch (error) {
       console.error("Profile update error:", error);
-      this.showMessage("error", error.message || "Failed to update profile");
+      this.showMessage(
+        "error",
+        error.message || "An unexpected error occurred. Please try again later."
+      );
     } finally {
       this.hideLoader();
     }

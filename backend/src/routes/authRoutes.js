@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 const {
   register,
   login,
@@ -18,32 +19,47 @@ router.get("/profile", protect, getProfile);
 router.put("/profile", protect, async (req, res) => {
   try {
     const { name, password, phoneNumber, department } = req.body;
-
     const user = await User.findById(req.user.id);
-
     if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: req.t("auth.userNotFound"),
+      });
     }
-
-    // Update fields
     if (name) user.name = name;
-    if (password) user.password = password; // Will be hashed by pre-save middleware
+    if (password) user.password = password;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (department) user.department = department;
-
     await user.save();
-
-    res.status(200).json({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      department: user.department,
+    // regenerate token with updated name
+    const newToken = jwt.sign(
+      { id: user._id, name: user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" },
+    );
+    // set new cookie
+    res.cookie("token", newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
     });
-  } catch {
-    res.status(500).json({ success: false, message: "Error updating profile" });
+    res.status(200).json({
+      success: true,
+      message: req.t("auth.profileUpdateSuccess"),
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        department: user.department,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: req.t("auth.errorUpdatingProfile"),
+      error: error.message,
+    });
   }
 });
 
