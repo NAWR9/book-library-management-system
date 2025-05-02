@@ -3,10 +3,8 @@
 <!-- Hero Section -->
 <header class="auth-hero text-center">
   <div class="container">
-    <h1 data-i18n="welcomeToLibrary">Welcome to University Library</h1>
-    <p class="lead" data-i18n="accessResources">
-      Access thousands of academic resources at your fingertips
-    </p>
+    <h1><%= t('login.welcomeToLibrary') %></h1>
+    <p class="lead"><%= t('login.accessResources') %></p>
   </div>
 </header>
 
@@ -16,16 +14,14 @@
     <div class="col-md-6 col-lg-5">
       <!-- API Status Indicator -->
       <div class="text-center mb-3">
-        <small id="api-status" class="text-muted" data-i18n="apiStatus">
-          Checking server connection...
-        </small>
+        <small id="api-status" class="text-muted"><%= t('api.apiStatus') %></small>
       </div>
 
       <div class="card auth-card">
         <div class="card-header text-center">
           <h2 class="mb-0">
             <i class="fas fa-sign-in-alt me-2"></i
-            ><span data-i18n="loginTitle">Login</span>
+            ><span><%= t('login.loginTitle') %></span>
           </h2>
         </div>
         <div class="card-body p-4">
@@ -44,9 +40,7 @@
           <!-- Login Form -->
           <form id="loginForm">
             <div class="mb-3">
-              <label for="email" class="form-label" data-i18n="emailLabel"
-                >Email</label
-              >
+              <label for="email" class="form-label"><%= t('login.emailLabel') %></label>
               <input
                 type="email"
                 class="form-control"
@@ -54,14 +48,10 @@
                 name="email"
                 required
               />
-              <div class="error-feedback" data-i18n="emailError">
-                Please enter a valid email address.
-              </div>
+              <div class="error-feedback"><%= t('login.emailError') %></div>
             </div>
             <div class="mb-3">
-              <label for="password" class="form-label" data-i18n="passwordLabel"
-                >Password</label
-              >
+              <label for="password" class="form-label"><%= t('login.passwordLabel') %></label>
               <input
                 type="password"
                 class="form-control"
@@ -69,27 +59,22 @@
                 name="password"
                 required
               />
-              <div class="error-feedback" data-i18n="passwordError">
-                Password is required.
-              </div>
+              <div class="error-feedback"><%= t('login.passwordError') %></div>
             </div>
             <div class="d-grid">
               <button
                 type="submit"
                 class="btn btn-primary btn-lg"
-                data-i18n="loginButton"
               >
-                Login
+                <%= t('login.loginButton') %>
               </button>
             </div>
           </form>
 
           <div class="text-center mt-3">
             <p>
-              <span data-i18n="noAccount">Don't have an account?</span>
-              <a href="./register" class="auth-link" data-i18n="registerHere"
-                >Register here</a
-              >
+              <span><%= t('login.noAccount') %></span>
+              <a href="./register" class="auth-link"><%= t('login.registerHere') %></a>
             </p>
           </div>
         </div>

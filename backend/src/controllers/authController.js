@@ -1,9 +1,9 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// Generate JWT token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+// Generate JWT token with user id and name
+const generateToken = (id, name) => {
+  return jwt.sign({ id, name }, process.env.JWT_SECRET, {
     expiresIn: "24h",
   });
 };
@@ -20,7 +20,7 @@ exports.register = async (req, res) => {
     if (userExists) {
       return res.status(400).json({
         success: false,
-        message: "User with that email already exists",
+        message: req.t("auth.userExists"),
       });
     }
 
@@ -35,11 +35,19 @@ exports.register = async (req, res) => {
     });
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.name);
+
+    // Set token in HttpOnly cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000, // 24h
+    });
 
     // Return user data without password
     res.status(201).json({
       success: true,
+      message: req.t("auth.registerSuccess"),
       token,
       user: {
         id: user._id,
@@ -54,7 +62,7 @@ exports.register = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error registering user",
+      message: req.t("auth.serverConnectError"),
       error: error.message,
     });
   }
@@ -71,7 +79,7 @@ exports.login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Please provide email and password",
+        message: req.t("auth.provideBoth"),
       });
     }
 
@@ -80,7 +88,7 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials",
+        message: req.t("auth.invalidCredentials"),
       });
     }
 
@@ -89,16 +97,24 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: "Invalid credentials",
+        message: req.t("auth.invalidCredentials"),
       });
     }
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.name);
+
+    // Set token in HttpOnly cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
 
     // Return user data without password
     res.status(200).json({
       success: true,
+      message: req.t("auth.loginSuccess"),
       token,
       user: {
         id: user._id,
@@ -113,7 +129,7 @@ exports.login = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: "Error logging in",
+      message: req.t("auth.serverConnectError"),
       error: error.message,
     });
   }

@@ -1,4 +1,3 @@
-import i18n from "./i18n.js";
 /**
  * Authentication class for handling user registration, login, and session management
  */
@@ -7,11 +6,6 @@ class Auth {
     this.baseUrl = "http://localhost:3000/api/auth";
     this.token = localStorage.getItem("token");
     this.user = JSON.parse(localStorage.getItem("user"));
-
-    // Update UI based on authentication status when class is initialized
-    if (this.isLoggedIn()) {
-      this.updateNavbar(true);
-    }
   }
   /**
    * Register a new user
@@ -27,9 +21,8 @@ class Auth {
 
       const response = await fetch(`${this.baseUrl}/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name,
           email,
@@ -39,62 +32,25 @@ class Auth {
         }),
       });
 
-      // Check if response is ok before trying to parse JSON
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage;
-
-        try {
-          // Try to parse as JSON
-          const errorData = JSON.parse(errorText);
-          errorMessage =
-            errorData.message ||
-            `Error: ${response.status} ${response.statusText}`;
-        } catch {
-          // If not JSON, use text or status
-          errorMessage =
-            errorText || `Error: ${response.status} ${response.statusText}`;
-        }
-
-        throw new Error(errorMessage);
+      const { success, message, token, user } = await response.json();
+      if (!success) {
+        throw new Error(message || "Registration failed");
       }
-
-      // Check if response is empty
-      const responseText = await response.text();
-      if (!responseText) {
-        throw new Error("Server returned an empty response");
-      }
-
-      // Parse JSON only if we have content
-      const data = responseText ? JSON.parse(responseText) : {};
 
       // Store token and user data
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      this.token = data.token;
-      this.user = data.user;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      this.token = token;
+      this.user = user;
 
       // Show success message
-      this.showMessage(
-        "success",
-        i18n.translate("registerSuccess") ||
-          "Registration successful! Redirecting to dashboard...",
-      );
-
-      // Update navbar and redirect
-      this.updateNavbar(true);
-
-      // Redirect to dashboard after 2 seconds
-      setTimeout(() => {
-        window.location.href = "./dashboard";
-      }, 2000);
+      this.showMessage("success", message);
+      window.location.href = "./dashboard";
     } catch (error) {
       console.error("Registration error:", error);
       this.showMessage(
         "error",
-        error.message ||
-          i18n.translate("serverConnectError") ||
-          "Unable to connect to server. Please try again later.",
+        error.message || "Unable to connect to server. Please try again later.",
       );
     } finally {
       this.hideLoader();
@@ -112,6 +68,7 @@ class Auth {
 
       const response = await fetch(`${this.baseUrl}/login`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -121,55 +78,20 @@ class Auth {
         }),
       });
 
-      // Check if response is ok before trying to parse JSON
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage;
-
-        try {
-          // Try to parse as JSON
-          const errorData = JSON.parse(errorText);
-          errorMessage =
-            errorData.message ||
-            `Error: ${response.status} ${response.statusText}`;
-        } catch {
-          // If not JSON, use text or status
-          errorMessage =
-            errorText || `Error: ${response.status} ${response.statusText}`;
-        }
-
-        throw new Error(errorMessage);
+      const { success, message, token, user } = await response.json();
+      if (!success) {
+        throw new Error(message || "Login failed");
       }
-
-      // Check if response is empty
-      const responseText = await response.text();
-      if (!responseText) {
-        throw new Error("Server returned an empty response");
-      }
-
-      // Parse JSON only if we have content
-      const data = responseText ? JSON.parse(responseText) : {};
 
       // Store token and user data
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      this.token = data.token;
-      this.user = data.user;
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      this.token = token;
+      this.user = user;
 
       // Show success message
-      this.showMessage(
-        "success",
-        i18n.translate("loginSuccess") ||
-          "Login successful! Redirecting to dashboard...",
-      );
-
-      // Update navbar and redirect
-      this.updateNavbar(true);
-
-      // Redirect to dashboard after 2 seconds
-      setTimeout(() => {
-        window.location.href = "./dashboard";
-      }, 2000);
+      this.showMessage("success", message);
+      window.location.href = "./dashboard";
     } catch (error) {
       console.error("Login error:", error);
       this.showMessage(
@@ -190,9 +112,6 @@ class Auth {
     localStorage.removeItem("user");
     this.token = null;
     this.user = null;
-
-    // Update navbar
-    this.updateNavbar(false);
 
     // Redirect to login page
     window.location.href = "./login";
@@ -227,36 +146,6 @@ class Auth {
    */
   getUser() {
     return this.user;
-  }
-
-  /**
-   * Update navbar based on authentication status
-   * @param {boolean} isLoggedIn - Whether user is logged in
-   */
-  updateNavbar(isLoggedIn) {
-    if (document.getElementById("loginNavItem")) {
-      document
-        .getElementById("loginNavItem")
-        .classList.toggle("d-none", isLoggedIn);
-      document
-        .getElementById("registerNavItem")
-        .classList.toggle("d-none", isLoggedIn);
-      document
-        .getElementById("dashboardNavItem")
-        .classList.toggle("d-none", !isLoggedIn);
-      document
-        .getElementById("logoutNavItem")
-        .classList.toggle("d-none", !isLoggedIn);
-    }
-
-    // Add event listener to logout button
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        this.logout();
-      });
-    }
   }
 
   /**
@@ -359,7 +248,7 @@ class Auth {
     if (submitBtn) {
       submitBtn.innerHTML =
         '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> ' +
-        (i18n.translate("loading") || "Loading...");
+        window.i18nMessages.loading;
       submitBtn.disabled = true;
     }
   }
@@ -370,17 +259,13 @@ class Auth {
   hideLoader() {
     const submitBtn = document.querySelector('button[type="submit"]');
     if (submitBtn) {
+      // Restore default state and label
       if (submitBtn.closest("#loginForm")) {
-        submitBtn.innerHTML = i18n.translate("loginButton") || "Login";
-        submitBtn.setAttribute("data-i18n", "loginButton");
+        submitBtn.innerHTML = window.i18nMessages.loginButton;
       } else if (submitBtn.closest("#registerForm")) {
-        submitBtn.innerHTML =
-          i18n.translate("createAccount") || "Create Account";
-        submitBtn.setAttribute("data-i18n", "createAccount");
+        submitBtn.innerHTML = window.i18nMessages.createAccount;
       } else {
-        submitBtn.innerHTML =
-          i18n.translate("updateAccount") || "Update Profile";
-        submitBtn.setAttribute("data-i18n", "updateAccount");
+        submitBtn.innerHTML = window.i18nMessages.updateProfile;
       }
       submitBtn.disabled = false;
     }
@@ -391,6 +276,7 @@ class Auth {
 
       const response = await fetch(`${this.baseUrl}/profile`, {
         method: "PUT",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${this.token}`,

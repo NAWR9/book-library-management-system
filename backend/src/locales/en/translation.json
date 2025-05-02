@@ -1,0 +1,113 @@
+{
+  "metadata": {
+    "language": "English",
+    "locale": "en"
+  },
+  "navbar": {
+    "home": "Home",
+    "books": "Books",
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "language": "Language"
+  },
+  "languages": {
+    "english": "English",
+    "arabic": "Arabic"
+  },
+  "homepage": {
+    "welcomeToSystem": "Welcome to Library Management System",
+    "systemDescription": "This is a web-based system for managing books and library operations."
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "welcomeToDashboard": "Welcome to Your Dashboard",
+    "welcomeSuccess": "You have successfully logged in to the University Library system.",
+    "myBooks": "My Books",
+    "manageBooks": "View and manage your borrowed books.",
+    "viewBooks": "View Books",
+    "findBooks": "Find Books",
+    "searchBooks": "Search for books in our catalog.",
+    "search": "Search",
+    "profile": "Profile",
+    "updateAccount": "Update your account information.",
+    "editProfile": "Edit Profile",
+    "backToDashboard": "Back to Dashboard"
+  },
+  "auth": {
+    "loading": "Loading...",
+    "loginSuccess": "Login successful! Redirecting to dashboard...",
+    "registerSuccess": "Registration successful! Redirecting to dashboard...",
+    "profileUpdateSuccess": "Profile updated successfully!",
+    "serverConnectError": "Unable to connect to server. Please try again later.",
+    "userExists": "User with that email already exists",
+    "invalidCredentials": "Invalid credentials",
+    "provideBoth": "Please provide email and password",
+    "notAuthorized": "Not authorized to access this route",
+    "userNotFound": "User not found",
+    "errorUpdatingProfile": "Error updating profile"
+  },
+  "login": {
+    "welcomeToLibrary": "Welcome to University Library",
+    "accessResources": "Access thousands of academic resources at your fingertips",
+    "loginTitle": "Login",
+    "emailLabel": "Email",
+    "emailError": "Please enter a valid email address.",
+    "passwordLabel": "Password",
+    "newPassword": "New Password",
+    "passwordError": "Password is required.",
+    "loginButton": "Login",
+    "noAccount": "Don't have an account?",
+    "registerHere": "Register here"
+  },
+  "register": {
+    "joinLibrary": "Join University Library",
+    "createAccountDesc": "Create an account to access our extensive collection of academic resources",
+    "registerTitle": "Register",
+    "fullNameLabel": "Full Name",
+    "fullNameError": "Please enter your full name.",
+    "passwordMinLength": "Password must be at least 6 characters.",
+    "phoneNumberLabel": "Phone Number (Optional)",
+    "departmentLabel": "Department",
+    "selectDepartment": "Select your department",
+    "departments": {
+      "engineering": "Engineering",
+      "computerScience": "Computer Science",
+      "business": "Business",
+      "medicine": "Medicine",
+      "law": "Law",
+      "arts": "Arts",
+      "education": "Education",
+      "science": "Science"
+    },
+    "createAccount": "Create Account",
+    "haveAccount": "Already have an account?",
+    "loginHere": "Login here"
+  },
+  "profile": {
+    "profileTitle": "Your Profile",
+    "emailCannotChange": "Email cannot be changed.",
+    "updateProfile": "Update Profile"
+  },
+  "api": {
+    "apiStatus": "Checking server connection...",
+    "serverOnline": "Server connection: Online",
+    "serverOffline": "Server connection: Offline - API server appears to be down",
+    "serverError": "Server connection: Error -"
+  },
+  "footer": {
+    "copyright": "© 2025 University Library. All rights reserved."
+  },
+  "titles": {
+    "home": "Home",
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "profile": "Profile"
+  },
+  "errors": {
+    "pageNotFound": "Page not found",
+    "serverError": "An unexpected error occurred"
+  }
+}
