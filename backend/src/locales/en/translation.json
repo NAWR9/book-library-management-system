@@ -105,5 +105,9 @@
     "register": "Register",
     "dashboard": "Dashboard",
     "profile": "Profile"
+  },
+  "errors": {
+    "pageNotFound": "Page not found",
+    "serverError": "An unexpected error occurred"
   }
 }

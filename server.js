@@ -143,6 +143,26 @@ app.get("/profile", (req, res) => {
   });
 });
 
+// 404 handler for unmatched routes
+app.use((req, res) => {
+  res.status(404).render("pages/error", {
+    title: req.t("titles.notFound") || req.t("errors.pageNotFound"),
+    errorCode: 404,
+    errorMessage: req.t("errors.pageNotFound"),
+  });
+});
+
+// Global error handler
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).render("pages/error", {
+    title: req.t("errors.serverError"),
+    errorCode: 500,
+    errorMessage: req.t("errors.serverError"),
+  });
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

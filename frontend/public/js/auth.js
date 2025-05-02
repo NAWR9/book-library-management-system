@@ -6,11 +6,6 @@ class Auth {
     this.baseUrl = "http://localhost:3000/api/auth";
     this.token = localStorage.getItem("token");
     this.user = JSON.parse(localStorage.getItem("user"));
-
-    // Update UI based on authentication status when class is initialized
-    if (this.isLoggedIn()) {
-      this.updateNavbar(true);
-    }
   }
   /**
    * Register a new user
@@ -50,12 +45,7 @@ class Auth {
 
       // Show success message
       this.showMessage("success", message);
-
-      // Update navbar and redirect
-      this.updateNavbar(true);
-
-      // Redirect to dashboard after 2 seconds
-      setTimeout(() => (window.location.href = "./dashboard"), 2000);
+      window.location.href = "./dashboard";
     } catch (error) {
       console.error("Registration error:", error);
       this.showMessage(
@@ -101,12 +91,7 @@ class Auth {
 
       // Show success message
       this.showMessage("success", message);
-
-      // Update navbar and redirect
-      this.updateNavbar(true);
-
-      // Redirect to dashboard after 2 seconds
-      setTimeout(() => (window.location.href = "./dashboard"), 2000);
+      window.location.href = "./dashboard";
     } catch (error) {
       console.error("Login error:", error);
       this.showMessage(
@@ -127,9 +112,6 @@ class Auth {
     localStorage.removeItem("user");
     this.token = null;
     this.user = null;
-
-    // Update navbar
-    this.updateNavbar(false);
 
     // Redirect to login page
     window.location.href = "./login";
@@ -164,36 +146,6 @@ class Auth {
    */
   getUser() {
     return this.user;
-  }
-
-  /**
-   * Update navbar based on authentication status
-   * @param {boolean} isLoggedIn - Whether user is logged in
-   */
-  updateNavbar(isLoggedIn) {
-    if (document.getElementById("loginNavItem")) {
-      document
-        .getElementById("loginNavItem")
-        .classList.toggle("d-none", isLoggedIn);
-      document
-        .getElementById("registerNavItem")
-        .classList.toggle("d-none", isLoggedIn);
-      document
-        .getElementById("dashboardNavItem")
-        .classList.toggle("d-none", !isLoggedIn);
-      document
-        .getElementById("logoutNavItem")
-        .classList.toggle("d-none", !isLoggedIn);
-    }
-
-    // Add event listener to logout button
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        this.logout();
-      });
-    }
   }
 
   /**
