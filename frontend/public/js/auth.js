@@ -290,7 +290,10 @@ class Auth {
       window.location.href = "./dashboard";
     } catch (error) {
       console.error("Profile update error:", error);
-      this.showMessage("error", error.message);
+      this.showMessage(
+        "error",
+        error.message || "An unexpected error occurred. Please try again later."
+      );
     } finally {
       this.hideLoader();
     }
