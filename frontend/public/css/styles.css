@@ -152,6 +152,9 @@ body {
 .cta-button {
   background-color: var(--accent-color);
 }
+.text-muted {
+  color: inherit !important;
+}
 #theme-switch {
   height: 50px;
   width: 50px;

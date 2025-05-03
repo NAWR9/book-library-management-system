@@ -9,6 +9,7 @@ const cors = require("cors");
 const path = require("path");
 const expressLayouts = require("express-ejs-layouts");
 const jwt = require("jsonwebtoken");
+const bookRoutes = require("./backend/src/routes/bookRoutes");
 
 // Import routes
 const authRoutes = require("./backend/src/routes/authRoutes");
@@ -28,6 +29,9 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(expressLayouts);
+
+// Add the book routes
+app.use("/api/books", bookRoutes);
 
 // Set up static folder
 app.use(express.static(path.join(__dirname, "frontend/public")));
