@@ -40,11 +40,6 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  borrowedBooks: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: "Book",
-    default: [],
-  },
   createdAt: {
     type: Date,
     default: Date.now,
