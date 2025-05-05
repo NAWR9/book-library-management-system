@@ -147,6 +147,42 @@ app.get("/profile", (req, res) => {
   });
 });
 
+// Dummy book data
+let books = [
+  {
+    title:
+      "Hands-On Machine Learning with Scikit-Learn," +
+      " Keras, and TensorFlow: Concepts, Tools, and Techniques to Build Intelligent Systems" +
+      " 2nd Edition",
+    author: "Aurélien Géron",
+    cover:
+      "https://m.media-amazon.com/images/I/81R5BmGtv-L._AC_UF1000,1000_QL80_.jpg",
+  },
+  {
+    title:
+      "Learn Java 17 Programming - " +
+      "Second Edition: Learn the fundamentals" +
+      " of Java Programming with this updated guide" +
+      " with the latest features",
+    author: " Nick Samoylov",
+    cover:
+      "https://m.media-amazon.com/images/I/81wQIyojm1L._AC_UF1000,1000_QL80_.jpg",
+  },
+];
+
+app.get("/books", (req, res) => {
+  if (!res.locals.user) return res.redirect("/login");
+  res.render("pages/books", {
+    title: req.t("titles.books"),
+    pageScript: "books",
+    books: books,
+  });
+});
+
+app.get("/books/new", (req, res) => {
+  res.render("new");
+});
+
 // 404 handler for unmatched routes
 app.use((req, res) => {
   res.status(404).render("pages/error", {
