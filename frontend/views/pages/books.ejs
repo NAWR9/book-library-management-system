@@ -1,0 +1,23 @@
+<%- contentFor('body') %>
+
+<div class="container py-5">
+    <h1 class="text-center mb-4"><%= t('books.bookLibrary') %></h1>
+    <div class="text-end mb-3">
+      <a href="/books/new" class="btn btn-primary">+ <%= t('books.addBook') %></a>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+      <% books.forEach(book => { %>
+        <div class="col">
+          <div class="card book-card h-100 shadow-sm">
+            <img src="<%= book.cover %>" class="card-img-top" alt="Book Cover">
+            <div class="card-body">
+              <h5 class="card-title"><%= book.title %></h5>
+              <p class="card-text text-muted"> <%= t('books.by') %> 
+                 <%= book.author %></p>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
