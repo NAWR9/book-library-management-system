@@ -104,10 +104,17 @@
     "login": "Login",
     "register": "Register",
     "dashboard": "Dashboard",
-    "profile": "Profile"
+    "profile": "Profile",
+    "books": "Books"
   },
   "errors": {
     "pageNotFound": "Page not found",
     "serverError": "An unexpected error occurred"
+  },
+  "books": {
+    "bookLibrary": "Book Library",
+    "addBook": "Add Book",
+    "bookTitle": "Book Title",
+    "by": "by"
   }
 }
