@@ -11,10 +11,12 @@ const expressLayouts = require("express-ejs-layouts");
 const jwt = require("jsonwebtoken");
 const bookRoutes = require("./backend/src/routes/bookRoutes");
 const searchRoutes = require("./backend/src/routes/searchRoutes");
-// Import routes
 const authRoutes = require("./backend/src/routes/authRoutes");
 
 const app = express();
+
+const API_BASE_URL =
+  process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
 
 // CORS configuration
 const corsOptions = {
@@ -74,6 +76,7 @@ app.use((req, res, next) => {
   res.locals.htmlLang = req.language;
   res.locals.rtl = req.language === "ar";
   res.locals.user = null;
+  res.locals.API_BASE_URL = API_BASE_URL;
   const token = req.cookies.token;
   if (token) {
     try {

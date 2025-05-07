@@ -11,7 +11,7 @@ export async function checkApiConnection() {
   if (!statusEl) return null;
 
   try {
-    const response = await fetch("http://localhost:3000/api/health");
+    const response = await fetch(`${window.API_BASE_URL}/api/health`);
 
     if (response.ok) {
       statusEl.textContent = window.i18nMessages.serverOnline;

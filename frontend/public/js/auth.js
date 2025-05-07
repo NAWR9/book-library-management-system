@@ -3,7 +3,7 @@
  */
 class Auth {
   constructor() {
-    this.baseUrl = "http://localhost:3000/api/auth";
+    this.baseUrl = `${window.API_BASE_URL}/api/auth`;
     this.token = localStorage.getItem("token");
     this.user = JSON.parse(localStorage.getItem("user"));
   }
@@ -292,7 +292,8 @@ class Auth {
       console.error("Profile update error:", error);
       this.showMessage(
         "error",
-        error.message || "An unexpected error occurred. Please try again later."
+        error.message ||
+          "An unexpected error occurred. Please try again later.",
       );
     } finally {
       this.hideLoader();
