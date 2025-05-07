@@ -10,7 +10,7 @@ const path = require("path");
 const expressLayouts = require("express-ejs-layouts");
 const jwt = require("jsonwebtoken");
 const bookRoutes = require("./backend/src/routes/bookRoutes");
-
+const searchRoutes = require("./backend/src/routes/searchRoutes");
 // Import routes
 const authRoutes = require("./backend/src/routes/authRoutes");
 
@@ -35,6 +35,9 @@ app.use("/api/books", bookRoutes);
 
 // Set up static folder
 app.use(express.static(path.join(__dirname, "frontend/public")));
+
+//search Route
+app.use("/api/search", searchRoutes);
 
 // Set up EJS with layouts
 app.set("layout", "layout");
@@ -144,6 +147,13 @@ app.get("/profile", (req, res) => {
   res.render("pages/profile", {
     title: req.t("titles.profile"),
     pageScript: "profile",
+  });
+});
+
+app.get("/search", (req, res) => {
+  res.render("pages/search", {
+    title: "Search Books",
+    pageScript: "search",
   });
 });
 

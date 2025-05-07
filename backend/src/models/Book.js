@@ -43,6 +43,10 @@ const BookSchema = new mongoose.Schema({
     default: 1, // Default to 1 copy of the book
     min: [1, "Book count must be at least 1"],
   },
+  category: {
+    type: String,
+    default: "General", // Optional field for book category
+  },
 });
 
 module.exports = mongoose.model("Book", BookSchema);
