@@ -1,3 +1,5 @@
+import { searchBooks } from "../utils/api-client.js";
+
 document.addEventListener("DOMContentLoaded", function () {
   const searchForm = document.getElementById("searchForm");
   const searchResults = document.getElementById("searchResults");
@@ -10,28 +12,24 @@ document.addEventListener("DOMContentLoaded", function () {
     const genre = document.getElementById("genre").value;
     const category = document.getElementById("category").value;
 
-    // Build query parameters
-    const params = new URLSearchParams();
-    if (title) params.append("title", title);
-    if (author) params.append("author", author);
-    if (genre) params.append("genre", genre);
-    if (category) params.append("category", category);
+    // Create search criteria object
+    const searchCriteria = {
+      title,
+      author,
+      genre,
+      category,
+    };
 
     // Debug log
-    console.log("Search params:", Object.fromEntries(params));
+    console.log("Search criteria:", searchCriteria);
 
     try {
-      const response = await fetch(`/api/search?${params}`);
-      const data = await response.json();
+      const books = await searchBooks(searchCriteria);
 
       // Debug log
-      console.log("Search response:", data);
+      console.log("Search results:", books);
 
-      if (data.success) {
-        displayResults(data.data);
-      } else {
-        searchResults.innerHTML = '<p class="text-center">No results found</p>';
-      }
+      displayResults(books);
     } catch (error) {
       console.error("Search error:", error);
       searchResults.innerHTML =

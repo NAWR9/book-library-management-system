@@ -196,10 +196,45 @@ body {
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
 .book-card:hover {
   transform: scale(1.05);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   z-index: 1;
+}
+
+.book-card img {
+  height: 300px;
+  object-fit: cover;
+}
+
+/* Book details modal styles */
+.description-text {
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: 10px;
+  line-height: 1.6;
+}
+
+#bookDetailsModal .modal-header {
+  background-color: var(--primary);
+  color: white;
+}
+
+#bookDetailsModal .modal-title {
+  font-weight: 600;
+}
+
+.darkmode #bookDetailsModal .modal-content {
+  background-color: var(--dark);
+  color: var(--text-color);
+}
+
+#bookCover {
+  max-height: 300px;
+  width: auto;
+  margin: 0 auto;
+  display: block;
 }

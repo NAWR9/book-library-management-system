@@ -30,6 +30,8 @@
     "prettier": "^3.5.3"
   },
   "dependencies": {
+    "@vitalets/google-translate-api": "^9.2.1",
+    "axios": "^1.6.2",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

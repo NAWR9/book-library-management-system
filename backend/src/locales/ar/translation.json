@@ -116,6 +116,23 @@
     "bookLibrary": "مكتبة الكتب",
     "addBook": "إضافة كتاب",
     "bookTitle": "عنوان الكتاب",
-    "by": "المؤلف "
+    "by": "المؤلف ",
+    "bookDetails": "تفاصيل الكتاب",
+    "close": "إغلاق",
+    "description": "الوصف",
+    "genre": "التصنيف",
+    "author": "المؤلف",
+    "publicationDate": "تاريخ النشر",
+    "publisher": "الناشر",
+    "pageCount": "عدد الصفحات",
+    "category": "الفئة",
+    "isbn": "الرقم الدولي",
+    "loadingDetails": "جاري تحميل تفاصيل الكتاب...",
+    "noDescription": "لا يوجد وصف متاح.",
+    "fetchError": "فشل في جلب تفاصيل الكتاب. يرجى المحاولة مرة أخرى لاحقًا.",
+    "viewDetails": "عرض التفاصيل",
+    "bookCount": "عدد النسخ",
+    "saveBook": "حفظ الكتاب",
+    "cancel": "إلغاء"
   }
 }

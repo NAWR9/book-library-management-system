@@ -115,6 +115,23 @@
     "bookLibrary": "Book Library",
     "addBook": "Add Book",
     "bookTitle": "Book Title",
-    "by": "by"
+    "by": "by",
+    "bookDetails": "Book Details",
+    "close": "Close",
+    "description": "Description",
+    "genre": "Genre",
+    "author": "Author",
+    "publicationDate": "Publication Date",
+    "publisher": "Publisher",
+    "pageCount": "Page Count",
+    "category": "Category",
+    "isbn": "ISBN",
+    "loadingDetails": "Loading book details...",
+    "noDescription": "No description available.",
+    "fetchError": "Failed to fetch book details. Please try again later.",
+    "viewDetails": "View Details",
+    "bookCount": "Number of Copies",
+    "saveBook": "Save Book",
+    "cancel": "Cancel"
   }
 }

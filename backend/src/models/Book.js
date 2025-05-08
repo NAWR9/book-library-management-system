@@ -17,35 +17,72 @@ const BookSchema = new mongoose.Schema({
   },
   addedToLibraryDate: {
     type: Date,
-    default: Date.now, // Automatically set to the current date when added
+    default: Date.now,
   },
   availability: {
     type: Boolean,
-    default: true, // True if the book is available for borrowing
+    default: true,
   },
   genre: {
     type: String,
-    default: "General", // Optional field for book genre
+    default: "General",
   },
-  description: {
+  description_en: {
     type: String,
     trim: true,
-    default: null, // Optional field for a brief description of the book
+    default: null,
+  },
+  description_ar: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  description_fetched: {
+    type: Boolean,
+    default: false,
+  },
+  publisher: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  pageCount: {
+    type: Number,
+    default: null,
+  },
+  isbn: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  coverImage: {
+    type: String,
+    default: null,
+  },
+  categories: {
+    type: [String],
+    default: [],
   },
   borrowedBy: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: "User", // Reference to the User model if the book is borrowed
+    ref: "User",
     default: null,
   },
   bookCount: {
     type: Number,
     required: true,
-    default: 1, // Default to 1 copy of the book
+    default: 1,
     min: [1, "Book count must be at least 1"],
   },
+  // Keep the legacy category field for backward compatibility
   category: {
     type: String,
-    default: "General", // Optional field for book category
+    default: "General",
+  },
+  // Add main category reference
+  mainCategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
   },
 });
 

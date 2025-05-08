@@ -33,4 +33,33 @@ export async function checkApiConnection() {
   }
 }
 
-export default { checkApiConnection };
+/**
+ * Search for books with the provided criteria
+ * @param {Object} criteria - Search criteria object (title, author, genre, category)
+ * @returns {Promise<Array>} - Array of books matching search criteria
+ */
+export async function searchBooks(criteria) {
+  try {
+    // Build query parameters from criteria
+    const params = new URLSearchParams();
+    if (criteria.title) params.append("title", criteria.title);
+    if (criteria.author) params.append("author", criteria.author);
+    if (criteria.genre) params.append("genre", criteria.genre);
+    if (criteria.category) params.append("category", criteria.category);
+
+    // Make API request
+    const response = await fetch(`${window.API_BASE_URL}/api/search?${params}`);
+    const data = await response.json();
+
+    if (data.success) {
+      return data.data;
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Search API error:", error);
+    throw error;
+  }
+}
+
+export default { checkApiConnection, searchBooks };

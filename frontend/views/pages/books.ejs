@@ -8,16 +8,73 @@
     <div class="row row-cols-1 row-cols-md-3 g-4">
       <% books.forEach(book => { %>
         <div class="col">
-          <div class="card book-card h-100 shadow-sm">
-            <img src="<%= book.cover %>" class="card-img-top" alt="Book Cover">
+          <div class="card book-card h-100 shadow-sm" data-book-title="<%= book.title %>" data-book-author="<%= book.author %>">
+            <img src="<%= book.cover %>" class="card-img-top" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
             <div class="card-body">
               <h5 class="card-title"><%= book.title %></h5>
-              <p class="card-text text-muted"> <%= t('books.by') %> 
-                 <%= book.author %></p>
+              <p class="card-text text-muted"><%= t('books.by') %> <%= book.author %></p>
+              <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
             </div>
           </div>
         </div>
       <% }) %>
     </div>
+</div>
+
+<!-- Book Details Modal -->
+<div class="modal fade" id="bookDetailsModal" tabindex="-1" aria-labelledby="bookDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bookDetailsModalLabel"><%= t('books.bookDetails') %></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<%= t('books.close') %>"></button>
+      </div>
+      <div class="modal-body">
+        <div id="bookDetailsLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden"><%= t('books.loadingDetails') %></span>
+          </div>
+          <p class="mt-2"><%= t('books.loadingDetails') %></p>
+        </div>
+        <div id="bookDetailsContent" class="d-none">
+          <div class="row">
+            <div class="col-md-4">
+              <img id="bookCover" src="" class="img-fluid rounded" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
+            </div>
+            <div class="col-md-8">
+              <h4 id="bookTitle"></h4>
+              <p class="text-muted mb-3">
+                <span id="bookAuthors"></span>
+                <small id="bookPublisher" class="d-block"></small>
+              </p>
+              
+              <div class="mb-3">
+                <h5><%= t('books.description') %></h5>
+                <div id="bookDescription" class="description-text"></div>
+              </div>
+              
+              <div class="row mb-3">
+                <div class="col-sm-6">
+                  <p><strong><%= t('books.publicationDate') %>:</strong> <span id="bookPublishedDate"></span></p>
+                </div>
+                <div class="col-sm-6">
+                  <p><strong><%= t('books.pageCount') %>:</strong> <span id="bookPageCount"></span></p>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <p><strong><%= t('books.category') %>:</strong> <span id="bookCategories"></span></p>
+                <p><strong><%= t('books.isbn') %>:</strong> <span id="bookIsbn"></span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="bookDetailsError" class="alert alert-danger d-none" role="alert"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= t('books.close') %></button>
+      </div>
+    </div>
   </div>
+</div>
 
