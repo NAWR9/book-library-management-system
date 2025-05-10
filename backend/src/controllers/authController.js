@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const { generateResetToken } = require("../utils/generateToken");
+const { sendEmail } = require("../utils/sendEmail");
 
 // Generate JWT token with user id and name
 const generateToken = (id, name) => {
@@ -160,6 +162,140 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching profile",
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Forgot password
+// @route   POST /api/auth/forgot-password
+// @access  Public
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: req.t("auth.provideEmail"),
+      });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+
+    // Always return success to prevent email enumeration
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: req.t("auth.resetPasswordEmailSent"),
+      });
+    }
+
+    // Generate reset token
+    const resetToken = generateResetToken();
+
+    // Set token and expiration in database
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    // Get the base URL from request
+    const protocol = req.protocol;
+    const host = req.get("host");
+
+    // Handle temp-mail and other services that might append their domain to the link
+    // Create reset URL with absolute path
+    const resetUrl = `${protocol}://${host}/reset-password?token=${resetToken}`;
+
+    // Create a note in the email about temp-mail services
+    const tempMailNote =
+      "Note: If you're using a temporary email service, please copy and paste the entire link into your browser if clicking doesn't work.";
+
+    // Create email content
+    const emailOptions = {
+      to: user.email,
+      subject: req.t("auth.resetPasswordSubject"),
+      text: `${req.t("auth.resetPasswordText")}\n\n${resetUrl}\n\n${req.t("auth.resetPasswordExpiry")}\n\n${tempMailNote}`,
+      html: `
+        <p>${req.t("auth.resetPasswordText")}</p>
+        <p><a href="${resetUrl}">${req.t("auth.resetPasswordLink")}</a></p>
+        <p>${req.t("auth.resetPasswordExpiry")}</p>
+        <p><small><em>${tempMailNote}</em></small></p>
+      `,
+    };
+
+    // Send email
+    await sendEmail(emailOptions);
+
+    // Return success message
+    res.status(200).json({
+      success: true,
+      message: req.t("auth.resetPasswordEmailSent"),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: req.t("auth.serverConnectError"),
+      error: error.message,
+    });
+  }
+};
+
+// @desc    Reset password
+// @route   POST /api/auth/reset-password
+// @access  Public
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: req.t("auth.provideTokenAndPassword"),
+      });
+    }
+
+    // Find user by token and check if expired
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: req.t("auth.invalidOrExpiredToken"),
+      });
+    }
+
+    // Validate password length
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: req.t("auth.passwordMinLength"),
+      });
+    }
+
+    // Set new password
+    user.password = newPassword;
+
+    // Clear reset token fields
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    // Save the user
+    await user.save();
+
+    // Return success message
+    res.status(200).json({
+      success: true,
+      message: req.t("auth.passwordResetSuccess"),
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: req.t("auth.serverConnectError"),
       error: error.message,
     });
   }
