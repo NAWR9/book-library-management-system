@@ -46,7 +46,17 @@
     "provideBoth": "الرجاء تقديم البريد الإلكتروني وكلمة المرور",
     "notAuthorized": "غير مصرح لك بالوصول إلى هذا المسار",
     "userNotFound": "لم يتم العثور على المستخدم",
-    "errorUpdatingProfile": "خطأ في تحديث الملف الشخصي"
+    "errorUpdatingProfile": "خطأ في تحديث الملف الشخصي",
+    "provideEmail": "الرجاء تقديم عنوان بريدك الإلكتروني",
+    "provideTokenAndPassword": "الرجاء تقديم الرمز وكلمة المرور الجديدة",
+    "invalidOrExpiredToken": "رمز إعادة تعيين كلمة المرور غير صالح أو منتهي الصلاحية",
+    "passwordMinLength": "يجب أن تتكون كلمة المرور من 6 أحرف على الأقل",
+    "passwordResetSuccess": "تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.",
+    "resetPasswordEmailSent": "إذا كان بريدك الإلكتروني موجودًا في نظامنا، فقد تم إرسال رابط إعادة تعيين كلمة المرور.",
+    "resetPasswordSubject": "طلب إعادة تعيين كلمة المرور - مكتبة الجامعة",
+    "resetPasswordText": "لقد طلبت إعادة تعيين كلمة المرور. يرجى النقر على الرابط أدناه لإعادة تعيين كلمة المرور:",
+    "resetPasswordLink": "إعادة تعيين كلمة المرور",
+    "resetPasswordExpiry": "هذا الرابط صالح لمدة ساعة واحدة فقط."
   },
   "login": {
     "welcomeToLibrary": "مرحبًا بك في مكتبة الجامعة",
@@ -59,7 +69,16 @@
     "passwordError": "كلمة المرور مطلوبة.",
     "loginButton": "تسجيل الدخول",
     "noAccount": "ليس لديك حساب؟",
-    "registerHere": "سجل هنا"
+    "registerHere": "سجل هنا",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "resetPasswordInstructions": "أدخل عنوان بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.",
+    "sendResetLink": "إرسال رابط إعادة التعيين",
+    "resetYourPassword": "إعادة تعيين كلمة المرور",
+    "newPasswordLabel": "كلمة المرور الجديدة",
+    "confirmPasswordLabel": "تأكيد كلمة المرور الجديدة",
+    "passwordsDoNotMatch": "كلمات المرور غير متطابقة",
+    "backToLogin": "العودة إلى تسجيل الدخول"
   },
   "register": {
     "joinLibrary": "انضم إلى مكتبة الجامعة",
@@ -106,7 +125,9 @@
     "dashboard": "لوحة التحكم",
     "profile": "الملف الشخصي",
     "notFound": "الصفحة غير موجودة",
-    "books": "الكتب"
+    "books": "الكتب",
+    "forgotPassword": "نسيت كلمة المرور",
+    "resetPassword": "إعادة تعيين كلمة المرور"
   },
   "errors": {
     "pageNotFound": "الصفحة التي تبحث عنها غير موجودة",

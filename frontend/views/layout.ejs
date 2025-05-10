@@ -23,6 +23,30 @@
     <!-- Load Navbar -->
     <%- include('./partials/navbar') %>
 
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+      <% if(locals.success_msg && success_msg.length > 0) { %>
+        <div class="alert alert-success alert-dismissible fade show">
+          <%= success_msg %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      
+      <% if(locals.error_msg && error_msg.length > 0) { %>
+        <div class="alert alert-warning alert-dismissible fade show">
+          <%= error_msg %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      
+      <% if(locals.error && error.length > 0) { %>
+        <div class="alert alert-danger alert-dismissible fade show">
+          <%= error %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+    </div>
+
     <!-- Page Content -->
     <%- body %>
 
@@ -45,14 +69,23 @@
           invalidCredentials: t('auth.invalidCredentials'),
           profileUpdateSuccess: t('auth.profileUpdateSuccess'),
           errorUpdatingProfile: t('auth.errorUpdatingProfile'),
+          passwordMinLength: t('register.passwordMinLength'),
+          passwordsDoNotMatch: t('login.passwordsDoNotMatch'),
+          
           // Button labels
           loginButton: t('login.loginButton'),
           createAccount: t('register.createAccount'),
           updateProfile: t('profile.updateProfile'),
+          sendResetLink: t('login.sendResetLink'),
+          resetPassword: t('login.resetPassword'),
+          
           // API status messages
           serverOnline: t('api.serverOnline'),
           serverOffline: t('api.serverOffline'),
           serverError: t('api.serverError'),
+          
+          // Form validation
+          emailError: t('login.emailError')
         }) %>
       </script>
       <script>
