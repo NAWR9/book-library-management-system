@@ -13,6 +13,8 @@ const bookRoutes = require("./backend/src/routes/bookRoutes");
 const searchRoutes = require("./backend/src/routes/searchRoutes");
 // Import routes
 const authRoutes = require("./backend/src/routes/authRoutes");
+// Add with other route imports
+const { smartSearchBookInfo } = require("./backend/src/controllers/smartSearchController");
 
 const app = express();
 
@@ -38,6 +40,20 @@ app.use(express.static(path.join(__dirname, "frontend/public")));
 
 //search Route
 app.use("/api/search", searchRoutes);
+
+// Add with other route declarations
+app.get('/api/smart-search', async (req, res) => {
+  const { question, title } = req.query;
+
+  try {
+    const result = await smartSearchBookInfo(question, title);
+    // For word-by-word animation, split the answer into words
+    res.json({ success: true, answer: result.split(' ') });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
 
 // Set up EJS with layouts
 app.set("layout", "layout");

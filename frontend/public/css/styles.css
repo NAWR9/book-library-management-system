@@ -203,3 +203,54 @@ body {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
+
+/* Add at the end of the file */
+
+.smart-search-float {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--bs-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.smart-search-float:hover {
+  transform: scale(1.1);
+}
+
+.smart-search-modal {
+  display: none;
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  width: 300px;
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.typing-effect {
+  display: inline-block;
+  min-height: 20px;
+}
+
+.word {
+  opacity: 0;
+  transition: opacity 0.1s ease-in;
+}
+
+.word.visible {
+  opacity: 1;
+}
