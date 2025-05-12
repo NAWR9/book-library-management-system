@@ -33,48 +33,41 @@ A Web-based library management system built with Node.js, Express, and MongoDB.
 - Book borrowing and returning system
 - Search functionality
 - Authentication and Authorization
+- Password reset functionality
 
 ## Project Structure
 
 ```
 book-library-management-system/
 ├── backend/
-│   ├── .env
 │   ├── README.md
 │   ├── package-lock.json
 │   ├── package.json
 │   └── src/
 │       ├── controllers/
-│       │   └── authController.js
 │       ├── middleware/
-│       │   └── authMiddleware.js
 │       ├── models/
-│       │   └── User.js
 │       ├── routes/
-│       │   └── authRoutes.js
-│       └── server.js
+│       └── utils/
 ├── frontend/
-│   ├── components/
-│   │   └── navbar.html
-│   ├── css/
-│   │   └── styles.css
-│   ├── img/
-│   │   ├── library-bg.png
-│   │   └── university-logo.png
-│   ├── js/
-│   │   ├── auth.js
-│   │   ├── i18n.js
-│   │   └── lang/
-│   │       ├── ar.js
-│   │       └── en.js
-│   ├── dashboard.html
-│   ├── index.html
-│   ├── login.html
-│   ├── profile.html
-│   └── register.html
+│   ├── public/
+│   │   ├── css/
+│   │   ├── img/
+│   │   └── js/
+│   │       ├── utils/
+│   │       └── pages/
+│   └── views/
+│       ├── layout.ejs
+│       ├── partials/
+│       │   ├── navbar.ejs
+│       │   └── footer.ejs
+│       └── pages/
+│           └── auth/
 ├── eslint.config.mjs
 ├── .prettierrc
 ├── .prettierignore
+├── .env
+├── server.js
 ├── package.json
 ├── package-lock.json
 ├── README.md
@@ -109,6 +102,18 @@ book-library-management-system/
    PORT=3000
    MONGODB_URI=mongodb://localhost:27017/library
    JWT_SECRET=your_jwt_secret_key
+
+   # Frontend URL for password reset links
+   FRONTEND_URL=http://localhost:3000
+
+   # Email Configuration for Password Reset
+   EMAIL_HOST=smtp.example.com
+   EMAIL_PORT=587
+   EMAIL_SECURE=false
+   EMAIL_USER=your_email@example.com
+   EMAIL_PASSWORD=your_email_password
+   EMAIL_FROM=noreply@yourlibrary.com
+   EMAIL_FROM_NAME=University Library
    ```
 
 4. Start the backend development server:

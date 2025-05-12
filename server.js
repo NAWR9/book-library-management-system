@@ -1,6 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const session = require("express-session");
+const flash = require("connect-flash");
 const i18next = require("i18next");
 const Backend = require("i18next-fs-backend");
 const i18nextMiddleware = require("i18next-http-middleware");
@@ -33,10 +35,20 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(expressLayouts);
+app.use(cookieParser());
 
-// Add the book routes
-app.use("/api/books", bookRoutes);
+// Set up sessions and flash messages
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "librarysecret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === "production" },
+  }),
+);
+app.use(flash());
+
+app.use(expressLayouts);
 
 // Set up static folder
 app.use(express.static(path.join(__dirname, "frontend/public")));
@@ -77,8 +89,16 @@ i18next
     saveMissing: false,
   });
 
-app.use(cookieParser());
 app.use(i18nextMiddleware.handle(i18next));
+
+// Pass flash messages to all views
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash("success_msg");
+  res.locals.error_msg = req.flash("error_msg");
+  res.locals.error = req.flash("error");
+  next();
+});
+
 // i18n locals and user detection
 app.use((req, res, next) => {
   res.locals.t = req.t;
@@ -113,6 +133,7 @@ mongoose
 
 // API Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/books", bookRoutes);
 
 // Health check route
 app.get("/api/health", (req, res) => {
@@ -142,6 +163,41 @@ app.get("/register", (req, res) => {
   res.render("pages/register", {
     title: req.t("titles.register"),
     pageScript: "register",
+  });
+});
+
+app.get("/forgot-password", (req, res) => {
+  if (res.locals.user) return res.redirect("/dashboard");
+  res.render("pages/auth/forgot-password", {
+    title: req.t("titles.forgotPassword"),
+    pageScript: "forgot-password",
+  });
+});
+
+app.get("/reset-password", (req, res) => {
+  if (res.locals.user) return res.redirect("/dashboard");
+
+  // Get token from query parameter
+  const token = req.query.token;
+
+  // Token might be part of a larger URL if coming from a service like temp-mail
+  // Try to extract it if there's a "token=" in the URL
+  if (!token && req.originalUrl) {
+    const tokenMatch = req.originalUrl.match(/token=([a-f0-9]+)/i);
+    if (tokenMatch && tokenMatch[1]) {
+      return res.redirect(`/reset-password?token=${tokenMatch[1]}`);
+    }
+  }
+
+  if (!token) {
+    req.flash("error", "Invalid or missing password reset token.");
+    return res.redirect("/login");
+  }
+
+  res.render("pages/auth/reset-password", {
+    title: req.t("titles.resetPassword"),
+    pageScript: "reset-password",
+    token: token,
   });
 });
 

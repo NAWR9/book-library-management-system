@@ -46,7 +46,17 @@
     "provideBoth": "Please provide email and password",
     "notAuthorized": "Not authorized to access this route",
     "userNotFound": "User not found",
-    "errorUpdatingProfile": "Error updating profile"
+    "errorUpdatingProfile": "Error updating profile",
+    "provideEmail": "Please provide your email address",
+    "provideTokenAndPassword": "Please provide both token and new password",
+    "invalidOrExpiredToken": "Invalid or expired password reset token",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordResetSuccess": "Your password has been reset successfully. You can now login.",
+    "resetPasswordEmailSent": "If your email exists in our system, a password reset link has been sent.",
+    "resetPasswordSubject": "Password Reset Request - University Library",
+    "resetPasswordText": "You requested a password reset. Please click the link below to reset your password:",
+    "resetPasswordLink": "Reset My Password",
+    "resetPasswordExpiry": "This link is valid for 1 hour only."
   },
   "login": {
     "welcomeToLibrary": "Welcome to University Library",
@@ -59,7 +69,16 @@
     "passwordError": "Password is required.",
     "loginButton": "Login",
     "noAccount": "Don't have an account?",
-    "registerHere": "Register here"
+    "registerHere": "Register here",
+    "forgotPassword": "Forgot your password?",
+    "resetPassword": "Reset Password",
+    "resetPasswordInstructions": "Enter your email address and we'll send you a link to reset your password.",
+    "sendResetLink": "Send Reset Link",
+    "resetYourPassword": "Reset Your Password",
+    "newPasswordLabel": "New Password",
+    "confirmPasswordLabel": "Confirm New Password",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "backToLogin": "Back to Login"
   },
   "register": {
     "joinLibrary": "Join University Library",
@@ -105,7 +124,9 @@
     "register": "Register",
     "dashboard": "Dashboard",
     "profile": "Profile",
-    "books": "Books"
+    "books": "Books",
+    "forgotPassword": "Forgot Password",
+    "resetPassword": "Reset Password"
   },
   "errors": {
     "pageNotFound": "Page not found",
