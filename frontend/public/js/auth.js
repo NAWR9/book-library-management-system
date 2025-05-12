@@ -104,6 +104,41 @@ class Auth {
   }
 
   /**
+   * Send a password reset email
+   * @param {string} email - User's email
+   */
+  async forgotPassword(email) {
+    try {
+      this.showLoader();
+
+      const response = await fetch(`${this.baseUrl}/forgot-password`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const { success, message } = await response.json();
+      if (!success) {
+        throw new Error(message || "Failed to send password reset link");
+      }
+
+      // Show success message
+      this.showMessage("success", message);
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      this.showMessage(
+        "error",
+        error.message || "Unable to connect to server. Please try again later.",
+      );
+    } finally {
+      this.hideLoader();
+    }
+  }
+
+  /**
    * Logout the user
    */
   logout() {
@@ -187,6 +222,16 @@ class Auth {
   }
 
   /**
+   * Validate email format
+   * @param {string} email - Email to validate
+   * @returns {boolean} - Whether email is valid
+   */
+  validateEmail(email) {
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    return emailRegex.test(email);
+  }
+
+  /**
    * Set input as invalid
    * @param {HTMLElement} input - Input element
    */
@@ -264,6 +309,8 @@ class Auth {
         submitBtn.innerHTML = window.i18nMessages.loginButton;
       } else if (submitBtn.closest("#registerForm")) {
         submitBtn.innerHTML = window.i18nMessages.createAccount;
+      } else if (submitBtn.closest("#forgotPasswordForm")) {
+        submitBtn.innerHTML = window.i18nMessages.sendResetLink;
       } else {
         submitBtn.innerHTML = window.i18nMessages.updateProfile;
       }
@@ -292,7 +339,49 @@ class Auth {
       console.error("Profile update error:", error);
       this.showMessage(
         "error",
-        error.message || "An unexpected error occurred. Please try again later."
+        error.message ||
+          "An unexpected error occurred. Please try again later.",
+      );
+    } finally {
+      this.hideLoader();
+    }
+  }
+
+  /**
+   * Reset password with token
+   * @param {string} token - Reset password token
+   * @param {string} newPassword - New password
+   */
+  async resetPassword(token, newPassword) {
+    try {
+      this.showLoader();
+
+      const response = await fetch(`${this.baseUrl}/reset-password`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token, newPassword }),
+      });
+
+      const { success, message } = await response.json();
+      if (!success) {
+        throw new Error(message || "Failed to reset password");
+      }
+
+      // Show success message
+      this.showMessage("success", message);
+
+      // After 3 seconds, redirect to login page
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 3000);
+    } catch (error) {
+      console.error("Reset password error:", error);
+      this.showMessage(
+        "error",
+        error.message || "Unable to connect to server. Please try again later.",
       );
     } finally {
       this.hideLoader();
