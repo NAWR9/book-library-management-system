@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="stylesheet" href="/css/tag-input.css" />
     <% if (locals.pageStyles) { %><%- pageStyles %><% } %>
   </head>
   <body class="<%= locals.bodyClass || '' %>">
@@ -89,7 +90,14 @@
           serverError: t('api.serverError'),
           
           // Form validation
-          emailError: t('login.emailError')
+          emailError: t('login.emailError'),
+          
+          // Book and tag related translations
+          books: {
+            noTagsAdded: t('books.noTagsAdded'),
+            english: t('books.english'),
+            arabic: t('books.arabic')
+          }
         }) %>
       </script>
       <script>

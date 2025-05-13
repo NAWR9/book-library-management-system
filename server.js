@@ -15,7 +15,8 @@ const bookRoutes = require("./backend/src/routes/bookRoutes");
 const searchRoutes = require("./backend/src/routes/searchRoutes");
 const authRoutes = require("./backend/src/routes/authRoutes");
 const bookDetailsRoutes = require("./backend/src/routes/bookDetailsRoutes");
-const testRoutes = require("./backend/src/routes/testRoutes");
+
+const translateRoutes = require("./backend/src/routes/translateRoutes");
 const Book = require("./backend/src/models/Book");
 
 const app = express();
@@ -59,8 +60,8 @@ app.use("/api/search", searchRoutes);
 // Book Details Route
 app.use("/api/book-details", bookDetailsRoutes);
 
-// Test Routes
-app.use("/api/test", testRoutes);
+// Translation Routes
+app.use("/api/translate", translateRoutes);
 
 // Set up EJS with layouts
 app.set("layout", "layout");
@@ -99,7 +100,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// i18n locals and user detection
+/**
+ * Set up i18n locals and user detection from JWT token
+ */
 app.use((req, res, next) => {
   res.locals.t = req.t;
   res.locals.htmlLang = req.language;
@@ -265,7 +268,16 @@ app.get("/books", async (req, res) => {
 });
 
 app.get("/books/new", (req, res) => {
-  res.render("new");
+  if (!res.locals.user) return res.redirect("/login");
+  if (res.locals.user.role !== "admin") {
+    req.flash("error_msg", req.t("errors.adminOnly"));
+    return res.redirect("/books");
+  }
+
+  res.render("pages/add-book", {
+    title: req.t("titles.addBook"),
+    pageScript: "add-book",
+  });
 });
 
 // 404 handler for unmatched routes

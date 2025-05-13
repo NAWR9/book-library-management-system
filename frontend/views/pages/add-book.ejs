@@ -1,0 +1,252 @@
+<%- contentFor('body') %>
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h1 class="h4 mb-0"><%= t('books.addBook') %></h1>
+        </div>
+        <div class="card-body">
+          <form id="bookForm" class="needs-validation" novalidate>
+            <!-- Google Books Search -->
+            <div class="mb-4">
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <div class="form-floating">
+                    <input type="text" class="form-control" id="googleSearchQuery" placeholder="<%= t('books.searchQuery') %>">
+                    <label for="googleSearchQuery"><%= t('books.searchQuery') %></label>
+                  </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                  <button type="button" id="searchGoogleBtn" class="btn btn-primary">
+                    <i class="bi bi-search"></i> <%= t('books.fetchFromGoogle') %>
+                  </button>
+                </div>
+              </div>
+              <div id="searchResults" class="mt-3">
+                <!-- Search results will be displayed here -->
+              </div>
+            </div>
+
+            <!-- Common Fields (Always Visible) -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="title" name="title" required>
+                  <label for="title"><%= t('books.title') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.titleRequired') %></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="author" name="author" required>
+                  <label for="author"><%= t('books.author') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.authorRequired') %></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Language Tabs -->
+            <ul class="nav nav-tabs mb-4" id="languageTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="english-tab" data-bs-toggle="tab" data-bs-target="#english" type="button" role="tab" aria-controls="english" aria-selected="true"><%= t('books.english') %></button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="arabic-tab" data-bs-toggle="tab" data-bs-target="#arabic" type="button" role="tab" aria-controls="arabic" aria-selected="false"><%= t('books.arabic') %></button>
+              </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="languageTabsContent">
+              <!-- English Tab -->
+              <div class="tab-pane fade show active" id="english" role="tabpanel" aria-labelledby="english-tab">
+                <!-- Description -->
+                <div class="form-floating mb-3">
+                  <textarea class="form-control" id="description_en" name="description_en" style="height: 150px"></textarea>
+                  <label for="description_en"><%= t('books.description') %></label>
+                </div>
+
+                <!-- Tags -->
+                <div class="mb-4">
+                  <label class="form-label"><%= t('books.tags') %></label>
+                  <div class="tag-overview-container mb-2">
+                    <div class="language-tag-section">
+                      <div class="lang-label"><%= t('books.englishTags') || 'English Tags' %>:</div>
+                      <div class="tag-preview" id="tag_preview_en"></div>
+                    </div>
+                    <div class="language-tag-section mt-2">
+                      <div class="lang-label"><%= t('books.arabicTags') || 'Arabic Tags' %>:</div>
+                      <div class="tag-preview" id="tag_preview_ar"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-2">
+                    <div class="current-language-label" data-language="english"><%= t('books.addEnglishTags') || 'Add English Tags' %>:</div>
+                  </div>
+                  <div class="tag-input-container">
+                    <div class="tag-chips-container" id="tag_chips_en"></div>
+                    <input type="text" class="form-control tag-input" id="tags_input_en" placeholder="<%= t('books.tagPlaceholder') || 'Type a tag and press Enter' %>">
+                    <input type="hidden" id="tags_en" name="tags_en">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Arabic Tab -->
+              <div class="tab-pane fade" id="arabic" role="tabpanel" aria-labelledby="arabic-tab">
+                <!-- Description Arabic -->
+                <div class="form-floating mb-3">
+                  <textarea class="form-control" id="description_ar" name="description_ar" style="height: 150px" dir="rtl"></textarea>
+                  <label for="description_ar"><%= t('books.description') %></label>
+                </div>
+
+                <!-- Tags -->
+                <div class="mb-4">
+                  <label class="form-label"><%= t('books.tags') %></label>
+                  <div class="tag-overview-container mb-2">
+                    <div class="language-tag-section">
+                      <div class="lang-label"><%= t('books.englishTags') || 'English Tags' %>:</div>
+                      <div class="tag-preview" id="tag_preview_en_in_ar"></div>
+                    </div>
+                    <div class="language-tag-section mt-2">
+                      <div class="lang-label"><%= t('books.arabicTags') || 'Arabic Tags' %>:</div>
+                      <div class="tag-preview" id="tag_preview_ar_in_ar"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-2">
+                    <div class="current-language-label" data-language="arabic"><%= t('books.addArabicTags') || 'Add Arabic Tags' %>:</div>
+                  </div>
+                  <div class="tag-input-container">
+                    <div class="tag-chips-container text-end" id="tag_chips_ar" dir="rtl"></div>
+                    <input type="text" class="form-control tag-input" id="tags_input_ar" dir="rtl" placeholder="<%= t('books.tagPlaceholder') || 'اكتب علامة واضغط على Enter' %>">
+                    <input type="hidden" id="tags_ar" name="tags_ar">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Book Details -->
+            <h5 class="mt-4 mb-3"><%= t('books.additionalDetails') %></h5>
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="date" class="form-control" id="publicationDate" name="publicationDate" required>
+                  <label for="publicationDate"><%= t('books.publicationDate') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.dateRequired') %></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="publisher" name="publisher">
+                  <label for="publisher"><%= t('books.publisher') %></label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="pageCount" name="pageCount" min="1">
+                  <label for="pageCount"><%= t('books.pageCount') %></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="isbn" name="isbn">
+                  <label for="isbn"><%= t('books.isbn') %></label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="bookCount" name="bookCount" min="1" value="1" required>
+                  <label for="bookCount"><%= t('books.bookCount') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.countRequired') %></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="coverImage" name="coverImage">
+                  <label for="coverImage"><%= t('books.coverImageUrl') %></label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <select class="form-select" id="language" name="language" required>
+                    <option value="english" selected><%= t('books.english') || 'English' %></option>
+                    <option value="arabic"><%= t('books.arabic') || 'Arabic' %></option>
+                  </select>
+                  <label for="language">Book Language *</label>
+                  <div class="invalid-feedback">Book language is required</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" checked id="availability" name="availability">
+              <label class="form-check-label" for="availability">
+                <%= t('books.available') %>
+              </label>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="mt-4 d-flex justify-content-between">
+              <button type="button" id="cancelBtn" class="btn btn-outline-secondary"><%= t('books.cancel') %></button>
+              <button type="button" id="submitBtn" class="btn btn-primary"><%= t('books.addBook') %></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+  <div id="bookFormToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto" id="toast-title"></strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body" id="toast-message"></div>
+  </div>
+</div>
+
+<!-- Cancel Confirmation Modal -->
+<div class="modal fade" id="cancelConfirmModal" tabindex="-1" aria-labelledby="cancelConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelConfirmModalLabel"><%= t('common.confirmCancel') || 'Confirm Cancel' %></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <%= t('books.cancelConfirmMessage') || 'Are you sure you want to cancel? All entered information will be lost.' %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= t('common.no') || 'No' %></button>
+        <button type="button" class="btn btn-danger" id="confirmCancelBtn"><%= t('common.yes') || 'Yes' %></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Submit Confirmation Modal -->
+<div class="modal fade" id="submitConfirmModal" tabindex="-1" aria-labelledby="submitConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="submitConfirmModalLabel"><%= t('common.confirmAdd') || 'Confirm Add Book' %></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <%= t('books.submitConfirmMessage') || 'Are you sure you want to add this book?' %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= t('common.no') || 'No' %></button>
+        <button type="button" class="btn btn-primary" id="confirmSubmitBtn"><%= t('common.yes') || 'Yes' %></button>
+      </div>
+    </div>
+  </div>
+</div>

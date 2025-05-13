@@ -1,67 +1,128 @@
-/**
- * Translation Utility Service
- * Uses @vitalets/google-translate-api to translate text from English to Arabic
- */
 const { translate } = require("@vitalets/google-translate-api");
 
 /**
- * Translates text from English to Arabic
- * @param {string} text - The English text to translate
- * @returns {Promise<string>} - The translated Arabic text
+ * Sleep function to delay between retries
+ * @param {number} ms - Milliseconds to sleep
+ * @returns {Promise} - Promise that resolves after the specified time
  */
-const translateToArabic = async (text) => {
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Translate text with retry logic
+ * @param {string} text - Text to translate
+ * @param {string} targetLang - Target language code
+ * @param {number} maxRetries - Maximum number of retries
+ * @returns {Promise<string>} - Translated text or original text if translation fails
+ */
+// Track translation success rate for monitoring
+const translationStats = {
+  totalAttempts: 0,
+  successCount: 0,
+  failureCount: 0,
+  lastFailure: null,
+  rateLimitHits: 0,
+};
+
+const translateWithRetry = async (text, targetLang) => {
+  if (!text) return null;
+
+  translationStats.totalAttempts++;
+
+  if (text.length > 5000) {
+    text = text.substring(0, 5000) + "...";
+  }
+
   try {
-    if (!text) return null;
+    if (text.length <= 3) {
+      return text;
+    }
 
-    console.log(`Translating text to Arabic: "${text.substring(0, 50)}..."`);
-
-    const result = await translate(text, { to: "ar" });
-    console.log(
-      `Translation successful, result: "${result.text.substring(0, 50)}..."`,
-    );
-
+    const result = await translate(text, { to: targetLang });
+    translationStats.successCount++;
     return result.text;
   } catch (error) {
-    console.error("Translation error:", error);
-    // Return original text if translation fails
-    return text;
+    if (
+      error.message &&
+      (error.message.includes("429") ||
+        error.message.includes("Too Many Requests"))
+    ) {
+      translationStats.rateLimitHits++;
+      translationStats.failureCount++;
+      return text;
+    }
+
+    // Try once more after a delay
+    try {
+      await sleep(500);
+      const result = await translate(text, { to: targetLang });
+      translationStats.successCount++;
+      return result.text;
+    } catch {
+      translationStats.failureCount++;
+      translationStats.lastFailure = new Date();
+      return text;
+    }
   }
 };
 
-/**
- * Translates book details from English to Arabic
- * @param {Object} bookDetails - Book details object with English text
- * @returns {Promise<Object>} - Book details with Arabic translations
- */
+const translateToArabic = async (text) => {
+  return await translateWithRetry(text, "ar");
+};
+
+const translateToEnglish = async (text) => {
+  return await translateWithRetry(text, "en");
+};
+
 const translateBookDetails = async (bookDetails) => {
   try {
     const result = { ...bookDetails };
 
-    // Translate description if available
     if (bookDetails.description) {
-      result.description_ar = await translateToArabic(bookDetails.description);
-    }
+      const isArabic = (text) => {
+        if (!text) return false;
+        const arabicChars = (text.match(/[\u0600-\u06FF]/g) || []).length;
+        return arabicChars / text.length > 0.3;
+      };
 
-    // Optionally translate other fields like title, author, etc.
-    // Uncomment if you want to translate these fields
-    /*
-    if (bookDetails.title) {
-      result.title_ar = await translateToArabic(bookDetails.title);
+      if (isArabic(bookDetails.description)) {
+        result.description_ar = bookDetails.description;
+        result.description_en = await translateToEnglish(
+          bookDetails.description,
+        );
+      } else {
+        result.description_en = bookDetails.description;
+        result.description_ar = await translateToArabic(
+          bookDetails.description,
+        );
+      }
     }
-    
-    if (bookDetails.author) {
-      result.author_ar = await translateToArabic(bookDetails.author);
-    }
-    */
 
     return result;
-  } catch (error) {
-    console.error("Error translating book details:", error);
-    return bookDetails;
+  } catch {
+    return { ...bookDetails };
   }
+};
+
+/**
+ * Get current translation service statistics
+ * @returns {Object} - Translation service statistics
+ */
+const getTranslationStats = () => {
+  return {
+    ...translationStats,
+    successRate:
+      translationStats.totalAttempts > 0
+        ? (
+            (translationStats.successCount / translationStats.totalAttempts) *
+            100
+          ).toFixed(1)
+        : 0,
+  };
 };
 
 module.exports = {
   translateToArabic,
+  translateToEnglish,
   translateBookDetails,
+  getTranslationStats,
 };

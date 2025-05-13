@@ -1,18 +1,22 @@
 const express = require("express");
 const router = express.Router();
 const Book = require("../models/Book");
+const { protect, authorize } = require("../middleware/authMiddleware");
 const {
   fetchAndUpdateBookDetails,
 } = require("../controllers/bookDetailsController");
 
-// @desc    Add a new book
-// @route   POST /api/books
-// @access  Admin
-router.post("/", async (req, res) => {
+/**
+ * Add a new book
+ * @route   POST /api/books
+ * @access  Admin only
+ */
+router.post("/", protect, authorize(["admin"]), async (req, res) => {
   try {
     const {
       title,
       author,
+      language,
       publicationDate,
       genre,
       description_en,
@@ -24,13 +28,16 @@ router.post("/", async (req, res) => {
       categories,
       bookCount,
       category,
+      tags_en,
+      tags_ar,
+      availability,
     } = req.body;
 
-    // Create the basic book
     // Create the basic book
     const book = await Book.create({
       title,
       author,
+      language: language || "english", // Include the language field
       publicationDate,
       genre: genre || "General",
       description_en: description_en || null,
@@ -42,6 +49,10 @@ router.post("/", async (req, res) => {
       categories: categories || [],
       bookCount: bookCount || 1,
       category: category || "General",
+      tags_en: tags_en || [],
+      tags_ar: tags_ar || [],
+      availability: availability !== undefined ? availability : true,
+      addedBy: req.user._id, // Store the admin who added the book
       description_fetched: !!(description_en || description_ar), // Mark as fetched if either description exists
     });
 
@@ -182,7 +193,7 @@ router.get("/:id", async (req, res) => {
 // @desc    Update a book
 // @route   PUT /api/books/:id
 // @access  Admin
-router.put("/:id", async (req, res) => {
+router.put("/:id", protect, authorize(["admin"]), async (req, res) => {
   try {
     const {
       title,
@@ -199,6 +210,8 @@ router.put("/:id", async (req, res) => {
       availability,
       bookCount,
       category,
+      tags_en,
+      tags_ar,
     } = req.body;
 
     const book = await Book.findById(req.params.id);
@@ -232,6 +245,8 @@ router.put("/:id", async (req, res) => {
     if (availability !== undefined) book.availability = availability;
     if (bookCount !== undefined) book.bookCount = bookCount;
     if (category !== undefined) book.category = category;
+    if (tags_en !== undefined) book.tags_en = tags_en;
+    if (tags_ar !== undefined) book.tags_ar = tags_ar;
 
     // If descriptions were updated, mark as fetched
     if (description_en !== undefined || description_ar !== undefined) {
@@ -253,7 +268,7 @@ router.put("/:id", async (req, res) => {
 // @desc    Delete a book
 // @route   DELETE /api/books/:id
 // @access  Admin
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", protect, authorize(["admin"]), async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
 

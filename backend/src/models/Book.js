@@ -11,6 +11,12 @@ const BookSchema = new mongoose.Schema({
     required: [true, "Please provide the author's name"],
     trim: true,
   },
+  language: {
+    type: String,
+    required: [true, "Please specify the book language"],
+    enum: ["english", "arabic"],
+    default: "english",
+  },
   publicationDate: {
     type: Date,
     required: [true, "Please provide the publication date"],
@@ -22,10 +28,6 @@ const BookSchema = new mongoose.Schema({
   availability: {
     type: Boolean,
     default: true,
-  },
-  genre: {
-    type: String,
-    default: "General",
   },
   description_en: {
     type: String,
@@ -59,10 +61,20 @@ const BookSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  categories: {
+  tags_en: {
     type: [String],
     default: [],
   },
+  tags_ar: {
+    type: [String],
+    default: [],
+  },
+  addedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
+
   borrowedBy: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "User",
@@ -74,16 +86,12 @@ const BookSchema = new mongoose.Schema({
     default: 1,
     min: [1, "Book count must be at least 1"],
   },
-  // Keep the legacy category field for backward compatibility
-  category: {
-    type: String,
-    default: "General",
-  },
-  // Add main category reference
-  mainCategory: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Category",
-  },
 });
+
+// Calculate the number of available books (total count minus borrowed books)
+BookSchema.methods.availableBooks = function () {
+  const borrowedCount = this.borrowedBy ? this.borrowedBy.length : 0;
+  return Math.max(0, this.bookCount - borrowedCount);
+};
 
 module.exports = mongoose.model("Book", BookSchema);

@@ -127,11 +127,19 @@
     "notFound": "الصفحة غير موجودة",
     "books": "الكتب",
     "forgotPassword": "نسيت كلمة المرور",
-    "resetPassword": "إعادة تعيين كلمة المرور"
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "addBook": "إضافة كتاب"
   },
   "errors": {
     "pageNotFound": "الصفحة التي تبحث عنها غير موجودة",
-    "serverError": "حدث خطأ غير متوقع"
+    "serverError": "حدث خطأ غير متوقع",
+    "adminOnly": "يمكن للمسؤولين فقط الوصول إلى هذه الصفحة"
+  },
+  "common": {
+    "yes": "نعم",
+    "no": "لا",
+    "confirmCancel": "تأكيد الإلغاء",
+    "confirmAdd": "تأكيد إضافة الكتاب"
   },
   "books": {
     "bookLibrary": "مكتبة الكتب",
@@ -150,10 +158,39 @@
     "isbn": "الرقم الدولي",
     "loadingDetails": "جاري تحميل تفاصيل الكتاب...",
     "noDescription": "لا يوجد وصف متاح.",
-    "fetchError": "فشل في جلب تفاصيل الكتاب. يرجى المحاولة مرة أخرى لاحقًا.",
+    "fetchError": "فشل في الحصول على تفاصيل الكتاب. يرجى المحاولة لاحقًا.",
     "viewDetails": "عرض التفاصيل",
     "bookCount": "عدد النسخ",
     "saveBook": "حفظ الكتاب",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "cancelConfirmMessage": "هل أنت متأكد من الإلغاء؟ ستفقد جميع المعلومات التي أدخلتها.",
+    "submitConfirmMessage": "هل أنت متأكد من إضافة هذا الكتاب؟",
+    "manualEntry": "إدخال يدوي",
+    "fetchFromGoogle": "تعبئة البيانات من كتب جوجل",
+    "searchQuery": "استعلام البحث (العنوان، المؤلف، الرقم الدولي)",
+    "search": "بحث",
+    "english": "الإنجليزية",
+    "arabic": "العربية",
+    "title": "العنوان",
+    "titleRequired": "العنوان مطلوب",
+    "authorRequired": "اسم المؤلف مطلوب",
+    "dateRequired": "تاريخ النشر مطلوب",
+    "tags": "العلامات",
+    "commaSeparated": "مفصولة بفواصل",
+    "tagPlaceholder": "اكتب علامة واضغط على Enter",
+    "additionalDetails": "تفاصيل إضافية",
+    "copyToArabic": "نسخ إلى العربية",
+    "copyToEnglish": "نسخ إلى الإنجليزية",
+    "englishTags": "العلامات الإنجليزية",
+    "arabicTags": "العلامات العربية",
+    "addEnglishTags": "أضف علامات إنجليزية",
+    "addArabicTags": "أضف علامات عربية",
+    "noTagsAdded": "لم تتم إضافة علامات",
+    "coverImageUrl": "رابط صورة الغلاف",
+    "available": "متاح للاستعارة",
+    "translateFromEnglish": "ترجمة من الإنجليزية",
+    "translateToArabic": "ترجمة إلى العربية",
+    "translateToEnglish": "ترجمة إلى الإنجليزية",
+    "countRequired": "عدد النسخ مطلوب (الحد الأدنى 1)"
   }
 }

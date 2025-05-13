@@ -126,11 +126,19 @@
     "profile": "Profile",
     "books": "Books",
     "forgotPassword": "Forgot Password",
-    "resetPassword": "Reset Password"
+    "resetPassword": "Reset Password",
+    "addBook": "Add Book"
   },
   "errors": {
     "pageNotFound": "Page not found",
-    "serverError": "An unexpected error occurred"
+    "serverError": "An unexpected error occurred",
+    "adminOnly": "Only administrators can access this page"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "confirmCancel": "Confirm Cancel",
+    "confirmAdd": "Confirm Add Book"
   },
   "books": {
     "bookLibrary": "Book Library",
@@ -153,6 +161,35 @@
     "viewDetails": "View Details",
     "bookCount": "Number of Copies",
     "saveBook": "Save Book",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "cancelConfirmMessage": "Are you sure you want to cancel? All entered information will be lost.",
+    "submitConfirmMessage": "Are you sure you want to add this book?",
+    "manualEntry": "Manual Entry",
+    "fetchFromGoogle": "Fetch from Google Books",
+    "searchQuery": "Search Query (Title, Author, ISBN)",
+    "search": "Search",
+    "english": "English",
+    "arabic": "Arabic",
+    "title": "Title",
+    "titleRequired": "Title is required",
+    "authorRequired": "Author is required",
+    "dateRequired": "Publication date is required",
+    "tags": "Tags",
+    "commaSeparated": "comma separated",
+    "tagPlaceholder": "Type a tag and press Enter",
+    "additionalDetails": "Additional Details",
+    "coverImageUrl": "Cover Image URL",
+    "copyToArabic": "Copy to Arabic",
+    "copyToEnglish": "Copy to English",
+    "englishTags": "English Tags",
+    "arabicTags": "Arabic Tags",
+    "addEnglishTags": "Add English Tags",
+    "addArabicTags": "Add Arabic Tags",
+    "noTagsAdded": "No tags added",
+    "available": "Available for borrowing",
+    "translateFromEnglish": "Translate from English",
+    "translateToArabic": "Translate to Arabic",
+    "translateToEnglish": "Translate to English",
+    "countRequired": "Number of copies is required (minimum 1)"
   }
 }

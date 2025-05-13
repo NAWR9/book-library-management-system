@@ -1,6 +1,20 @@
 const axios = require("axios");
 const Book = require("../models/Book");
-const { translateToArabic } = require("../utils/translateService");
+const {
+  translateToArabic,
+  translateToEnglish,
+} = require("../utils/translateService");
+
+/**
+ * Checks if text is primarily written in Arabic
+ * @param {string} text - The text to check
+ * @returns {boolean} - True if the text is primarily in Arabic
+ */
+const isArabicText = (text) => {
+  if (!text) return false;
+  const arabicChars = (text.match(/[\u0600-\u06FF]/g) || []).length;
+  return arabicChars / text.length > 0.3;
+};
 
 /**
  * Retrieves book details by ID, title, or author
@@ -70,31 +84,38 @@ const getBookDetails = async (req, res) => {
 };
 
 /**
- * Gets book details by ID and ensures descriptions are available
- * @param {string} bookId - The book ID to look up
- * @param {string} lang - The language code (en/ar)
- * @returns {Object|null} Book details object or null if not found
+ * Helper function to get book details by ID
+ * @param {string} id - Book ID
+ * @param {string} lang - Language code (en/ar)
+ * @returns {Object|null} Book details or null if not found
  */
-const getBookDetailsById = async (bookId, lang) => {
-  let book = await Book.findById(bookId);
-  if (!book) return null;
+const getBookDetailsById = async (id, lang) => {
+  try {
+    const book = await Book.findById(id);
+    if (!book) return null;
 
-  // Check if we need to do a lazy fetch for missing descriptions
-  if (!book.description_fetched || book.description_en === null) {
-    await fetchAndUpdateBookDetails(book);
-    // Get updated book after fetching details
-    const updatedBook = await Book.findById(book._id);
-    book = updatedBook;
+    // If descriptions are not fetched, update them
+    if (!book.description_fetched) {
+      await fetchAndUpdateBookDetails(book);
+      // Refetch the book to get updated details
+      const updatedBook = await Book.findById(id);
+      return formatBookDetails(updatedBook, lang);
+    }
+
+    return formatBookDetails(book, lang);
+  } catch (error) {
+    console.error("Error fetching book by ID:", error);
+    return null;
   }
+};
 
-  // Translate description to Arabic if needed
-  if (book.description_en && !book.description_ar) {
-    book.description_ar = await translateToArabic(book.description_en);
-    book.description_fetched = true;
-    await book.save();
-  }
-
-  // Return book with both descriptions and appropriate current language description
+/**
+ * Format book details based on language
+ * @param {Object} book - Book model instance
+ * @param {string} lang - Language code (en/ar)
+ * @returns {Object} Formatted book details
+ */
+const formatBookDetails = (book, lang) => {
   const description =
     lang === "ar"
       ? book.description_ar || book.description_en
@@ -125,13 +146,45 @@ const processExistingBookDetails = async (existingBook, lang) => {
     // Refetch the updated book
     const updatedBook = await Book.findById(existingBook._id);
 
-    // Translate description to Arabic if needed
+    // Translate description if needed
     if (updatedBook.description_en && !updatedBook.description_ar) {
-      updatedBook.description_ar = await translateToArabic(
-        updatedBook.description_en,
-      );
-      updatedBook.description_fetched = true;
-      await updatedBook.save();
+      // If we have English but no Arabic, translate to Arabic
+      try {
+        const translatedArabic = await translateToArabic(
+          updatedBook.description_en,
+        );
+        // Check if translation failed
+        if (translatedArabic === updatedBook.description_en) {
+          console.warn("Translation to Arabic failed, using original text");
+        }
+        updatedBook.description_ar = translatedArabic;
+        updatedBook.description_fetched = true;
+        await updatedBook.save();
+      } catch (translateError) {
+        console.error("Error translating English to Arabic:", translateError);
+        updatedBook.description_ar = updatedBook.description_en; // Fallback to English
+        updatedBook.description_fetched = true;
+        await updatedBook.save();
+      }
+    } else if (updatedBook.description_ar && !updatedBook.description_en) {
+      // If we have Arabic but no English, translate to English
+      try {
+        const translatedEnglish = await translateToEnglish(
+          updatedBook.description_ar,
+        );
+        // Check if translation failed
+        if (translatedEnglish === updatedBook.description_ar) {
+          console.warn("Translation to English failed, using original text");
+        }
+        updatedBook.description_en = translatedEnglish;
+        updatedBook.description_fetched = true;
+        await updatedBook.save();
+      } catch (translateError) {
+        console.error("Error translating Arabic to English:", translateError);
+        updatedBook.description_en = updatedBook.description_ar; // Fallback to Arabic
+        updatedBook.description_fetched = true;
+        await updatedBook.save();
+      }
     }
 
     // Get description based on current language
@@ -150,13 +203,45 @@ const processExistingBookDetails = async (existingBook, lang) => {
     };
   }
 
-  // Translate description to Arabic if needed
+  // Handle translations for existing book
   if (existingBook.description_en && !existingBook.description_ar) {
-    existingBook.description_ar = await translateToArabic(
-      existingBook.description_en,
-    );
-    existingBook.description_fetched = true;
-    await existingBook.save();
+    // If we have English but no Arabic, translate to Arabic
+    try {
+      const translatedArabic = await translateToArabic(
+        existingBook.description_en,
+      );
+      // Check if translation failed
+      if (translatedArabic === existingBook.description_en) {
+        console.warn("Translation to Arabic failed, using original text");
+      }
+      existingBook.description_ar = translatedArabic;
+      existingBook.description_fetched = true;
+      await existingBook.save();
+    } catch (translateError) {
+      console.error("Error translating English to Arabic:", translateError);
+      existingBook.description_ar = existingBook.description_en; // Fallback to English
+      existingBook.description_fetched = true;
+      await existingBook.save();
+    }
+  } else if (existingBook.description_ar && !existingBook.description_en) {
+    // If we have Arabic but no English, translate to English
+    try {
+      const translatedEnglish = await translateToEnglish(
+        existingBook.description_ar,
+      );
+      // Check if translation failed
+      if (translatedEnglish === existingBook.description_ar) {
+        console.warn("Translation to English failed, using original text");
+      }
+      existingBook.description_en = translatedEnglish;
+      existingBook.description_fetched = true;
+      await existingBook.save();
+    } catch (translateError) {
+      console.error("Error translating Arabic to English:", translateError);
+      existingBook.description_en = existingBook.description_ar; // Fallback to Arabic
+      existingBook.description_fetched = true;
+      await existingBook.save();
+    }
   }
 
   // Return existing book with appropriate language description
@@ -173,6 +258,21 @@ const processExistingBookDetails = async (existingBook, lang) => {
     isbn: existingBook.isbn,
     publishedDate: existingBook.publicationDate,
   };
+};
+
+/**
+ * Helper to extract ISBN from Google Books API response
+ * @param {Object} bookData - Book data from Google Books API
+ * @returns {string|null} ISBN or null if not found
+ */
+const extractIsbnFromData = (bookData) => {
+  if (!bookData.industryIdentifiers) return null;
+
+  const isbnObj = bookData.industryIdentifiers.find(
+    (id) => id.type === "ISBN_13" || id.type === "ISBN_10",
+  );
+
+  return isbnObj ? isbnObj.identifier : null;
 };
 
 /**
@@ -200,20 +300,46 @@ const fetchBookDetailsFromApi = async (title, author, lang) => {
   }
 
   // Extract book data from response
-  const englishBookData =
+  const bookData =
     englishResponse.data.totalItems > 0
       ? englishResponse.data.items[0].volumeInfo
       : null;
 
-  if (!englishBookData) {
+  if (!bookData) {
     return null;
   }
 
-  // Translate English description to Arabic
-  const englishDescription = englishBookData?.description || null;
-  const arabicDescription = englishDescription
-    ? await translateToArabic(englishDescription)
-    : null;
+  // Check if the description is in Arabic
+  const originalDescription = bookData?.description || null;
+  let englishDescription = originalDescription;
+  let arabicDescription = null;
+
+  if (originalDescription) {
+    if (isArabicText(originalDescription)) {
+      try {
+        const translatedText = await translateToEnglish(originalDescription);
+        if (translatedText === originalDescription) {
+          console.warn("Translation to English failed");
+        }
+        englishDescription = translatedText;
+        arabicDescription = originalDescription;
+      } catch (translateError) {
+        console.error("Error translating Arabic to English:", translateError);
+        englishDescription = originalDescription;
+        arabicDescription = originalDescription;
+      }
+    } else {
+      try {
+        arabicDescription = await translateToArabic(originalDescription);
+        if (arabicDescription === originalDescription) {
+          console.warn("Translation to Arabic failed");
+        }
+      } catch (translateError) {
+        console.error("Error translating English to Arabic:", translateError);
+        arabicDescription = originalDescription;
+      }
+    }
+  }
 
   // Get description based on current language
   const description =
@@ -222,42 +348,46 @@ const fetchBookDetailsFromApi = async (title, author, lang) => {
       : englishDescription || arabicDescription;
 
   // Extract ISBN
-  let isbn = extractIsbnFromData(englishBookData);
+  let isbn = extractIsbnFromData(bookData);
 
   const bookDetails = {
-    title: englishBookData.title,
-    authors: englishBookData.authors || [],
+    title: bookData.title,
+    authors: bookData.authors || [],
     description,
     description_en: englishDescription,
     description_ar: arabicDescription,
     description_fetched: true,
-    publishedDate: englishBookData.publishedDate,
-    publicationDate: englishBookData.publishedDate,
-    pageCount: englishBookData.pageCount,
-    categories: englishBookData.categories || [],
-    imageLinks: englishBookData.imageLinks || {},
-    language: englishBookData.language,
-    previewLink: englishBookData.previewLink,
-    industryIdentifiers: englishBookData.industryIdentifiers || [],
-    publisher: englishBookData.publisher,
+    publishedDate: bookData.publishedDate,
+    publicationDate: bookData.publishedDate,
+    pageCount: bookData.pageCount,
+    categories: bookData.categories || [],
+    imageLinks: bookData.imageLinks || {},
+    language: bookData.language,
+    previewLink: bookData.previewLink,
+    industryIdentifiers: bookData.industryIdentifiers || [],
+    publisher: bookData.publisher,
     isbn,
   };
 
   // Create a book record in our database for future reference
   try {
     const newBook = new Book({
-      title: englishBookData.title,
-      author: englishBookData.authors ? englishBookData.authors[0] : "Unknown",
-      publicationDate: englishBookData.publishedDate || new Date(),
+      title: bookData.title,
+      author: bookData.authors ? bookData.authors[0] : "Unknown",
+      language:
+        bookData.language && bookData.language.toLowerCase() === "ar"
+          ? "arabic"
+          : "english",
+      publicationDate: bookData.publishedDate || new Date(),
       description_en: englishDescription,
       description_ar: arabicDescription,
       description_fetched: true,
-      publisher: englishBookData.publisher || null,
-      pageCount: englishBookData.pageCount || null,
+      publisher: bookData.publisher || null,
+      pageCount: bookData.pageCount || null,
       isbn: isbn,
-      coverImage: englishBookData.imageLinks?.thumbnail || null,
-      categories: englishBookData.categories || [],
-      genre: englishBookData.categories?.[0] || "General",
+      coverImage: bookData.imageLinks?.thumbnail || null,
+      categories: bookData.categories || [],
+      genre: bookData.categories?.[0] || "General",
     });
 
     await newBook.save();
@@ -268,23 +398,6 @@ const fetchBookDetailsFromApi = async (title, author, lang) => {
   }
 
   return bookDetails;
-};
-
-/**
- * Helper function to extract ISBN from book data
- * @param {Object} bookData - The book data object
- * @returns {string|null} ISBN or null if not found
- */
-const extractIsbnFromData = (bookData) => {
-  if (!bookData.industryIdentifiers || !bookData.industryIdentifiers.length) {
-    return null;
-  }
-
-  const isbnObj = bookData.industryIdentifiers.find(
-    (id) => id.type === "ISBN_13" || id.type === "ISBN_10",
-  );
-
-  return isbnObj ? isbnObj.identifier : null;
 };
 
 /**
@@ -306,41 +419,90 @@ const fetchAndUpdateBookDetails = async (book) => {
     const englishResponse = await axios.get(englishApiUrl);
 
     if (englishResponse.data.totalItems > 0) {
-      const englishBookData = englishResponse.data.items[0].volumeInfo;
-      book.description_en =
-        englishBookData.description || book.description_en || null;
+      const bookData = englishResponse.data.items[0].volumeInfo;
+      const originalDescription =
+        bookData.description || book.description_en || null;
+
+      // Check if the description is in Arabic
+      if (originalDescription && isArabicText(originalDescription)) {
+        book.description_ar = originalDescription;
+        try {
+          const translatedText = await translateToEnglish(originalDescription);
+          if (translatedText === originalDescription) {
+            console.warn("Translation to English failed");
+          }
+          book.description_en = translatedText;
+        } catch (translateError) {
+          console.error("Error translating Arabic to English:", translateError);
+          book.description_en = originalDescription;
+        }
+      } else {
+        book.description_en = originalDescription;
+      }
 
       // Update other metadata if available
-      if (englishBookData.publisher && !book.publisher) {
-        book.publisher = englishBookData.publisher;
+      if (bookData.publisher && !book.publisher) {
+        book.publisher = bookData.publisher;
       }
-      if (englishBookData.pageCount && !book.pageCount) {
-        book.pageCount = englishBookData.pageCount;
+      if (bookData.pageCount && !book.pageCount) {
+        book.pageCount = bookData.pageCount;
       }
-      if (englishBookData.categories && englishBookData.categories.length > 0) {
-        book.categories = englishBookData.categories;
+      if (bookData.categories && bookData.categories.length > 0) {
+        book.categories = bookData.categories;
       }
       if (
-        englishBookData.industryIdentifiers &&
-        englishBookData.industryIdentifiers.length > 0
+        bookData.industryIdentifiers &&
+        bookData.industryIdentifiers.length > 0
       ) {
-        const isbn = extractIsbnFromData(englishBookData);
+        const isbn = extractIsbnFromData(bookData);
         if (isbn && !book.isbn) {
           book.isbn = isbn;
         }
       }
       if (
-        englishBookData.imageLinks &&
-        englishBookData.imageLinks.thumbnail &&
+        bookData.imageLinks &&
+        bookData.imageLinks.thumbnail &&
         !book.coverImage
       ) {
-        book.coverImage = englishBookData.imageLinks.thumbnail;
+        book.coverImage = bookData.imageLinks.thumbnail;
       }
     }
 
-    // If we have English description, translate to Arabic
+    // Handle translations based on available descriptions
     if (book.description_en && !book.description_ar) {
-      book.description_ar = await translateToArabic(book.description_en);
+      // If we have English description but no Arabic, translate English to Arabic
+      try {
+        const translatedArabic = await translateToArabic(book.description_en);
+        // Check if translation failed (returns the original text)
+        if (translatedArabic === book.description_en) {
+          console.warn("Translation to Arabic failed, using placeholder");
+          // Use a placeholder message instead of the original English text
+          book.description_ar = book.description_en;
+        } else {
+          book.description_ar = translatedArabic;
+        }
+      } catch (translateError) {
+        console.error("Error translating English to Arabic:", translateError);
+        // Use the English version as a fallback
+        book.description_ar = book.description_en;
+      }
+    } else if (book.description_ar && !book.description_en) {
+      // If we have Arabic description but no English, translate Arabic to English
+      try {
+        const translatedEnglish = await translateToEnglish(book.description_ar);
+        // Check if translation failed (returns the original text)
+        if (translatedEnglish === book.description_ar) {
+          console.warn("Translation to English failed, using placeholder");
+          // Use a placeholder message instead of the original Arabic text
+          book.description_en = book.description_ar;
+        } else {
+          book.description_en = translatedEnglish;
+        }
+      } catch (translateError) {
+        console.error("Error translating Arabic to English:", translateError);
+        // Use the Arabic version as a fallback
+        book.description_en = book.description_ar;
+      }
     }
 
     book.description_fetched = true;

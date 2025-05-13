@@ -2,9 +2,11 @@
 
 <div class="container py-5">
     <h1 class="text-center mb-4"><%= t('books.bookLibrary') %></h1>
+    <% if (locals.user && (locals.user.role === "admin" || locals.user.isAdmin)) { %>
     <div class="text-end mb-3">
       <a href="/books/new" class="btn btn-primary">+ <%= t('books.addBook') %></a>
     </div>
+    <% } %>
     <div class="row row-cols-1 row-cols-md-3 g-4">
       <% books.forEach(book => { %>
         <div class="col">

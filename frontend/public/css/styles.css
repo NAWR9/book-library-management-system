@@ -207,7 +207,8 @@ body {
 
 .book-card img {
   height: 300px;
-  object-fit: cover;
+  object-fit: contain;
+  background-color: gray;
 }
 
 /* Book details modal styles */
