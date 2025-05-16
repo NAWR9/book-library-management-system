@@ -24,7 +24,6 @@ router.post("/", protect, authorize(["admin"]), async (req, res) => {
       author,
       language,
       publicationDate,
-      genre,
       description_en,
       description_ar,
       publisher,
@@ -33,24 +32,18 @@ router.post("/", protect, authorize(["admin"]), async (req, res) => {
       coverImage,
       categories,
       bookCount,
-      category,
-      tags_en,
-      tags_ar,
-      tags, // Add support for backward compatibility
       availability,
     } = req.body;
 
-    // Map categories to predefined category keys if categories not provided directly
-    const mappedCategories =
-      categories || mapGoogleCategoriesToCategoryKeys(tags || []);
+    // Map categories to predefined category keys
+    const mappedCategories = categories;
 
     // Create the basic book
     const book = await Book.create({
       title,
       author,
-      language: language || "english", // Include the language field
+      language: language || "english",
       publicationDate,
-      genre: genre || "General",
       description_en: description_en || null,
       description_ar: description_ar || null,
       publisher: publisher || null,
@@ -59,13 +52,9 @@ router.post("/", protect, authorize(["admin"]), async (req, res) => {
       coverImage: coverImage || null,
       categories: mappedCategories || [],
       bookCount: bookCount || 1,
-      category: category || "General",
-      tags: tags || [],
-      tags_en: tags_en || [], // For backward compatibility
-      tags_ar: tags_ar || [], // For backward compatibility
       availability: availability !== undefined ? availability : true,
-      addedBy: req.user._id, // Store the admin who added the book
-      description_fetched: !!(description_en || description_ar), // Mark as fetched if either description exists
+      addedBy: req.user._id,
+      description_fetched: !!(description_en || description_ar),
     });
 
     // If no descriptions were provided, try to fetch them automatically
@@ -153,27 +142,6 @@ router.get("/categories", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching category keys",
-      error: error.message,
-    });
-  }
-});
-
-/**
- * For backward compatibility
- * @route   GET /api/books/tags
- * @access  Public
- */
-router.get("/tags", async (req, res) => {
-  try {
-    // Redirect to the categories endpoint
-    res.redirect(
-      "/api/books/categories" +
-        (req.query.categorized ? "?categorized=" + req.query.categorized : ""),
-    );
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Error fetching tag keys",
       error: error.message,
     });
   }
@@ -370,10 +338,6 @@ router.put("/:id", protect, authorize(["admin"]), async (req, res) => {
       categories,
       availability,
       bookCount,
-      category,
-      tags_en,
-      tags_ar,
-      tags,
     } = req.body;
 
     const book = await Book.findById(req.params.id);
@@ -408,10 +372,6 @@ router.put("/:id", protect, authorize(["admin"]), async (req, res) => {
 
     if (availability !== undefined) book.availability = availability;
     if (bookCount !== undefined) book.bookCount = bookCount;
-    if (category !== undefined) book.category = category;
-    if (tags !== undefined) book.tags = tags;
-    if (tags_en !== undefined) book.tags_en = tags_en;
-    if (tags_ar !== undefined) book.tags_ar = tags_ar;
 
     // If descriptions were updated, mark as fetched
     if (description_en !== undefined || description_ar !== undefined) {

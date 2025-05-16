@@ -1,5 +1,4 @@
 /* global bootstrap */
-import { authGet } from "../utils/auth-fetch.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const bookCards = document.querySelectorAll(".book-card");
@@ -43,10 +42,11 @@ document.addEventListener("DOMContentLoaded", () => {
         lang: currentLanguage,
       });
 
-      // Fetch book details using authGet utility
-      const result = await authGet(
+      // Fetch book details
+      const response = await fetch(
         `${window.API_BASE_URL}/api/book-details?${params}`,
       );
+      const result = await response.json();
 
       // Display the book details
       displayBookDetails(result.data);

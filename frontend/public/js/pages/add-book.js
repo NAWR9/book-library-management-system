@@ -9,19 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const descriptionEn = document.getElementById("description_en");
   const descriptionAr = document.getElementById("description_ar");
 
-  // For backward compatibility
-  const categoriesEnHidden = document.createElement("input");
-  categoriesEnHidden.type = "hidden";
-  categoriesEnHidden.id = "categories_en";
-  categoriesEnHidden.name = "categories_en";
-  bookForm.appendChild(categoriesEnHidden);
-
-  const categoriesArHidden = document.createElement("input");
-  categoriesArHidden.type = "hidden";
-  categoriesArHidden.id = "categories_ar";
-  categoriesArHidden.name = "categories_ar";
-  bookForm.appendChild(categoriesArHidden);
-
   // Initialize a single category manager - we use the same categories for both languages
   let categoryManager;
   try {
@@ -49,31 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Sync the selected categories to hidden fields when categories change
   function syncCategoriesToHiddenFields() {
     try {
-      if (
-        !categoryManager ||
-        typeof categoryManager.getSelectedCategories !== "function"
-      ) {
-        console.error(
-          "Category manager is not properly initialized for syncing",
-        );
-        return;
-      }
-
       const selectedCategories = categoryManager.getSelectedCategories();
-      if (!Array.isArray(selectedCategories)) {
-        console.error(
-          "Selected categories is not an array:",
-          selectedCategories,
-        );
-        return;
-      }
-
       const categoriesJson = JSON.stringify(selectedCategories);
-      console.log("Syncing categories to hidden fields:", selectedCategories);
-
-      // Update both English and Arabic hidden fields with the same categories
-      categoriesEnHidden.value = categoriesJson;
-      categoriesArHidden.value = categoriesJson;
 
       // Update the main categories hidden field
       const mainCategoriesField = document.getElementById("categories");
