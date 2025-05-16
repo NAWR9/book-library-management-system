@@ -4,6 +4,9 @@ const {
   translateToArabic,
   translateToEnglish,
 } = require("../utils/translateService");
+const {
+  mapGoogleCategoriesToCategoryKeys,
+} = require("../utils/categoryMapper");
 
 /**
  * Checks if text is primarily written in Arabic
@@ -386,7 +389,7 @@ const fetchBookDetailsFromApi = async (title, author, lang) => {
       pageCount: bookData.pageCount || null,
       isbn: isbn,
       coverImage: bookData.imageLinks?.thumbnail || null,
-      categories: bookData.categories || [],
+      categories: mapGoogleCategoriesToCategoryKeys(bookData.categories || []),
       genre: bookData.categories?.[0] || "General",
     });
 
@@ -514,7 +517,72 @@ const fetchAndUpdateBookDetails = async (book) => {
   }
 };
 
+/**
+ * Search Google Books API and return results
+ * @route GET /api/books/search/google
+ * @access Public
+ */
+const searchGoogleBooks = async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing search query (q)" });
+    }
+    const url = `https://www.googleapis.com/books/v1/volumes`;
+    const params = {
+      q,
+      maxResults: 10,
+      printType: "books",
+    };
+
+    console.log(`Searching Google Books API with query: ${q}`);
+    const response = await axios.get(url, { params });
+
+    // Extract the items array from the response
+    const books = response.data.items || [];
+
+    // Transform the data to a simpler format
+    const formattedBooks = books.map((book) => {
+      const volumeInfo = book.volumeInfo || {};
+      return {
+        id: book.id,
+        title: volumeInfo.title || "Unknown Title",
+        author: volumeInfo.authors
+          ? volumeInfo.authors.join(", ")
+          : "Unknown Author",
+        publisher: volumeInfo.publisher || "",
+        publication_date: volumeInfo.publishedDate || "",
+        description: volumeInfo.description || "",
+        page_count: volumeInfo.pageCount || 0,
+        isbn: volumeInfo.industryIdentifiers
+          ? volumeInfo.industryIdentifiers[0].identifier
+          : "",
+        cover_image: volumeInfo.imageLinks
+          ? volumeInfo.imageLinks.thumbnail
+          : "",
+        tags: volumeInfo.categories || [],
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: formattedBooks.length,
+      data: formattedBooks,
+    });
+  } catch (error) {
+    console.error("Error searching Google Books:", error);
+    return res.status(500).json({
+      success: false,
+      message: `Failed to search Google Books: ${error.response?.status || error.message}`,
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getBookDetails,
   fetchAndUpdateBookDetails,
+  searchGoogleBooks,
 };

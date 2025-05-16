@@ -1,4 +1,5 @@
 /* global bootstrap */
+/* global initializeCategoryManager */
 
 document.addEventListener("DOMContentLoaded", () => {
   const bookForm = document.getElementById("bookForm");
@@ -6,35 +7,173 @@ document.addEventListener("DOMContentLoaded", () => {
   const googleSearchQuery = document.getElementById("googleSearchQuery");
   const searchResults = document.getElementById("searchResults");
   const descriptionEn = document.getElementById("description_en");
-  const tagsEnHidden = document.getElementById("tags_en");
-  const tagsArHidden = document.getElementById("tags_ar");
-  const tagsInputEn = document.getElementById("tags_input_en");
-  const tagsInputAr = document.getElementById("tags_input_ar");
-  const tagChipsEn = document.getElementById("tag_chips_en");
-  const tagChipsAr = document.getElementById("tag_chips_ar");
+  const descriptionAr = document.getElementById("description_ar");
 
-  // Tag preview elements
-  const tagPreviewEn = document.getElementById("tag_preview_en");
-  const tagPreviewAr = document.getElementById("tag_preview_ar");
-  const tagPreviewEnInAr = document.getElementById("tag_preview_en_in_ar");
-  const tagPreviewArInAr = document.getElementById("tag_preview_ar_in_ar");
+  // For backward compatibility
+  const categoriesEnHidden = document.createElement("input");
+  categoriesEnHidden.type = "hidden";
+  categoriesEnHidden.id = "categories_en";
+  categoriesEnHidden.name = "categories_en";
+  bookForm.appendChild(categoriesEnHidden);
+
+  const categoriesArHidden = document.createElement("input");
+  categoriesArHidden.type = "hidden";
+  categoriesArHidden.id = "categories_ar";
+  categoriesArHidden.name = "categories_ar";
+  bookForm.appendChild(categoriesArHidden);
+
+  // Initialize a single category manager - we use the same categories for both languages
+  let categoryManager;
+  try {
+    categoryManager = initializeCategoryManager(
+      "category_select",
+      "categories",
+      "selected_categories_container",
+    );
+
+    // Verify that the category manager was initialized correctly
+    if (!categoryManager) {
+      console.error(
+        "Category manager initialization failed - returned undefined",
+      );
+    } else if (typeof categoryManager.getSelectedCategories !== "function") {
+      console.error(
+        "Category manager is missing expected methods:",
+        categoryManager,
+      );
+    }
+  } catch (error) {
+    console.error("Error initializing category manager:", error);
+  }
+
+  // Sync the selected categories to hidden fields when categories change
+  function syncCategoriesToHiddenFields() {
+    try {
+      if (
+        !categoryManager ||
+        typeof categoryManager.getSelectedCategories !== "function"
+      ) {
+        console.error(
+          "Category manager is not properly initialized for syncing",
+        );
+        return;
+      }
+
+      const selectedCategories = categoryManager.getSelectedCategories();
+      if (!Array.isArray(selectedCategories)) {
+        console.error(
+          "Selected categories is not an array:",
+          selectedCategories,
+        );
+        return;
+      }
+
+      const categoriesJson = JSON.stringify(selectedCategories);
+      console.log("Syncing categories to hidden fields:", selectedCategories);
+
+      // Update both English and Arabic hidden fields with the same categories
+      categoriesEnHidden.value = categoriesJson;
+      categoriesArHidden.value = categoriesJson;
+
+      // Update the main categories hidden field
+      const mainCategoriesField = document.getElementById("categories");
+      if (mainCategoriesField) {
+        mainCategoriesField.value = categoriesJson;
+      } else {
+        console.error("Main categories field not found");
+      }
+    } catch (error) {
+      console.error("Error syncing categories to hidden fields:", error);
+    }
+  }
 
   const cancelBtn = document.getElementById("cancelBtn");
   const submitBtn = document.getElementById("submitBtn");
   const confirmCancelBtn = document.getElementById("confirmCancelBtn");
   const confirmSubmitBtn = document.getElementById("confirmSubmitBtn");
 
+  // Setup Bootstrap modals
   const cancelModal = new bootstrap.Modal(
     document.getElementById("cancelConfirmModal"),
   );
-  const submitModal = new bootstrap.Modal(
-    document.getElementById("submitConfirmModal"),
-  );
 
-  const toast = new bootstrap.Toast(document.getElementById("bookFormToast"));
+  let submitModal;
+  if (document.getElementById("submitConfirmModal")) {
+    submitModal = new bootstrap.Modal(
+      document.getElementById("submitConfirmModal"),
+    );
+  }
+
+  const bookFormToast = document.getElementById("bookFormToast");
+  let toast;
+  if (bookFormToast) {
+    toast = new bootstrap.Toast(bookFormToast);
+  }
   const toastTitle = document.getElementById("toast-title");
   const toastMessage = document.getElementById("toast-message");
 
+  // Form validation and submission
+  bookForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!bookForm.checkValidity()) {
+      bookForm.classList.add("was-validated");
+      return;
+    }
+
+    try {
+      const formData = new FormData(bookForm);
+      const formDataObj = Object.fromEntries(formData.entries());
+
+      // Parse categories as array
+      const categoriesValue = document.getElementById("categories").value;
+      formDataObj.categories = categoriesValue
+        ? JSON.parse(categoriesValue)
+        : [];
+
+      // Convert bookCount and pageCount to numbers
+      if (formDataObj.bookCount)
+        formDataObj.bookCount = parseInt(formDataObj.bookCount, 10);
+      if (formDataObj.pageCount)
+        formDataObj.pageCount = parseInt(formDataObj.pageCount, 10);
+
+      // Convert availability to boolean
+      formDataObj.availability =
+        document.getElementById("availability").checked;
+
+      // Remove unnecessary fields
+      delete formDataObj.categories_en;
+      delete formDataObj.categories_ar;
+
+      const token = localStorage.getItem("token");
+
+      // Make the API request with proper Authorization header
+      const response = await fetch(`${window.API_BASE_URL}/api/books`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formDataObj),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        window.location.href = "/books";
+      } else {
+        showToast("Error", result.message || "Failed to add book");
+      }
+    } catch (error) {
+      console.error("Error adding book:", error);
+      showToast(
+        "Error",
+        error.message || "Failed to add book. Please try again.",
+      );
+    }
+  });
+
+  // Cancel button functionality
   cancelBtn.addEventListener("click", () => {
     const hasData =
       document.getElementById("title").value ||
@@ -58,769 +197,379 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    submitModal.show();
+    if (submitModal) {
+      submitModal.show();
+    } else {
+      bookForm.dispatchEvent(new Event("submit"));
+    }
   });
 
-  confirmSubmitBtn.addEventListener("click", () => {
-    submitModal.hide();
-    bookForm.dispatchEvent(new Event("submit"));
-  });
-
-  // Add event listeners for auto-translation
-  descriptionEn.addEventListener("blur", () => {
-    translateToArabic("description");
-  });
-
-  // No need to update UI on tab changes as we're now using translation keys in the HTML
-  // The labels are now handled by EJS templates with proper internationalization
-
-  // Translations happen automatically when tags are added
-  // No buttons needed for manual translation
-
-  // Tag storage for both languages
-  const tagsEnCollection = [];
-  const tagsArCollection = [];
-
-  function updateTagPreviews() {
-    updateTagPreview(tagPreviewEn, tagsEnCollection);
-    updateTagPreview(tagPreviewAr, tagsArCollection);
-    updateTagPreview(tagPreviewEnInAr, tagsEnCollection);
-    updateTagPreview(tagPreviewArInAr, tagsArCollection);
+  if (confirmSubmitBtn) {
+    confirmSubmitBtn.addEventListener("click", () => {
+      if (submitModal) submitModal.hide();
+      bookForm.dispatchEvent(new Event("submit"));
+    });
   }
 
-  function updateTagPreview(previewElement, tagsCollection) {
-    if (!previewElement) return;
-
-    previewElement.innerHTML = "";
-
-    if (tagsCollection.length === 0) {
-      const emptyElement = document.createElement("em");
-      emptyElement.className = "text-muted";
-      emptyElement.textContent =
-        window.i18nMessages?.books?.noTagsAdded || "No tags added";
-      previewElement.appendChild(emptyElement);
+  // Google Books API Integration
+  searchGoogleBtn.addEventListener("click", async () => {
+    const query = googleSearchQuery.value.trim();
+    if (!query) {
+      showToast("Error", "Please enter search text");
       return;
     }
 
-    tagsCollection.forEach((tag) => {
-      const tagElement = document.createElement("span");
-      tagElement.className = "preview-tag";
-
-      if (/[\u0600-\u06FF]/.test(tag)) {
-        tagElement.dir = "rtl";
-      }
-
-      tagElement.textContent = tag;
-      previewElement.appendChild(tagElement);
-    });
-  }
-
-  setupTagInput(tagsInputEn, tagChipsEn, tagsEnHidden, tagsEnCollection);
-  setupTagInput(tagsInputAr, tagChipsAr, tagsArHidden, tagsArCollection);
-
-  // Initialize tag previews
-  updateTagPreviews();
-
-  function renderTags(chipsContainer, tagsCollection, hiddenInput) {
-    if (!chipsContainer) return;
-
-    chipsContainer.innerHTML = "";
-    tagsCollection.forEach((tag, index) => {
-      const tagChip = document.createElement("span");
-      tagChip.className = "tag-chip";
-
-      const isArabic = /[\u0600-\u06FF]/.test(tag);
-      if (isArabic) {
-        tagChip.dir = "rtl";
-      }
-
-      const tagText = document.createElement("span");
-      tagText.className = "tag-chip-text";
-      tagText.textContent = tag;
-
-      const removeBtn = document.createElement("span");
-      removeBtn.className = "tag-chip-remove";
-      removeBtn.innerHTML = "&times;";
-      removeBtn.onclick = (e) => {
-        e.preventDefault();
-        tagsCollection.splice(index, 1);
-        renderTags(chipsContainer, tagsCollection, hiddenInput);
-        if (hiddenInput) hiddenInput.value = tagsCollection.join(", ");
-        updateTagPreviews();
-      };
-
-      tagChip.appendChild(tagText);
-      tagChip.appendChild(removeBtn);
-      chipsContainer.appendChild(tagChip);
-    });
-  }
-
-  function setupTagInput(
-    inputElement,
-    chipsContainer,
-    hiddenInput,
-    tagsCollection,
-  ) {
-    function updateHiddenInput() {
-      hiddenInput.value = tagsCollection.join(", ");
-      updateTagPreviews();
-    }
-
-    // Function to add a tag
-    function addTag(tagValue) {
-      tagValue = tagValue.trim();
-      if (tagValue && !tagsCollection.includes(tagValue)) {
-        tagsCollection.push(tagValue);
-        renderTags(chipsContainer, tagsCollection, hiddenInput);
-        updateHiddenInput();
-        updateTagPreviews();
-        inputElement.value = "";
-      }
-    }
-
-    // Handle keydown events on the input
-    inputElement.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === ",") {
-        e.preventDefault();
-        addTag(inputElement.value);
-      } else if (
-        e.key === "Backspace" &&
-        inputElement.value === "" &&
-        tagsCollection.length > 0
-      ) {
-        // Remove the last tag when pressing backspace with empty input
-        tagsCollection.pop();
-        renderTags(chipsContainer, tagsCollection, hiddenInput);
-        updateHiddenInput();
-        updateTagPreviews();
-      }
-    });
-
-    // Handle paste events
-    inputElement.addEventListener("paste", (e) => {
-      e.preventDefault();
-
-      const pastedText = (e.clipboardData || window.clipboardData).getData(
-        "text",
-      );
-
-      // Check if pasted text contains commas - if so, treat as multiple tags
-      if (pastedText.includes(",")) {
-        const pastedTags = pastedText.split(",");
-        pastedTags.forEach((tag) => {
-          if (tag.trim()) addTag(tag);
-        });
-      } else {
-        addTag(inputElement.value + pastedText);
-      }
-    });
-
-    inputElement.addEventListener("blur", () => {
-      addTag(inputElement.value);
-    });
-  }
-
-  // Handle Google Books search
-  const performSearch = async () => {
-    const query = googleSearchQuery.value.trim();
-    if (!query) return;
+    searchResults.innerHTML =
+      '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
 
     try {
-      // Show loading state
-      searchResults.innerHTML = `<div class="d-flex justify-content-center">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>`;
-
-      // Search for books
-      const apiKey = window.GOOGLE_BOOKS_API_KEY || "";
       const response = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&key=${apiKey}`,
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=5`,
       );
-
       const data = await response.json();
 
-      if (data.totalItems === 0) {
-        searchResults.innerHTML = `<div class="alert alert-info">No books found matching "${query}"</div>`;
+      if (!data.items || data.items.length === 0) {
+        searchResults.innerHTML =
+          '<div class="alert alert-warning">No books found</div>';
         return;
       }
 
-      // Display search results
       displaySearchResults(data.items);
-    } catch {
-      searchResults.innerHTML = `<div class="alert alert-danger">Error searching for books. Please try again.</div>`;
-    }
-  };
-
-  searchGoogleBtn.addEventListener("click", performSearch);
-
-  googleSearchQuery.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      performSearch();
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      searchResults.innerHTML =
+        '<div class="alert alert-danger">Error fetching books</div>';
     }
   });
 
-  // Display search results
   function displaySearchResults(books) {
-    if (!books || books.length === 0) {
-      searchResults.innerHTML = `<div class="alert alert-info">No books found</div>`;
-      return;
-    }
+    searchResults.innerHTML = "";
 
-    // Limit to top 5 results
-    const topBooks = books.slice(0, 5);
+    const resultsList = document.createElement("div");
+    resultsList.className = "list-group";
 
-    // Create result cards
-    const resultsHtml = topBooks
-      .map((book) => {
-        const volumeInfo = book.volumeInfo || {};
-        const title = volumeInfo.title || "Unknown Title";
-        const authors = volumeInfo.authors
-          ? volumeInfo.authors.join(", ")
-          : "Unknown Author";
-        const thumbnail =
-          volumeInfo.imageLinks?.thumbnail || "/img/book-cover-placeholder.svg";
+    books.forEach((book) => {
+      const bookInfo = book.volumeInfo;
+      const resultItem = document.createElement("button");
+      resultItem.type = "button";
+      resultItem.className = "list-group-item list-group-item-action";
 
-        return `
-        <div class="card mb-2 google-book-result" data-book-id="${book.id}">
-          <div class="card-body">
-            <div class="row g-0">
-              <div class="col-md-2">
-                <img src="${thumbnail}" alt="${title}" class="img-fluid rounded" style="max-height: 100px;">
-              </div>
-              <div class="col-md-10">
-                <h5 class="card-title">${title}</h5>
-                <p class="card-text">${authors}</p>
-                <button type="button" class="btn btn-sm btn-primary select-book-btn">
-                  Select
-                </button>
-              </div>
-            </div>
+      // Use fallback image if no cover is available
+      const coverImg = bookInfo.imageLinks?.thumbnail
+        ? `<img src="${bookInfo.imageLinks.thumbnail}" alt="Book Cover" class="img-thumbnail me-4" style="width:80px; margin-right:12px;" onerror="this.src='/img/book-cover-placeholder.svg'">`
+        : `<img src="/img/book-cover-placeholder.svg" alt="Book Cover" class="img-thumbnail me-4" style="width:80px; margin-right:12px;">`;
+
+      // Render mapped categories (if any) - show only those that can be mapped to our system
+      let categoryBadges = "";
+      if (
+        Array.isArray(bookInfo.categories) &&
+        bookInfo.categories.length > 0
+      ) {
+        try {
+          // Get available category keys
+          // First check if categoryManager has the method
+          let availableCategoryKeys = [];
+          if (
+            categoryManager &&
+            typeof categoryManager.getSelectedCategories === "function"
+          ) {
+            // We need to get all available categories from window.i18nMessages
+            availableCategoryKeys = Object.keys(
+              window.i18nMessages?.bookCategories || {},
+            );
+          }
+
+          // Map Google categories to our system
+          const mappedCategories = availableCategoryKeys.filter(
+            (categoryKey) => {
+              // Check if any Google category matches this category key
+              return bookInfo.categories.some((googleCat) => {
+                if (!googleCat) return false;
+                const lowerGoogleCat = googleCat.toLowerCase();
+                // Get the variations for this category key
+                const variations = categoryKey
+                  .toLowerCase()
+                  .split("_")
+                  .join(" ");
+                return (
+                  lowerGoogleCat.includes(variations) ||
+                  variations.includes(lowerGoogleCat)
+                );
+              });
+            },
+          );
+
+          // Display mapped categories with proper translations
+          if (mappedCategories.length > 0) {
+            categoryBadges = mappedCategories
+              .map((catKey) => {
+                // Get proper translation for the category
+                let label = "";
+                if (
+                  categoryManager &&
+                  typeof categoryManager.getCategoryTranslation === "function"
+                ) {
+                  label = categoryManager.getCategoryTranslation(catKey);
+                } else {
+                  // Fallback translation
+                  label =
+                    window.i18nMessages?.bookCategories?.[catKey] ||
+                    catKey
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (char) => char.toUpperCase());
+                }
+                return `<span class="badge bg-info text-dark me-1">${label}</span>`;
+              })
+              .join("");
+          }
+        } catch (error) {
+          console.error("Error mapping categories:", error);
+        }
+      }
+
+      resultItem.innerHTML = `
+        <div class="d-flex align-items-start">
+          <div class="me-3">
+            ${coverImg}
           </div>
-        </div>
-      `;
-      })
-      .join("");
+          <div class="flex-grow-1">
+            <h6>${bookInfo.title || window.i18nMessages?.books?.unknownTitle || "Unknown Title"}</h6>
+            <p class="mb-1">${bookInfo.authors ? bookInfo.authors.join(", ") : window.i18nMessages?.books?.unknownAuthor || "Unknown Author"}</p>
+            <small class="text-muted">${bookInfo.publishedDate || window.i18nMessages?.books?.unknownDate || "Unknown Date"}</small>
+            ${bookInfo.publisher ? `<p class="mb-1 small text-muted mt-1">${window.i18nMessages?.books?.publisher || "Publisher"}: ${bookInfo.publisher}</p>` : ""}
+            ${
+              categoryBadges
+                ? `<div class="mt-2">${categoryBadges}</div>`
+                : bookInfo.categories && bookInfo.categories.length > 0
+                  ? `<div class="mt-2"><small class="text-muted">${window.i18nMessages?.books?.category || "Categories"}: ${bookInfo.categories.join(", ")}</small></div>`
+                  : ""
+            }
+          </div>
+        </div>`;
 
-    searchResults.innerHTML = `
-      <h6>Search Results:</h6>
-      ${resultsHtml}
-    `;
-
-    document.querySelectorAll(".select-book-btn").forEach((btn, index) => {
-      btn.addEventListener("click", () => {
-        populateFormWithBookData(topBooks[index]);
-      });
+      resultItem.addEventListener("click", () => populateForm(bookInfo));
+      resultsList.appendChild(resultItem);
     });
+
+    searchResults.appendChild(resultsList);
   }
 
-  async function populateFormWithBookData(book) {
-    const volumeInfo = book.volumeInfo || {};
-
-    document.getElementById("title").value = volumeInfo.title || "";
-    document.getElementById("author").value = volumeInfo.authors
-      ? volumeInfo.authors[0]
+  function populateForm(bookData) {
+    // Set basic fields
+    document.getElementById("title").value = bookData.title || "";
+    document.getElementById("author").value = bookData.authors
+      ? bookData.authors.join(", ")
       : "";
-
-    // Set language based on Google Books API data
-    if (volumeInfo.language) {
-      const lang = volumeInfo.language.toLowerCase();
-      if (lang === "ar") {
-        document.getElementById("language").value = "arabic";
-      } else {
-        document.getElementById("language").value = "english"; // Default to English for all other languages
-      }
-    }
-
-    // Get the description and check if it's Arabic
-    const description = volumeInfo.description || "";
-    const isDescriptionArabic = isArabicText(description);
-
-    // Place the text in the appropriate field based on detected language
-    if (isDescriptionArabic) {
-      // If Arabic text, put it directly in the Arabic field
-      document.getElementById("description_ar").value = description;
-      // Leave English field empty for now, it will be filled by translation
-      document.getElementById("description_en").value = "";
-    } else {
-      // If non-Arabic text, put it in the English field
-      document.getElementById("description_en").value = description;
-      // The Arabic field will be filled by translation
-    }
-
-    document.getElementById("publisher").value = volumeInfo.publisher || "";
-    document.getElementById("pageCount").value = volumeInfo.pageCount || "";
-    document.getElementById("isbn").value =
-      volumeInfo.industryIdentifiers?.find(
-        (id) => id.type === "ISBN_13" || id.type === "ISBN_10",
-      )?.identifier || "";
+    document.getElementById("publisher").value = bookData.publisher || "";
+    document.getElementById("pageCount").value = bookData.pageCount || "";
+    document.getElementById("isbn").value = bookData.industryIdentifiers
+      ? bookData.industryIdentifiers[0].identifier
+      : "";
     document.getElementById("coverImage").value =
-      volumeInfo.imageLinks?.thumbnail || "";
+      bookData.imageLinks?.thumbnail || "";
 
-    if (volumeInfo.publishedDate) {
-      const date = new Date(volumeInfo.publishedDate);
-      if (!isNaN(date.getTime())) {
-        document.getElementById("publicationDate").value = date
-          .toISOString()
-          .split("T")[0];
+    // Set the publication date
+    if (bookData.publishedDate) {
+      let dateValue = bookData.publishedDate;
+      if (dateValue.length === 4) {
+        dateValue += "-01-01"; // Format YYYY to YYYY-01-01
+      } else if (dateValue.length === 7) {
+        dateValue += "-01"; // Format YYYY-MM to YYYY-MM-01
+      }
+      document.getElementById("publicationDate").value = dateValue;
+    }
+
+    // Set descriptions
+    const description = bookData.description || "";
+
+    // Check if the description is in Arabic
+    if (description && isArabicText(description)) {
+      // If description is in Arabic, put it in Arabic field and translate to English
+      descriptionAr.value = description;
+      descriptionEn.value = ""; // Clear English field
+      translateToEnglish(description).then((translatedText) => {
+        descriptionEn.value = translatedText || description;
+      });
+    } else {
+      // If description is in English or unknown, put it in English field
+      descriptionEn.value = description;
+
+      // Try to translate the description to Arabic if we have one
+      if (description) {
+        translateToArabic("description");
       }
     }
 
-    if (volumeInfo.categories && volumeInfo.categories.length > 0) {
-      // Clear existing tag collections
-      tagsEnCollection.length = 0;
-      tagsArCollection.length = 0;
+    // Set language
+    const bookLanguage = bookData.language || "en";
+    if (bookLanguage === "ar" || bookLanguage === "arabic") {
+      document.getElementById("language").value = "arabic";
+    } else {
+      document.getElementById("language").value = "english";
+    }
 
-      // Clear existing tag chips displays
-      const tagChipsEn = document.getElementById("tag_chips_en");
-      const tagChipsAr = document.getElementById("tag_chips_ar");
-      tagChipsEn.innerHTML = "";
-      tagChipsAr.innerHTML = "";
+    // Handle categories mapping and selection
+    if (
+      bookData.categories &&
+      Array.isArray(bookData.categories) &&
+      bookData.categories.length > 0
+    ) {
+      // First, clear any existing selected categories
+      const selectedCategoriesContainer = document.getElementById(
+        "selected_categories_container",
+      );
+      if (selectedCategoriesContainer) {
+        selectedCategoriesContainer.innerHTML = "";
+      }
 
-      // Process each category
-      volumeInfo.categories.forEach((category) => {
-        const individualCategories = category.split(/[/&]/);
+      // Get all available category keys from i18n messages
+      const availableCategoryKeys = Object.keys(
+        window.i18nMessages?.bookCategories || {},
+      );
+      const mappedCategories = new Set(); // Using a Set to avoid duplicates
 
-        individualCategories.forEach((cat) => {
-          const singleCategory = cat.trim();
-          if (!singleCategory) return;
+      // Map each Google category to our system using multiple matching strategies
+      bookData.categories.forEach((googleCat) => {
+        if (!googleCat) return;
 
-          // Check if the tag is in Arabic
-          const isArabic = isArabicText(singleCategory);
+        const lowerGoogleCat = googleCat.toLowerCase().trim();
 
-          if (isArabic) {
-            // Add to Arabic collection if not already there
-            if (!tagsArCollection.includes(singleCategory)) {
-              tagsArCollection.push(singleCategory);
-            }
-          } else {
-            // Add to English collection if not already there
-            if (!tagsEnCollection.includes(singleCategory)) {
-              tagsEnCollection.push(singleCategory);
-            }
+        availableCategoryKeys.forEach((categoryKey) => {
+          // Enhanced matching logic
+          const categoryWords = categoryKey.toLowerCase().split("_");
+          const categoryPhrase = categoryWords.join(" ");
+
+          // Various matching approaches
+          if (
+            lowerGoogleCat === categoryPhrase ||
+            lowerGoogleCat.includes(categoryPhrase) ||
+            categoryPhrase.includes(lowerGoogleCat) ||
+            categoryWords.some(
+              (word) => lowerGoogleCat.includes(word) && word.length > 3,
+            )
+          ) {
+            mappedCategories.add(categoryKey);
           }
         });
       });
 
-      renderTags(tagChipsEn, tagsEnCollection, tagsEnHidden);
-      renderTags(tagChipsAr, tagsArCollection, tagsArHidden);
+      // Convert Set to Array
+      const mappedCategoryArray = Array.from(mappedCategories);
 
-      tagsEnHidden.value = tagsEnCollection.join(", ");
-      tagsArHidden.value = tagsArCollection.join(", ");
+      // Add the mapped categories to the UI
+      if (mappedCategoryArray.length > 0 && categoryManager) {
+        mappedCategoryArray.forEach((categoryKey) => {
+          if (categoryManager.addCategory) {
+            categoryManager.addCategory(categoryKey, true);
+          }
+        });
 
-      renderTags(tagChipsEn, tagsEnCollection, tagsEnHidden);
-      renderTags(tagChipsAr, tagsArCollection, tagsArHidden);
-
-      updateTagPreviews();
-    }
-
-    showToast("Book Selected", "Book details have been loaded.");
-
-    searchResults.innerHTML = "";
-    googleSearchQuery.value = "";
-
-    document
-      .getElementById("languageTabs")
-      .scrollIntoView({ behavior: "smooth" });
-
-    // Handle specific case for Arabic description that came from Google Books
-    const descriptionAr = document
-      .getElementById("description_ar")
-      .value.trim();
-    const descriptionEn = document
-      .getElementById("description_en")
-      .value.trim();
-
-    if (descriptionAr && !descriptionEn) {
-      // We have Arabic content directly from Google Books API
-      // Temporarily move Arabic content to English field to trigger proper translation
-      document.getElementById("description_en").value = descriptionAr;
-      document.getElementById("description_ar").value = "";
-    }
-
-    try {
-      await translateAllContentToArabic();
-    } catch {
-      console.error("Translation error");
-    }
-
-    // Determine which tab to show first based on detected language
-    if (isArabicText(volumeInfo.description || "")) {
-      // If original content was Arabic, show Arabic tab first
-      document.getElementById("arabic-tab").click();
-    } else {
-      // Otherwise show English tab
-      document.getElementById("english-tab").click();
-    }
-  }
-
-  async function translateAllContentToArabic() {
-    try {
-      const descriptionEn = document
-        .getElementById("description_en")
-        .value.trim();
-      const descriptionAr = document
-        .getElementById("description_ar")
-        .value.trim();
-
-      if (descriptionEn || descriptionAr) {
-        if (descriptionAr && !descriptionEn) {
-          // If only Arabic description is filled, translate from Arabic to English
-          document.getElementById("description_en").value = descriptionAr;
-          document.getElementById("description_ar").value = "";
-
-          // Translate from Arabic to English
-          await translateToArabic("description");
-        } else if (descriptionEn) {
-          // If the English description is filled, translate to Arabic
-          await translateToArabic("description");
+        // Update the hidden field
+        const categoriesField = document.getElementById("categories");
+        if (categoriesField) {
+          categoriesField.value = JSON.stringify(mappedCategoryArray);
         }
-      }
 
-      updateTagPreviews();
-    } catch {
-      console.log("Translation error");
+        // Update all hidden fields to ensure consistency
+        syncCategoriesToHiddenFields();
+      }
     }
   }
 
-  // Function to detect if text is in Arabic
+  // Helper to detect if text is primarily in Arabic
   function isArabicText(text) {
     if (!text) return false;
-
-    const arabicPattern =
-      /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g;
-    const arabicChars = (text.match(arabicPattern) || []).length;
-
-    if (text.length < 10 && arabicChars > 0) {
-      return true;
-    }
-
-    return arabicChars / text.length > 0.3;
+    const arabicChars = (text.match(/[\u0600-\u06FF]/g) || []).length;
+    return arabicChars / text.length > 0.3; // If more than 30% is Arabic, consider it Arabic text
   }
 
-  async function translateToArabic(contentType) {
-    const description_en = document
-      .getElementById("description_en")
-      .value.trim();
-    const tags_en = document.getElementById("tags_en").value.trim();
-
-    if (
-      (contentType === "description" && !description_en) ||
-      (contentType === "tags" && !tags_en) ||
-      (contentType === "both" && !description_en && !tags_en)
-    ) {
-      return;
-    }
-
-    // Keep track of translation attempts to avoid infinite loops
-    if (!window.translationAttempts) {
-      window.translationAttempts = {};
-    }
-
-    // Check if we've tried to translate this content too many times
-    const contentKey =
-      contentType +
-      "_" +
-      (contentType === "description"
-        ? description_en.substring(0, 20)
-        : tags_en.substring(0, 20));
-    if (
-      window.translationAttempts[contentKey] &&
-      window.translationAttempts[contentKey] >= 3
-    ) {
-      console.log("Too many translation attempts for this content, skipping");
-      return;
-    }
-
-    // Increment the attempt counter
-    window.translationAttempts[contentKey] =
-      (window.translationAttempts[contentKey] || 0) + 1;
+  // Add this helper for English translation
+  async function translateToEnglish(text) {
+    if (!text) return "";
 
     try {
-      if (
-        (contentType === "description" || contentType === "both") &&
-        description_en
-      ) {
-        // Detect if the description is already in Arabic
-        const isArabic = isArabicText(description_en);
-        const source = isArabic ? "ar" : "en";
-        const target = isArabic ? "en" : "ar";
-
-        const descResponse = await fetch(
-          `${window.API_BASE_URL}/api/translate`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: description_en, source, target }),
-          },
-        );
-
-        if (descResponse.ok) {
-          const data = await descResponse.json();
-          if (data.success) {
-            // If original was Arabic, update English. Otherwise, update Arabic.
-            if (isArabicText(description_en)) {
-              // Original was Arabic, so we're updating the English field
-              document.getElementById("description_en").value =
-                data.translation;
-              // Always ensure original text is in Arabic field
-              document.getElementById("description_ar").value = description_en;
-            } else {
-              // Original was English, update Arabic field
-              document.getElementById("description_ar").value =
-                data.translation;
-            }
-          }
-        } else {
-          console.log("Error translating description.");
-        }
-      }
-
-      if ((contentType === "tags" || contentType === "both") && tags_en) {
-        // Only translate from English to Arabic for tags
-        const source = "en";
-        const target = "ar";
-
-        const tagsResponse = await fetch(
-          `${window.API_BASE_URL}/api/translate`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: tags_en, source, target }),
-          },
-        );
-
-        if (tagsResponse.ok) {
-          const data = await tagsResponse.json();
-          if (data.success) {
-            if (isArabicText(tags_en)) {
-              document.getElementById("tags_en").value = data.translation;
-              document.getElementById("tags_ar").value = tags_en;
-
-              const tagChipsEn = document.getElementById("tag_chips_en");
-              tagChipsEn.innerHTML = "";
-
-              tagsEnCollection.length = 0;
-
-              const enTags = data.translation
-                .split(",")
-                .map((tag) => tag.trim())
-                .filter((tag) => tag);
-
-              enTags.forEach((tag) => {
-                if (!tagsEnCollection.includes(tag)) {
-                  tagsEnCollection.push(tag);
-
-                  const tagChip = document.createElement("span");
-                  tagChip.className = "tag-chip";
-
-                  const tagText = document.createElement("span");
-                  tagText.className = "tag-chip-text";
-                  tagText.textContent = tag;
-
-                  const removeBtn = document.createElement("span");
-                  removeBtn.className = "tag-chip-remove";
-                  removeBtn.onclick = function () {
-                    const index = tagsEnCollection.indexOf(tag);
-                    if (index !== -1) {
-                      tagsEnCollection.splice(index, 1);
-                      tagChip.remove();
-                      document.getElementById("tags_en").value =
-                        tagsEnCollection.join(", ");
-                      updateTagPreviews();
-                    }
-                  };
-
-                  tagChip.appendChild(tagText);
-                  tagChip.appendChild(removeBtn);
-                  tagChipsEn.appendChild(tagChip);
-                }
-              });
-
-              const tagChipsAr = document.getElementById("tag_chips_ar");
-              tagChipsAr.innerHTML = "";
-
-              tagsArCollection.length = 0;
-
-              const arTags = tags_en
-                .split(",")
-                .map((tag) => tag.trim())
-                .filter((tag) => tag);
-
-              arTags.forEach((tag) => {
-                if (!tagsArCollection.includes(tag)) {
-                  tagsArCollection.push(tag);
-
-                  const tagChip = document.createElement("span");
-                  tagChip.className = "tag-chip";
-
-                  const tagText = document.createElement("span");
-                  tagText.className = "tag-chip-text";
-                  tagText.textContent = tag;
-
-                  const removeBtn = document.createElement("span");
-                  removeBtn.className = "tag-chip-remove";
-                  removeBtn.innerHTML = "&times;";
-                  removeBtn.onclick = function () {
-                    const index = tagsArCollection.indexOf(tag);
-                    if (index !== -1) {
-                      tagsArCollection.splice(index, 1);
-                      tagChip.remove();
-                      document.getElementById("tags_ar").value =
-                        tagsArCollection.join(", ");
-                    }
-                  };
-
-                  tagChip.appendChild(tagText);
-                  tagChip.appendChild(removeBtn);
-                  tagChipsAr.appendChild(tagChip);
-                }
-              });
-
-              updateTagPreviews();
-            } else {
-              document.getElementById("tags_ar").value = data.translation;
-
-              const tagChipsAr = document.getElementById("tag_chips_ar");
-              tagChipsAr.innerHTML = "";
-
-              tagsArCollection.length = 0;
-
-              const arTags = data.translation
-                .split(",")
-                .map((tag) => tag.trim())
-                .filter((tag) => tag);
-
-              arTags.forEach((tag) => {
-                if (!tagsArCollection.includes(tag)) {
-                  tagsArCollection.push(tag);
-
-                  const tagChip = document.createElement("span");
-                  tagChip.className = "tag-chip";
-
-                  const tagText = document.createElement("span");
-                  tagText.className = "tag-chip-text";
-                  tagText.textContent = tag;
-
-                  const removeBtn = document.createElement("span");
-                  removeBtn.className = "tag-chip-remove";
-                  removeBtn.innerHTML = "&times;";
-                  removeBtn.onclick = function () {
-                    const index = tagsArCollection.indexOf(tag);
-                    if (index !== -1) {
-                      tagsArCollection.splice(index, 1);
-                      tagChip.remove();
-                      document.getElementById("tags_ar").value =
-                        tagsArCollection.join(", ");
-                    }
-                  };
-
-                  tagChip.appendChild(tagText);
-                  tagChip.appendChild(removeBtn);
-                  tagChipsAr.appendChild(tagChip);
-                }
-              });
-
-              updateTagPreviews();
-            }
-          }
-        }
-      }
-    } catch {
-      console.error("Translation failed");
-    }
-  }
-
-  bookForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    if (!bookForm.checkValidity()) {
-      e.stopPropagation();
-      bookForm.classList.add("was-validated");
-      return;
-    }
-
-    // Prepare form data
-    const formData = {
-      title: document.getElementById("title").value.trim(),
-      author: document.getElementById("author").value.trim(),
-      language: document.getElementById("language").value,
-      publicationDate: document.getElementById("publicationDate").value,
-      description_en:
-        document.getElementById("description_en").value.trim() || null,
-      description_ar:
-        document.getElementById("description_ar").value.trim() || null,
-      publisher: document.getElementById("publisher").value.trim() || null,
-      pageCount: document.getElementById("pageCount").value
-        ? parseInt(document.getElementById("pageCount").value, 10)
-        : null,
-      isbn: document.getElementById("isbn").value.trim() || null,
-      coverImage: document.getElementById("coverImage").value.trim() || null,
-      availability: document.getElementById("availability").checked,
-      bookCount: Math.max(
-        1,
-        parseInt(document.getElementById("bookCount").value, 10) || 1,
-      ),
-      tags_en: document.getElementById("tags_en").value.trim()
-        ? document
-            .getElementById("tags_en")
-            .value.trim()
-            .split(",")
-            .map((tag) => tag.trim())
-        : [],
-      tags_ar: document.getElementById("tags_ar").value.trim()
-        ? document
-            .getElementById("tags_ar")
-            .value.trim()
-            .split(",")
-            .map((tag) => tag.trim())
-        : [],
-    };
-
-    try {
-      const response = await fetch(`${window.API_BASE_URL}/api/books`, {
+      const response = await fetch(`${window.API_BASE_URL}/api/translate`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text, source: "ar", target: "en" }),
       });
 
       const data = await response.json();
-
-      if (response.ok) {
-        showToast("Success", "Book added successfully!");
-
-        bookForm.reset();
-        bookForm.classList.remove("was-validated");
-
-        tagsEnCollection.length = 0;
-        tagsArCollection.length = 0;
-        tagChipsEn.innerHTML = "";
-        tagChipsAr.innerHTML = "";
-        updateTagPreviews();
-
-        setTimeout(() => {
-          window.location.href = "/books";
-        }, 2000);
+      if (data.success && !data.translationFailed) {
+        return data.translation;
       } else {
-        showToast(
-          "Error",
-          data.message || "Failed to add book. Please try again.",
-        );
+        console.warn("Translation failed, using original text");
+        return text;
       }
-    } catch {
-      showToast("Error", "Failed to add book. Please try again.");
+    } catch (error) {
+      console.error("Translation error:", error);
+      return text;
     }
-  });
+  }
 
-  // Helper function to show toast notifications
+  // Translation functionality for descriptions
+  async function translateToArabic(fieldName) {
+    const englishText = document.getElementById(`${fieldName}_en`).value.trim();
+    const arabicField = document.getElementById(`${fieldName}_ar`);
+
+    if (!englishText || !arabicField) return;
+
+    // If you have a translation API endpoint, call it here
+    try {
+      const response = await fetch(`${window.API_BASE_URL}/api/translate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: englishText, source: "en", target: "ar" }),
+      });
+
+      const data = await response.json();
+      if (data.success && !data.translationFailed) {
+        arabicField.value = data.translation;
+      } else if (data.warning) {
+        arabicField.placeholder = data.warning;
+      } else {
+        arabicField.placeholder = "Manual translation needed";
+      }
+    } catch (error) {
+      console.error("Translation error:", error);
+      arabicField.placeholder = "Translation service unavailable";
+    }
+  }
+
+  // Helper function to display toast messages
   function showToast(title, message) {
-    toastTitle.textContent = title;
-    toastMessage.textContent = message;
-    toast.show();
+    if (toast && toastTitle && toastMessage) {
+      // Use translations if available
+      const translatedTitle =
+        title === "Error" && window.i18nMessages?.common?.error
+          ? window.i18nMessages.common.error
+          : title;
+
+      // For known error messages, use translations if available
+      let translatedMessage = message;
+      if (
+        message === "Please enter search text" &&
+        window.i18nMessages?.books?.searchTextRequired
+      ) {
+        translatedMessage = window.i18nMessages.books.searchTextRequired;
+      } else if (
+        message === "Failed to add book" &&
+        window.i18nMessages?.books?.failedToAdd
+      ) {
+        translatedMessage = window.i18nMessages.books.failedToAdd;
+      } else if (
+        message === "Failed to add book. Please try again." &&
+        window.i18nMessages?.books?.failedToAdd &&
+        window.i18nMessages?.common?.tryAgain
+      ) {
+        translatedMessage = `${window.i18nMessages.books.failedToAdd}. ${window.i18nMessages.common.tryAgain}`;
+      }
+
+      toastTitle.textContent = translatedTitle;
+      toastMessage.textContent = translatedMessage;
+      toast.show();
+    } else {
+      alert(`${title}: ${message}`);
+    }
   }
 });

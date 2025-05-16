@@ -67,6 +67,10 @@
               <div class="mb-3">
                 <p><strong><%= t('books.category') %>:</strong> <span id="bookCategories"></span></p>
                 <p><strong><%= t('books.isbn') %>:</strong> <span id="bookIsbn"></span></p>
+                <!-- Hidden translation labels for JS -->
+                <span class="d-none">
+                  <strong data-i18n="books.publisher"><%= t('books.publisher') %></strong>
+                </span>
               </div>
             </div>
           </div>

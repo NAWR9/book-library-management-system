@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/styles.css" />
-    <link rel="stylesheet" href="/css/tag-input.css" />
+    <link rel="stylesheet" href="/css/category-input.css" />
     <% if (locals.pageStyles) { %><%- pageStyles %><% } %>
   </head>
   <body class="<%= locals.bodyClass || '' %>">
@@ -92,12 +92,48 @@
           // Form validation
           emailError: t('login.emailError'),
           
-          // Book and tag related translations
+          // Book and category related translations
           books: {
-            noTagsAdded: t('books.noTagsAdded'),
+            noCategoriesAdded: t('books.noCategoriesAdded'),
             english: t('books.english'),
-            arabic: t('books.arabic')
-          }
+            arabic: t('books.arabic'),
+            selectCategories: t('books.selectCategories'),
+            selectFromAvailableCategories: t('books.selectFromAvailableCategories'),
+            categoryHelpText: t('books.categoryHelpText'),
+            selectedCategories: t('books.selectedCategories'),
+            categoriesMappedAutomatically: t('books.categoriesMappedAutomatically'),
+            search: t('books.search'),
+            categoryMatchSuccess: t('books.categoryMatchSuccess'),
+            categoryMatchPartialSuccess: t('books.categoryMatchPartialSuccess'),
+            categoryMatchFailure: t('books.categoryMatchFailure'),
+            publisher: t('books.publisher'),
+            category: t('books.category'),
+            unknownTitle: t('books.unknownTitle', 'Unknown Title'),
+            unknownAuthor: t('books.unknownAuthor', 'Unknown Author'),
+            unknownDate: t('books.unknownDate', 'Unknown Date')
+          },
+          
+          // UI elements translations
+          ui: {
+            selectCategory: t('books.selectCategory')
+          },
+          
+          // Toast messages
+          toast: {
+            error: t('common.error', 'Error'),
+            success: t('common.success', 'Success'),
+            warning: t('common.warning', 'Warning'),
+            info: t('common.info', 'Information'),
+            searchRequired: t('books.searchTextRequired', 'Please enter search text'),
+            failedToAdd: t('books.failedToAdd', 'Failed to add book'),
+            tryAgain: t('common.tryAgain', 'Please try again.')
+          },
+          
+          // Category group translations for the category selection dropdown
+          categoryGroups: t("categoryGroups", { returnObjects: true }),
+          
+          // Book categories translations for the category selection dropdown
+          "bookCategories": t("bookCategories", { returnObjects: true })
         }) %>
       </script>
       <script>
@@ -105,6 +141,8 @@
           document.getElementById('i18n-data').textContent
         );
       </script>
+      <!-- Load shared components -->
+      <script src="/js/components/categoryManager.js"></script>
       <script type="module" src="/js/pages/<%= locals.pageScript %>.js"></script>
     <% } %>
     <!-- Language switcher script -->

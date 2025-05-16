@@ -4,7 +4,13 @@ const Book = require("../models/Book");
 const { protect, authorize } = require("../middleware/authMiddleware");
 const {
   fetchAndUpdateBookDetails,
+  searchGoogleBooks,
 } = require("../controllers/bookDetailsController");
+const {
+  mapGoogleCategoriesToCategoryKeys,
+  mapGoogleCategoryToCategoryKey,
+  getAllCategoryKeys,
+} = require("../utils/categoryMapper");
 
 /**
  * Add a new book
@@ -30,8 +36,13 @@ router.post("/", protect, authorize(["admin"]), async (req, res) => {
       category,
       tags_en,
       tags_ar,
+      tags, // Add support for backward compatibility
       availability,
     } = req.body;
+
+    // Map categories to predefined category keys if categories not provided directly
+    const mappedCategories =
+      categories || mapGoogleCategoriesToCategoryKeys(tags || []);
 
     // Create the basic book
     const book = await Book.create({
@@ -46,11 +57,12 @@ router.post("/", protect, authorize(["admin"]), async (req, res) => {
       pageCount: pageCount || null,
       isbn: isbn || null,
       coverImage: coverImage || null,
-      categories: categories || [],
+      categories: mappedCategories || [],
       bookCount: bookCount || 1,
       category: category || "General",
-      tags_en: tags_en || [],
-      tags_ar: tags_ar || [],
+      tags: tags || [],
+      tags_en: tags_en || [], // For backward compatibility
+      tags_ar: tags_ar || [], // For backward compatibility
       availability: availability !== undefined ? availability : true,
       addedBy: req.user._id, // Store the admin who added the book
       description_fetched: !!(description_en || description_ar), // Mark as fetched if either description exists
@@ -84,6 +96,155 @@ router.post("/", protect, authorize(["admin"]), async (req, res) => {
       error: error.message,
     });
   }
+});
+
+/**
+ * Get all available categories
+ * @route   GET /api/books/categories
+ * @access  Public
+ */
+router.get("/categories", async (req, res) => {
+  try {
+    console.log(`[API] Received request for /api/books/categories`);
+
+    // Check if client wants categorized categories
+    const categorized = req.query.categorized === "true";
+
+    // Get all predefined category keys (categorized or not)
+    const categoryData = getAllCategoryKeys(categorized);
+
+    // Log the user agent and referrer for debugging
+    console.log(
+      `[GET /api/books/categories] User agent: ${req.headers["user-agent"]}`,
+    );
+    console.log(
+      `[GET /api/books/categories] Referrer: ${req.headers["referer"] || "None"}`,
+    );
+
+    // Add CORS headers for debugging
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept",
+    );
+
+    if (categorized) {
+      console.log(
+        `[GET /api/books/categories] Returning categorized categories`,
+      );
+      res.status(200).json({
+        success: true,
+        data: categoryData,
+        categorized: true,
+      });
+    } else {
+      console.log(
+        `[GET /api/books/categories] Returning ${categoryData.length} categories:`,
+        categoryData.slice(0, 5),
+        "...",
+      );
+      res.status(200).json({
+        success: true,
+        data: categoryData,
+      });
+    }
+  } catch (error) {
+    console.error(`[GET /api/books/categories] Error:`, error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching category keys",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * For backward compatibility
+ * @route   GET /api/books/tags
+ * @access  Public
+ */
+router.get("/tags", async (req, res) => {
+  try {
+    // Redirect to the categories endpoint
+    res.redirect(
+      "/api/books/categories" +
+        (req.query.categorized ? "?categorized=" + req.query.categorized : ""),
+    );
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching tag keys",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * Map Google Books categories to predefined categories
+ * @route   GET /api/books/map-categories
+ * @access  Public
+ */
+router.get("/map-categories", async (req, res) => {
+  try {
+    // Get categories from query params
+    const googleCategories = Array.isArray(req.query.category)
+      ? req.query.category
+      : req.query.category
+        ? [req.query.category]
+        : [];
+
+    // Get detailed flag - if true, return both category keys and details about the mapping
+    const detailed = req.query.detailed === "true";
+
+    // Map the Google categories to our category keys
+    const categoryKeys = mapGoogleCategoriesToCategoryKeys(googleCategories);
+
+    // If detailed is requested, include mapping information
+    if (detailed) {
+      const mappingDetails = googleCategories.map((category) => {
+        const matchedKey = mapGoogleCategoryToCategoryKey(category);
+        return {
+          originalCategory: category,
+          matchedCategoryKey: matchedKey || null,
+          matchSuccess: !!matchedKey,
+        };
+      });
+
+      res.status(200).json({
+        success: true,
+        data: categoryKeys,
+        mappingDetails,
+        originalCategories: googleCategories,
+        unmappedCategories: googleCategories.filter(
+          (c) => !mapGoogleCategoryToCategoryKey(c),
+        ),
+        mappingRate:
+          googleCategories.length > 0
+            ? (categoryKeys.length / googleCategories.length).toFixed(2)
+            : 0,
+      });
+    } else {
+      // Standard response with just the category keys
+      res.status(200).json({
+        success: true,
+        data: categoryKeys,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error mapping Google categories to our categories",
+      error: error.message,
+    });
+  }
+});
+
+// Debug router path matching
+router.use((req, res, next) => {
+  console.log(
+    `[Router Debug] Path: ${req.path}, Method: ${req.method}, Base URL: ${req.baseUrl}`,
+  );
+  next();
 });
 
 // @desc    Get all books
@@ -212,6 +373,7 @@ router.put("/:id", protect, authorize(["admin"]), async (req, res) => {
       category,
       tags_en,
       tags_ar,
+      tags,
     } = req.body;
 
     const book = await Book.findById(req.params.id);
@@ -222,7 +384,6 @@ router.put("/:id", protect, authorize(["admin"]), async (req, res) => {
         .json({ success: false, message: "Book not found" });
     }
 
-    // Update fields if provided
     // Update fields if provided
     if (title) book.title = title;
     if (author) book.author = author;
@@ -241,10 +402,14 @@ router.put("/:id", protect, authorize(["admin"]), async (req, res) => {
     if (pageCount !== undefined) book.pageCount = pageCount;
     if (isbn !== undefined) book.isbn = isbn;
     if (coverImage !== undefined) book.coverImage = coverImage;
-    if (categories !== undefined) book.categories = categories;
+    if (categories !== undefined) {
+      book.categories = categories;
+    }
+
     if (availability !== undefined) book.availability = availability;
     if (bookCount !== undefined) book.bookCount = bookCount;
     if (category !== undefined) book.category = category;
+    if (tags !== undefined) book.tags = tags;
     if (tags_en !== undefined) book.tags_en = tags_en;
     if (tags_ar !== undefined) book.tags_ar = tags_ar;
 
@@ -291,5 +456,10 @@ router.delete("/:id", protect, authorize(["admin"]), async (req, res) => {
     });
   }
 });
+
+// @desc    Search Google Books
+// @route   GET /api/books/search/google
+// @access  Public
+router.get("/search/google", searchGoogleBooks);
 
 module.exports = router;

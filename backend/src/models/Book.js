@@ -61,11 +61,7 @@ const BookSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  tags_en: {
-    type: [String],
-    default: [],
-  },
-  tags_ar: {
+  categories: {
     type: [String],
     default: [],
   },

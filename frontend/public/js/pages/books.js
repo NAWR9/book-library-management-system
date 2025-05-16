@@ -1,4 +1,5 @@
 /* global bootstrap */
+import { authGet } from "../utils/auth-fetch.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const bookCards = document.querySelectorAll(".book-card");
@@ -42,18 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
         lang: currentLanguage,
       });
 
-      // Fetch book details from our API
-      const response = await fetch(
+      // Fetch book details using authGet utility
+      const result = await authGet(
         `${window.API_BASE_URL}/api/book-details?${params}`,
       );
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Failed to fetch book details");
-      }
 
       // Display the book details
-      displayBookDetails(data.data);
+      displayBookDetails(result.data);
     } catch (error) {
       console.error("Error fetching book details:", error);
       showError(error.message);
@@ -108,7 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Set publisher info
     const publisherElement = document.getElementById("bookPublisher");
     if (bookData.publisher) {
-      publisherElement.textContent = bookData.publisher;
+      // Get translations from DOM
+      const publisherLabel =
+        document.querySelector('strong[data-i18n="books.publisher"]')
+          ?.textContent || "Publisher";
+      publisherElement.textContent = `${publisherLabel}: ${bookData.publisher}`;
       publisherElement.classList.remove("d-none");
     } else {
       publisherElement.classList.add("d-none");

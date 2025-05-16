@@ -65,30 +65,6 @@
                   <textarea class="form-control" id="description_en" name="description_en" style="height: 150px"></textarea>
                   <label for="description_en"><%= t('books.description') %></label>
                 </div>
-
-                <!-- Tags -->
-                <div class="mb-4">
-                  <label class="form-label"><%= t('books.tags') %></label>
-                  <div class="tag-overview-container mb-2">
-                    <div class="language-tag-section">
-                      <div class="lang-label"><%= t('books.englishTags') || 'English Tags' %>:</div>
-                      <div class="tag-preview" id="tag_preview_en"></div>
-                    </div>
-                    <div class="language-tag-section mt-2">
-                      <div class="lang-label"><%= t('books.arabicTags') || 'Arabic Tags' %>:</div>
-                      <div class="tag-preview" id="tag_preview_ar"></div>
-                    </div>
-                  </div>
-                  
-                  <div class="mb-2">
-                    <div class="current-language-label" data-language="english"><%= t('books.addEnglishTags') || 'Add English Tags' %>:</div>
-                  </div>
-                  <div class="tag-input-container">
-                    <div class="tag-chips-container" id="tag_chips_en"></div>
-                    <input type="text" class="form-control tag-input" id="tags_input_en" placeholder="<%= t('books.tagPlaceholder') || 'Type a tag and press Enter' %>">
-                    <input type="hidden" id="tags_en" name="tags_en">
-                  </div>
-                </div>
               </div>
 
               <!-- Arabic Tab -->
@@ -98,33 +74,40 @@
                   <textarea class="form-control" id="description_ar" name="description_ar" style="height: 150px" dir="rtl"></textarea>
                   <label for="description_ar"><%= t('books.description') %></label>
                 </div>
-
-                <!-- Tags -->
-                <div class="mb-4">
-                  <label class="form-label"><%= t('books.tags') %></label>
-                  <div class="tag-overview-container mb-2">
-                    <div class="language-tag-section">
-                      <div class="lang-label"><%= t('books.englishTags') || 'English Tags' %>:</div>
-                      <div class="tag-preview" id="tag_preview_en_in_ar"></div>
-                    </div>
-                    <div class="language-tag-section mt-2">
-                      <div class="lang-label"><%= t('books.arabicTags') || 'Arabic Tags' %>:</div>
-                      <div class="tag-preview" id="tag_preview_ar_in_ar"></div>
-                    </div>
-                  </div>
-                  
-                  <div class="mb-2">
-                    <div class="current-language-label" data-language="arabic"><%= t('books.addArabicTags') || 'Add Arabic Tags' %>:</div>
-                  </div>
-                  <div class="tag-input-container">
-                    <div class="tag-chips-container text-end" id="tag_chips_ar" dir="rtl"></div>
-                    <input type="text" class="form-control tag-input" id="tags_input_ar" dir="rtl" placeholder="<%= t('books.tagPlaceholder') || 'اكتب علامة واضغط على Enter' %>">
-                    <input type="hidden" id="tags_ar" name="tags_ar">
-                  </div>
-                </div>
               </div>
             </div>
-
+            
+            <!-- Categories - Outside language tabs since they're shared between languages -->
+            <div class="mb-4 mt-4">
+              <h5 class="mb-3">
+                <%= t('books.categories') %>
+              </h5>
+              
+              <div class="category-selection-card p-3 border rounded mb-3">
+                <!-- Selected Categories Display -->
+                <div class="selected-categories-header mb-2">
+                  <small class="text-muted"><%= t('books.selectedCategories') %></small>
+                </div>
+                <div class="selected-categories mb-3" id="selected_categories_container"></div>
+                
+                <!-- Category Selector -->
+                <div class="category-selector-header mb-2 d-flex justify-content-between align-items-center">
+                  <div>
+                    <small class="text-muted"><%= t('books.selectFromAvailableCategories') %></small>
+                  </div>
+                  <span id="category_count" class="badge bg-secondary category-counter">0</span>
+                </div>
+                <div class="category-selection-container">
+                  <div class="input-group mb-2">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="category_search" placeholder="<%= t('books.search') %>" aria-label="<%= t('books.search') %>">
+                  </div>
+                  <select class="form-select category-select" id="category_select" multiple>
+                    <!-- Will be populated from the API -->
+                  </select>
+                  <input type="hidden" id="categories" name="categories">
+                </div>
+              </div>
             <!-- Additional Book Details -->
             <h5 class="mt-4 mb-3"><%= t('books.additionalDetails') %></h5>
             <div class="row g-3 mb-3">
@@ -196,6 +179,20 @@
               <button type="button" id="cancelBtn" class="btn btn-outline-secondary"><%= t('books.cancel') %></button>
               <button type="button" id="submitBtn" class="btn btn-primary"><%= t('books.addBook') %></button>
             </div>
+            
+            <!-- Hidden translation elements for category groups -->
+            <div class="d-none">
+              <span data-category-group="general"><%= t('categoryGroups.general') %></span>
+              <span data-category-group="genres"><%= t('categoryGroups.genres') %></span>
+              <span data-category-group="audience"><%= t('categoryGroups.audience') %></span>
+              <span data-category-group="academic"><%= t('categoryGroups.academic') %></span>
+              <span data-category-group="technology"><%= t('categoryGroups.technology') %></span>
+              <span data-category-group="science"><%= t('categoryGroups.science') %></span>
+              <span data-category-group="humanities"><%= t('categoryGroups.humanities') %></span>
+              <span data-category-group="business"><%= t('categoryGroups.business') %></span>
+              <span data-category-group="lifestyle"><%= t('categoryGroups.lifestyle') %></span>
+              <span data-category-group="other"><%= t('categoryGroups.other') %></span>
+            </div>
           </form>
         </div>
       </div>
@@ -250,3 +247,5 @@
     </div>
   </div>
 </div>
+
+<!-- Category debugging and fix tools removed -->

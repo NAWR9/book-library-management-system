@@ -136,6 +136,15 @@ mongoose
 
 // API Routes
 app.use("/api/auth", authRoutes);
+
+// Debug middleware for API books route
+app.use("/api/books", (req, res, next) => {
+  console.log(
+    `[API Debug] Request to /api/books${req.path || ""}, method: ${req.method}`,
+  );
+  next();
+});
+
 app.use("/api/books", bookRoutes);
 
 // Health check route
