@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .join("");
 
     document.querySelectorAll(".book-card").forEach(function(card) {
-      card.addEventListener("click", function (e) {
+      card.addEventListener("click", function () {
         document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
         card.classList.add("active");
         const title = card.getAttribute("data-book-title");
@@ -162,7 +162,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.querySelectorAll(".book-card").forEach(function(card) {
-    card.addEventListener("click", function (e) {
+    card.addEventListener("click", function () {
       document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
       card.classList.add("active");
       const title = card.getAttribute("data-book-title");
@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.querySelectorAll(".book-card").forEach(function(card) {
-    card.addEventListener("click", function (e) {
+    card.addEventListener("click", function () {
       // Remove 'active' from all cards
       document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
       // Add 'active' to this card
@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".book-card").forEach(function(card) {
-    card.addEventListener("click", function (e) {
+    card.addEventListener("click", function () {
       document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
       card.classList.add("active");
       const title = card.getAttribute("data-book-title");
@@ -412,7 +412,7 @@ function displayBookDetails(bookData) {
 }
 
 document.querySelectorAll(".book-card").forEach(function(card) {
-  card.addEventListener("click", function (e) {
+  card.addEventListener("click", function () {
     document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
     card.classList.add("active");
     // ...set smartSearchSelectedBook, etc...
@@ -421,7 +421,7 @@ document.querySelectorAll(".book-card").forEach(function(card) {
 
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".book-card").forEach(function(card) {
-    card.addEventListener("click", function (e) {
+    card.addEventListener("click", function () {
       // Remove 'active' from all cards
       document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
       // Add 'active' to this card
@@ -497,7 +497,7 @@ window.hideSmartSearchBox = function(closeBtn) {
 
 // Ask Smart Search question
 window.askSmartQuestion = async function(type, responseContainerId = "smartSearchFooterResponse") {
-  const { title, author } = window.smartSearchSelectedBook;
+  const { title} = window.smartSearchSelectedBook;
   const responseDiv = document.getElementById(responseContainerId);
   if (!title) {
     responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Please select a book first.</div>`;

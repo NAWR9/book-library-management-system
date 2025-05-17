@@ -388,7 +388,7 @@ window.openSmartSearchModal = function(title, author) {
 
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".book-card").forEach(function(card) {
-    card.addEventListener("click", function (e) {
+    card.addEventListener("click", function () {
       // Remove 'active' from all cards
       document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
       // Add 'active' to this card
@@ -410,7 +410,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".book-card").forEach(function(card) {
-    card.addEventListener("click", function (e) {
+    card.addEventListener("click", function () {
       document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
       card.classList.add("active");
       const title = card.getAttribute("data-book-title");
