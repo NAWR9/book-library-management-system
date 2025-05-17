@@ -117,6 +117,12 @@ body {
   left: 0;
 }
 
+/* Position modal close button on left in RTL */
+html[dir="rtl"] .modal-header .btn-close {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
 /* Language switcher styles */
 .language-switcher .dropdown-item {
   display: flex;

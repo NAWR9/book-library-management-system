@@ -20,36 +20,35 @@
     <link rel="stylesheet" href="/css/category-input.css" />
     <% if (locals.pageStyles) { %><%- pageStyles %><% } %>
   </head>
-  <body class="<%= locals.bodyClass || '' %>">
+  <body class="d-flex flex-column min-vh-100 <%= locals.bodyClass || '' %>">
     <!-- Load Navbar -->
     <%- include('./partials/navbar') %>
 
-    <!-- Flash Messages -->
-    <div class="container mt-3">
-      <% if(locals.success_msg && success_msg.length > 0) { %>
-        <div class="alert alert-success alert-dismissible fade show">
-          <%= success_msg %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      <% } %>
-      
-      <% if(locals.error_msg && error_msg.length > 0) { %>
-        <div class="alert alert-warning alert-dismissible fade show">
-          <%= error_msg %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      <% } %>
-      
-      <% if(locals.error && error.length > 0) { %>
-        <div class="alert alert-danger alert-dismissible fade show">
-          <%= error %>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      <% } %>
-    </div>
-
-    <!-- Page Content -->
-    <%- body %>
+    <main class="flex-grow-1">
+      <!-- Flash Messages -->
+      <div class="container mt-3">
+        <% if(locals.success_msg && success_msg.length > 0) { %>
+          <div class="alert alert-success alert-dismissible fade show">
+            <%= success_msg %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% } %>
+        <% if(locals.error_msg && error_msg.length > 0) { %>
+          <div class="alert alert-warning alert-dismissible fade show">
+            <%= error_msg %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% } %>
+        <% if(locals.error && error.length > 0) { %>
+          <div class="alert alert-danger alert-dismissible fade show">
+            <%= error %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% } %>
+      </div>
+      <!-- Page Content -->
+      <%- body %>
+    </main>
 
     <!-- Footer -->
     <%- include('./partials/footer') %>

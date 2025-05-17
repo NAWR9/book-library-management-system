@@ -15,7 +15,24 @@
             <div class="card-body">
               <h5 class="card-title"><%= book.title %></h5>
               <p class="card-text text-muted"><%= t('books.by') %> <%= book.author %></p>
+              <% if (book.categories && book.categories.length) { %>
+                <div class="mb-2">
+                  <% book.categories.forEach(categoryKey => { %>
+                    <span class="badge bg-secondary"><%= t('bookCategories.' + categoryKey) %></span>
+                  <% }) %>
+                </div>
+              <% } %>
               <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
+              <% if (locals.user && (locals.user.role === 'admin' || locals.user.isAdmin)) { %>
+                <span class="btn-group mt-2 ms-1">
+                  <a href="/books/<%= book.id %>/edit?lang=<%= locals.htmlLang %>" class="btn btn-sm btn-outline-secondary edit-book-card-btn" aria-label="<%= t('common.edit') %>">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <button class="btn btn-sm btn-outline-danger delete-book-card-btn" data-id="<%= book.id %>" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" aria-label="<%= t('common.delete') %>">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </span>
+              <% } %>
             </div>
           </div>
         </div>
@@ -77,8 +94,37 @@
         </div>
         <div id="bookDetailsError" class="alert alert-danger d-none" role="alert"></div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer justify-content-between">
+        <div>
+          <% if (locals.user && (locals.user.role === 'admin' || locals.user.isAdmin)) { %>
+            <button type="button" id="editBookBtn" class="btn btn-outline-secondary me-2" aria-label="<%= t('common.edit') %>">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button type="button" id="deleteBookBtn" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" aria-label="<%= t('common.delete') %>">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          <% } %>
+        </div>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= t('books.close') %></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmModalLabel"><%= t('common.confirmDelete') %></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <%= t('books.deleteConfirmMessage') %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= t('common.cancel') %></button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteBtn"><%= t('common.delete') %></button>
       </div>
     </div>
   </div>

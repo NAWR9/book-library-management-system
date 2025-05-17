@@ -33,7 +33,7 @@
               <div class="col-md-6">
                 <div class="form-floating mb-3">
                   <input type="text" class="form-control" id="title" name="title" required>
-                  <label for="title"><%= t('books.title') %> *</label>
+                  <label for="title"><%= t('books.bookTitle') %> *</label>
                   <div class="invalid-feedback"><%= t('books.titleRequired') %></div>
                 </div>
               </div>
@@ -158,11 +158,11 @@
               <div class="col-md-4">
                 <div class="form-floating">
                   <select class="form-select" id="language" name="language" required>
-                    <option value="english" selected><%= t('books.english') || 'English' %></option>
-                    <option value="arabic"><%= t('books.arabic') || 'Arabic' %></option>
+                    <option value="english" selected><%= t('books.english') %></option>
+                    <option value="arabic"><%= t('books.arabic') %></option>
                   </select>
-                  <label for="language">Book Language *</label>
-                  <div class="invalid-feedback">Book language is required</div>
+                  <label for="language"><%= t('books.bookLanguage') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.languageRequired') %></div>
                 </div>
               </div>
             </div>

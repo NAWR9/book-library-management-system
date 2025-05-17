@@ -289,6 +289,30 @@ app.get("/books/new", (req, res) => {
   });
 });
 
+// Edit existing book page (admin only)
+app.get("/books/:id/edit", async (req, res) => {
+  if (!res.locals.user) return res.redirect("/login");
+  if (res.locals.user.role !== "admin") {
+    req.flash("error_msg", req.t("errors.adminOnly"));
+    return res.redirect("/books");
+  }
+  try {
+    const book = await Book.findById(req.params.id).lean();
+    if (!book) {
+      req.flash("error_msg", req.t("errors.bookNotFound"));
+      return res.redirect("/books");
+    }
+    res.render("pages/edit-book", {
+      title: req.t("titles.editBook"),
+      pageScript: "edit-book",
+      book,
+    });
+  } catch (error) {
+    console.error(error);
+    res.redirect("/books");
+  }
+});
+
 // 404 handler for unmatched routes
 app.use((req, res) => {
   res.status(404).render("error", {
