@@ -39,3 +39,32 @@
   <!-- Search Results -->
   <div id="searchResults" class="row row-cols-1 row-cols-md-3 g-4"></div>
 </div>
+
+<!-- Smart Search Box (initially hidden) -->
+<div id="smartSearchBox" class="card shadow" style="display:none; position:fixed; bottom:110px; right:40px; width:320px; z-index:1060;">
+  <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
+    <span><strong>Smart Search</strong></span>
+    <button type="button" class="btn-close btn-sm" aria-label="Close" onclick="hideSmartSearchBox()"></button>
+  </div>
+  <div class="card-body py-2 px-3">
+    <div id="smartSearchResponse" class="mb-3" style="min-height:60px; max-height:160px; overflow-y:auto;"></div>
+    <div class="d-grid gap-2">
+      <button class="btn btn-outline-primary btn-sm" onclick="askSmartQuestion('about')">
+        What's this book about?
+      </button>
+      <button class="btn btn-outline-info btn-sm" onclick="askSmartQuestion('author')">
+        Who's the author?
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" onclick="askSmartQuestion('similar')">
+        Similar books?
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Smart Search Floating Button (initially hidden) -->
+<div id="smartSearchFloatBtn" style="display:none; position:fixed;bottom:40px;right:40px;z-index:1050;">
+  <button class="btn btn-primary rounded-circle" style="width:56px;height:56px;" onclick="toggleSmartSearchBox()">
+    <i class="fas fa-brain"></i>
+  </button>
+</div>

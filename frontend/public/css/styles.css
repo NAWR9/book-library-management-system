@@ -239,3 +239,25 @@ body {
   margin: 0 auto;
   display: block;
 }
+
+#smartSearchModal .modal-content {
+  background: var(--background, #fff);
+  color: var(--text-color, #222);
+  transition: background 0.3s, color 0.3s;
+}
+.darkmode #smartSearchModal .modal-content {
+  background: #231a38;
+  color: #f1f1f1;
+}
+
+#smartSearchBox {
+  background: var(--background, #fff);
+  color: var(--text-color, #222);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  transition: background 0.3s, color 0.3s;
+}
+.darkmode #smartSearchBox {
+  background: #231a38;
+  color: #f1f1f1;
+}

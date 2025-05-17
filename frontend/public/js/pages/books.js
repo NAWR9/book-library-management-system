@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const currentLanguage = document.documentElement.lang || "en";
 
+  // Track the currently selected book for Smart Search
+  let smartSearchSelectedBook = { title: "", author: "" };
+
   // Add click event listeners to all book cards
   bookCards.forEach((card) => {
     const viewDetailsBtn = card.querySelector(".view-details-btn");
@@ -27,6 +30,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const title = card.getAttribute("data-book-title");
       const author = card.getAttribute("data-book-author");
       fetchAndDisplayBookDetails(title, author);
+
+      // Get book info from data attributes
+      smartSearchSelectedBook.title = card.getAttribute('data-book-title');
+      smartSearchSelectedBook.author = card.getAttribute('data-book-author');
+
+      // Show the floating Smart Search button
+      document.getElementById('smartSearchFloatBtn').style.display = 'block';
+
+      // Optionally, hide the Smart Search box if open (for a new selection)
+      document.getElementById('smartSearchBox').style.display = 'none';
     });
   });
 
@@ -201,4 +214,53 @@ document.addEventListener("DOMContentLoaded", () => {
       bookDetailsContent.classList.add("d-none");
       bookDetailsError.classList.add("d-none");
     });
+});
+
+// Toggle Smart Search box
+window.toggleSmartSearchBox = function() {
+  const box = document.getElementById('smartSearchBox');
+  box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+};
+
+window.hideSmartSearchBox = function() {
+  document.getElementById('smartSearchBox').style.display = 'none';
+};
+
+// Smart Search question handler
+window.askSmartQuestion = async function(type) {
+  const { title } = window.smartSearchSelectedBook;
+  if (!title) {
+    document.getElementById("smartSearchResponse").innerHTML = "<span class='text-danger'>Please select a book first.</span>";
+    return;
+  }
+
+  document.getElementById("smartSearchResponse").innerHTML = "<span class='text-muted'>Loading...</span>";
+
+  try {
+    const res = await fetch(`/api/smart-search?question=${encodeURIComponent(type)}&title=${encodeURIComponent(title)}`);
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById("smartSearchResponse").innerHTML = data.answer.join(" ");
+    } else {
+      document.getElementById("smartSearchResponse").innerHTML = "<span class='text-danger'>No answer found.</span>";
+    }
+  } catch (err) {
+    document.getElementById("smartSearchResponse").innerHTML = "<span class='text-danger'>Error fetching answer.</span>";
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Track the currently selected book for Smart Search
+  window.smartSearchSelectedBook = { title: "", author: "" };
+
+  // Delegate click event for dynamically rendered cards (search page)
+  document.body.addEventListener('click', function(e) {
+    const card = e.target.closest('.book-card');
+    if (card) {
+      window.smartSearchSelectedBook.title = card.getAttribute('data-book-title');
+      window.smartSearchSelectedBook.author = card.getAttribute('data-book-author');
+      document.getElementById('smartSearchFloatBtn').style.display = 'block';
+      document.getElementById('smartSearchBox').style.display = 'none';
+    }
+  });
 });
