@@ -3,9 +3,15 @@ const User = require("../models/User");
 const { generateResetToken } = require("../utils/generateToken");
 const { sendEmail } = require("../utils/sendEmail");
 
-// Generate JWT token with user id and name
-const generateToken = (id, name) => {
-  return jwt.sign({ id, name }, process.env.JWT_SECRET, {
+/**
+ * Generate JWT token with user credentials
+ * @param {string} id - User ID
+ * @param {string} name - User name
+ * @param {string} role - User role
+ * @returns {string} JWT token
+ */
+const generateToken = (id, name, role) => {
+  return jwt.sign({ id, name, role }, process.env.JWT_SECRET, {
     expiresIn: "24h",
   });
 };
@@ -37,7 +43,7 @@ exports.register = async (req, res) => {
     });
 
     // Generate token
-    const token = generateToken(user._id, user.name);
+    const token = generateToken(user._id, user.name, user.role);
 
     // Set token in HttpOnly cookie
     res.cookie("token", token, {
@@ -104,7 +110,7 @@ exports.login = async (req, res) => {
     }
 
     // Generate token
-    const token = generateToken(user._id, user.name);
+    const token = generateToken(user._id, user.name, user.role);
 
     // Set token in HttpOnly cookie
     res.cookie("token", token, {

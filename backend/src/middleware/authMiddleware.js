@@ -1,20 +1,19 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-// Protect routes
+/**
+ * Middleware to protect routes - validates user authentication
+ */
 exports.protect = async (req, res, next) => {
   let token;
 
-  // Check if authorization header exists and starts with Bearer
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
   ) {
-    // Extract token from Bearer token
     token = req.headers.authorization.split(" ")[1];
   }
 
-  // Check if token exists
   if (!token) {
     return res.status(401).json({
       success: false,
@@ -23,11 +22,19 @@ exports.protect = async (req, res, next) => {
   }
 
   try {
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach user to request object
-    req.user = await User.findById(decoded.id);
+    if (decoded.id && decoded.role) {
+      req.user = {
+        _id: decoded.id,
+        id: decoded.id,
+        name: decoded.name,
+        role: decoded.role,
+      };
+    } else {
+      req.user = await User.findById(decoded.id);
+    }
+
     next();
   } catch {
     return res.status(401).json({
@@ -37,7 +44,10 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-// Admin only middleware
+/**
+ * Role-based authorization middleware
+ * @param {Array} roles - Array of allowed roles
+ */
 exports.authorize = (roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {

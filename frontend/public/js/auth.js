@@ -3,7 +3,7 @@
  */
 class Auth {
   constructor() {
-    this.baseUrl = "http://localhost:3000/api/auth";
+    this.baseUrl = `${window.API_BASE_URL}/api/auth`;
     this.token = localStorage.getItem("token");
     this.user = JSON.parse(localStorage.getItem("user"));
   }

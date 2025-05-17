@@ -11,42 +11,83 @@ const BookSchema = new mongoose.Schema({
     required: [true, "Please provide the author's name"],
     trim: true,
   },
+  language: {
+    type: String,
+    required: [true, "Please specify the book language"],
+    enum: ["english", "arabic"],
+    default: "english",
+  },
   publicationDate: {
     type: Date,
     required: [true, "Please provide the publication date"],
   },
   addedToLibraryDate: {
     type: Date,
-    default: Date.now, // Automatically set to the current date when added
+    default: Date.now,
   },
   availability: {
     type: Boolean,
-    default: true, // True if the book is available for borrowing
+    default: true,
   },
-  genre: {
-    type: String,
-    default: "General", // Optional field for book genre
-  },
-  description: {
+  description_en: {
     type: String,
     trim: true,
-    default: null, // Optional field for a brief description of the book
+    default: null,
   },
+  description_ar: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  description_fetched: {
+    type: Boolean,
+    default: false,
+  },
+  publisher: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  pageCount: {
+    type: Number,
+    default: null,
+  },
+  isbn: {
+    type: String,
+    trim: true,
+    default: null,
+  },
+  coverImage: {
+    type: String,
+    default: null,
+  },
+  categories: {
+    type: [String],
+    default: [],
+  },
+  addedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
+
   borrowedBy: {
     type: [mongoose.Schema.Types.ObjectId],
-    ref: "User", // Reference to the User model if the book is borrowed
+    ref: "User",
     default: null,
   },
   bookCount: {
     type: Number,
     required: true,
-    default: 1, // Default to 1 copy of the book
+    default: 1,
     min: [1, "Book count must be at least 1"],
   },
-  category: {
-    type: String,
-    default: "General", // Optional field for book category
-  },
 });
+
+// Calculate the number of available books (total count minus borrowed books)
+BookSchema.methods.availableBooks = function () {
+  const borrowedCount = this.borrowedBy ? this.borrowedBy.length : 0;
+  return Math.max(0, this.bookCount - borrowedCount);
+};
 
 module.exports = mongoose.model("Book", BookSchema);

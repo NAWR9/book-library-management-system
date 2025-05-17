@@ -13,10 +13,18 @@ const expressLayouts = require("express-ejs-layouts");
 const jwt = require("jsonwebtoken");
 const bookRoutes = require("./backend/src/routes/bookRoutes");
 const searchRoutes = require("./backend/src/routes/searchRoutes");
-// Import routes
 const authRoutes = require("./backend/src/routes/authRoutes");
+const bookDetailsRoutes = require("./backend/src/routes/bookDetailsRoutes");
+
+const translateRoutes = require("./backend/src/routes/translateRoutes");
+const Book = require("./backend/src/models/Book");
+
+const smartSearchRoutes = require("./backend/src/routes/smartSearchRoutes");
 
 const app = express();
+
+const API_BASE_URL =
+  process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
 
 // CORS configuration
 const corsOptions = {
@@ -48,8 +56,17 @@ app.use(expressLayouts);
 // Set up static folder
 app.use(express.static(path.join(__dirname, "frontend/public")));
 
-//search Route
+// Search Route
 app.use("/api/search", searchRoutes);
+
+// Book Details Route
+app.use("/api/book-details", bookDetailsRoutes);
+
+// Translation Routes
+app.use("/api/translate", translateRoutes);
+
+//smart search
+app.use("/api/smart-search", smartSearchRoutes);
 
 // Set up EJS with layouts
 app.set("layout", "layout");
@@ -88,12 +105,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// i18n locals and user detection
+/**
+ * Set up i18n locals and user detection from JWT token
+ */
 app.use((req, res, next) => {
   res.locals.t = req.t;
   res.locals.htmlLang = req.language;
   res.locals.rtl = req.language === "ar";
   res.locals.user = null;
+  res.locals.API_BASE_URL = API_BASE_URL;
   const token = req.cookies.token;
   if (token) {
     try {
@@ -121,6 +141,15 @@ mongoose
 
 // API Routes
 app.use("/api/auth", authRoutes);
+
+// Debug middleware for API books route
+app.use("/api/books", (req, res, next) => {
+  console.log(
+    `[API Debug] Request to /api/books${req.path || ""}, method: ${req.method}`,
+  );
+  next();
+});
+
 app.use("/api/books", bookRoutes);
 
 // Health check route
@@ -145,7 +174,6 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
-  // Public registration page
   if (res.locals.user) {
     return res.redirect("/dashboard");
   }
@@ -213,45 +241,62 @@ app.get("/search", (req, res) => {
   });
 });
 
-// Dummy book data
-let books = [
-  {
-    title:
-      "Hands-On Machine Learning with Scikit-Learn," +
-      " Keras, and TensorFlow: Concepts, Tools, and Techniques to Build Intelligent Systems" +
-      " 2nd Edition",
-    author: "Aurélien Géron",
-    cover:
-      "https://m.media-amazon.com/images/I/81R5BmGtv-L._AC_UF1000,1000_QL80_.jpg",
-  },
-  {
-    title:
-      "Learn Java 17 Programming - " +
-      "Second Edition: Learn the fundamentals" +
-      " of Java Programming with this updated guide" +
-      " with the latest features",
-    author: " Nick Samoylov",
-    cover:
-      "https://m.media-amazon.com/images/I/81wQIyojm1L._AC_UF1000,1000_QL80_.jpg",
-  },
-];
-
-app.get("/books", (req, res) => {
+app.get("/books", async (req, res) => {
   if (!res.locals.user) return res.redirect("/login");
-  res.render("pages/books", {
-    title: req.t("titles.books"),
-    pageScript: "books",
-    books: books,
-  });
+
+  try {
+    const { lang = "en" } = req.query;
+    const books = await Book.find();
+
+    // Format books for display
+    const formattedBooks = books.map((book) => {
+      return {
+        id: book._id,
+        title: book.title,
+        author: book.author,
+        cover: book.coverImage || "/img/book-cover-placeholder.svg",
+        description:
+          lang === "ar"
+            ? book.description_ar || book.description_en
+            : book.description_en || book.description_ar,
+        availability: book.availability,
+        isbn: book.isbn,
+        publicationDate: book.publicationDate,
+        publisher: book.publisher,
+      };
+    });
+
+    res.render("pages/books", {
+      title: req.t("titles.books"),
+      pageScript: "books",
+      books: formattedBooks,
+    });
+  } catch (error) {
+    console.error("Error fetching books:", error);
+    res.status(500).render("error", {
+      title: "Error",
+      errorCode: 500,
+      errorMessage: req.t("errors.serverError"),
+    });
+  }
 });
 
 app.get("/books/new", (req, res) => {
-  res.render("new");
+  if (!res.locals.user) return res.redirect("/login");
+  if (res.locals.user.role !== "admin") {
+    req.flash("error_msg", req.t("errors.adminOnly"));
+    return res.redirect("/books");
+  }
+
+  res.render("pages/add-book", {
+    title: req.t("titles.addBook"),
+    pageScript: "add-book",
+  });
 });
 
 // 404 handler for unmatched routes
 app.use((req, res) => {
-  res.status(404).render("pages/error", {
+  res.status(404).render("error", {
     title: req.t("titles.notFound") || req.t("errors.pageNotFound"),
     errorCode: 404,
     errorMessage: req.t("errors.pageNotFound"),
@@ -262,7 +307,7 @@ app.use((req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).render("pages/error", {
+  res.status(500).render("error", {
     title: req.t("errors.serverError"),
     errorCode: 500,
     errorMessage: req.t("errors.serverError"),
@@ -272,5 +317,5 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on ${API_BASE_URL}`);
 });
