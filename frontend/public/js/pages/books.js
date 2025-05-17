@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Add click event listeners to all book cards
   bookCards.forEach((card) => {
     const viewDetailsBtn = card.querySelector(".view-details-btn");
+    const fullDetailsLink = card.querySelector(".full-details-link");
 
     viewDetailsBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -22,6 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const author = card.getAttribute("data-book-author");
       fetchAndDisplayBookDetails(title, author);
     });
+
+    // Ensure full details link doesn't trigger the modal
+    if (fullDetailsLink) {
+      fullDetailsLink.addEventListener("click", (e) => {
+        e.stopPropagation();
+        // The link will handle the navigation naturally
+      });
+    }
 
     card.addEventListener("click", () => {
       const title = card.getAttribute("data-book-title");

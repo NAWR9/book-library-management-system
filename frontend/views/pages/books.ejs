@@ -17,7 +17,7 @@
               <p class="card-text text-muted"><%= t('books.by') %> <%= book.author %></p>
               <div class="d-flex justify-content-between">
                 <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
-                <a href="/books/<%= book.id %>" class="btn btn-sm btn-primary mt-2"><%= t('books.fullDetails') %></a>
+                <a href="/books/<%= book.id %>" class="btn btn-sm btn-primary mt-2 full-details-link" onclick="event.stopPropagation();"><%= t('books.fullDetails') %></a>
               </div>
             </div>
           </div>
