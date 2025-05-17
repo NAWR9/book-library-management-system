@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
           </div>
         </div>
-      `
+      `,
       )
       .join("");
   }
@@ -78,46 +78,67 @@ document.addEventListener("DOMContentLoaded", function () {
   window.smartSearchSelectedBook = { title: "", author: "" };
 
   // Delegate click event for dynamically rendered cards (search page)
-  document.body.addEventListener('click', function(e) {
-    const card = e.target.closest('.book-card');
+  document.body.addEventListener("click", function (e) {
+    const card = e.target.closest(".book-card");
     if (card) {
-      window.smartSearchSelectedBook.title = card.getAttribute('data-book-title');
-      window.smartSearchSelectedBook.author = card.getAttribute('data-book-author');
-      document.getElementById('smartSearchFloatBtn').style.display = 'block';
-      document.getElementById('smartSearchBox').style.display = 'none';
+      window.smartSearchSelectedBook.title =
+        card.getAttribute("data-book-title");
+      window.smartSearchSelectedBook.author =
+        card.getAttribute("data-book-author");
+      document.getElementById("smartSearchFloatBtn").style.display = "block";
+      document.getElementById("smartSearchBox").style.display = "none";
     }
   });
 });
 
 // Toggle Smart Search box
-window.toggleSmartSearchBox = function() {
-  const box = document.getElementById('smartSearchBox');
-  box.style.display = (box.style.display === 'none' || !box.style.display) ? 'block' : 'none';
+window.toggleSmartSearchBox = function () {
+  const box = document.getElementById("smartSearchBox");
+  box.style.display =
+    box.style.display === "none" || !box.style.display ? "block" : "none";
 };
 
-window.hideSmartSearchBox = function() {
-  document.getElementById('smartSearchBox').style.display = 'none';
+window.hideSmartSearchBox = function () {
+  document.getElementById("smartSearchBox").style.display = "none";
 };
 
 // Smart Search question handler
-window.askSmartQuestion = async function(type) {
+function typeChatResponse(container, words, delay = 60) {
+  container.innerHTML = ""; // Clear previous content
+  let i = 0;
+  function typeNext() {
+    if (i < words.length) {
+      container.innerHTML += (i === 0 ? "" : " ") + words[i];
+      i++;
+      setTimeout(typeNext, delay);
+    }
+  }
+  typeNext();
+}
+
+window.askSmartQuestion = async function (type) {
   const { title } = window.smartSearchSelectedBook;
+  const responseDiv = document.getElementById("smartSearchResponse");
   if (!title) {
-    document.getElementById("smartSearchResponse").innerHTML = "<span class='text-danger'>Please select a book first.</span>";
+    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Please select a book first.</div>`;
     return;
   }
 
-  document.getElementById("smartSearchResponse").innerHTML = "<span class='text-muted'>Loading...</span>";
+  responseDiv.innerHTML = `<div class="chat-bubble bg-light text-muted">Loading...</div>`;
 
   try {
-    const res = await fetch(`/api/smart-search?question=${encodeURIComponent(type)}&title=${encodeURIComponent(title)}`);
+    const res = await fetch(
+      `/api/smart-search?question=${encodeURIComponent(type)}&title=${encodeURIComponent(title)}`,
+    );
     const data = await res.json();
     if (data.success) {
-      document.getElementById("smartSearchResponse").innerHTML = data.answer.join(" ");
+      responseDiv.innerHTML = `<div class="chat-bubble"></div>`;
+      const bubble = responseDiv.querySelector(".chat-bubble");
+      typeChatResponse(bubble, data.answer, 60); // 60ms per word
     } else {
-      document.getElementById("smartSearchResponse").innerHTML = "<span class='text-danger'>No answer found.</span>";
+      responseDiv.innerHTML = `<div class="chat-bubble bg-warning text-dark">${data.answer.join(" ")}</div>`;
     }
-  } catch  {
-    document.getElementById("smartSearchResponse").innerHTML = "<span class='text-danger'>Error fetching answer.</span>";
+  } catch {
+    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Error fetching answer.</div>`;
   }
 };
