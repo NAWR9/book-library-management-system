@@ -104,8 +104,21 @@
     "arabic": "Arabic"
   },
   "homepage": {
-    "welcomeToSystem": "Welcome to Library Management System",
-    "systemDescription": "This is a web-based system for managing books and library operations."
+    "welcomeToSystem": "Welcome to University Library System",
+    "systemDescription": "This is a web-based system for managing books and library operations.",
+    "heroHeadline": "University Library Management System",
+    "heroSubtitle": "Access thousands of academic resources at your fingertips",
+    "feature1": "Browse our extensive collection of academic books",
+    "feature2": "Borrow books online with just a few clicks",
+    "feature3": "Access digital resources and research materials",
+    "feature4": "Get notifications about due dates and new arrivals",
+    "loginButton": "Login",
+    "registerButton": "Register",
+    "welcome": "Welcome, {{name}}",
+    "browseBooks": "Browse Books",
+    "borrowHistory": "My Borrow History",
+    "adminPlaceholder": "Welcome to the admin dashboard",
+    "manageBooks": "Manage Books"
   },
   "dashboard": {
     "welcome": "Welcome",

@@ -1,6 +1,6 @@
 :root {
-  --primary: #4a2c82; /* University purple */
-  --secondary: #ffc107; /* University gold */
+  --primary: #0d6efd; /* University blue */
+  --secondary: #20c997; /* Teal */
   --dark: #1d1d1d;
   --light: #f8f9fa;
 }
@@ -11,16 +11,27 @@ body {
 }
 
 .navbar-custom {
-  background-color: var(--primary);
+  background-color: var(--light);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-custom .navbar-brand,
 .navbar-custom .nav-link {
-  color: white;
+  color: var(--primary);
 }
 
 .navbar-custom .nav-link:hover {
   color: var(--secondary);
+}
+
+/* Navbar toggler (hamburger menu) styling for light mode */
+.navbar-custom .navbar-toggler {
+  border-color: var(--primary);
+  background-color: transparent;
+}
+
+.navbar-custom .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(13, 110, 253, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 .auth-hero {
@@ -139,8 +150,8 @@ body {
 
 /* darkmode */
 .darkmode {
-  --primary: #6b4ca6; /* Lighter purple for better contrast */
-  --secondary: #e6b800; /* Slightly muted gold */
+  --primary: #3d8bfd; /* Lighter blue for better contrast */
+  --secondary: #25d8a5; /* Lighter teal for dark mode */
   --dark: #1e1e1e; /* Dark but not pure black */
   --light: #f8f9fa;
   --background: #121212; /* True dark background */
@@ -315,14 +326,37 @@ body {
 
 /* Dark mode button styles */
 .darkmode .btn-primary {
-  background-color: var(--dark);
+  background-color: var(--primary);
   border-color: var(--primary);
+  color: white;
 }
 
 .darkmode .btn-primary:hover {
-  color: var(--light);
-  background-color: #5a3d8c; /* Slightly darker on hover */
-  border-color: #5a3d8c;
+  color: white;
+  background-color: #1c65d9; /* Slightly darker blue on hover */
+  border-color: #1c65d9;
+}
+
+/* Login and Register buttons in dark mode */
+.darkmode .btn-light {
+  color: var(--text-color);
+  background-color: var(--surface);
+  border-color: var(--border);
+}
+
+.darkmode .btn-light:hover {
+  color: white;
+  background-color: #3e3e3e;
+}
+
+.darkmode .btn-outline-light {
+  color: white;
+  border-color: white;
+}
+
+.darkmode .btn-outline-light:hover {
+  color: var(--dark);
+  background-color: white;
 }
 
 .darkmode .btn-outline-secondary {
@@ -500,4 +534,24 @@ body {
 /* Ensure the badge text is visible in dark mode */
 .darkmode .badge {
   font-weight: 500;
+}
+
+/* Book title links in borrow history */
+.table td a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.table td a:hover {
+  text-decoration: underline;
+}
+
+/* Dark mode styles for book title links */
+.darkmode .table td a {
+  color: var(--primary);
+}
+
+.darkmode .table td a:hover {
+  color: #5aa9d6;
 }

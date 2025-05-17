@@ -161,9 +161,13 @@ app.get("/api/health", (req, res) => {
 
 // Frontend routes (EJS views)
 app.get("/", (req, res) => {
+  // Get theme preference from cookie or default to light
+  const theme = req.cookies.theme || "light";
+
   res.render("pages/index", {
     title: req.t("titles.home"),
     pageScript: "index",
+    theme: theme,
   });
 });
 
