@@ -191,6 +191,59 @@ body {
   color: var(--text-color);
 }
 
+/* Borrow history and status dark mode styles */
+.darkmode .table {
+  color: var(--text-color);
+}
+
+.darkmode .table-striped > tbody > tr:nth-of-type(odd) > * {
+  color: var(--text-color);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.darkmode .table-striped > tbody > tr:nth-of-type(even) > * {
+  background-color: var(--background);
+}
+
+.darkmode .borrow-status {
+  background-color: var(--background);
+  border-radius: 8px;
+  padding: 15px;
+  border: 1px solid var(--primary);
+}
+
+.darkmode .form-select {
+  background-color: var(--dark);
+  color: var(--text-color);
+  border-color: var(--primary);
+}
+
+.darkmode .form-text {
+  color: #adb5bd !important;
+}
+
+.darkmode .alert-info {
+  background-color: #0d3446;
+  color: #8ed8f8;
+  border-color: #085d7c;
+}
+
+.darkmode .table-danger {
+  background-color: rgba(220, 53, 69, 0.2) !important;
+}
+
+/* Dark mode button styles */
+.darkmode .btn-outline-secondary {
+  color: #ffffff;
+  border-color: #6f757d;
+}
+
+.darkmode .btn-outline-secondary:hover {
+  color: var(--dark);
+  background-color: #bdbdbd;
+  border-color: #bdbdbd;
+}
+
 /* book styles */
 .book-card {
   transition:
@@ -231,6 +284,14 @@ body {
 .darkmode #bookDetailsModal .modal-content {
   background-color: var(--dark);
   color: var(--text-color);
+}
+
+.darkmode #bookDetailsModal .modal-header {
+  border-bottom-color: var(--primary);
+}
+
+.darkmode #bookDetailsModal .modal-footer {
+  border-top-color: var(--primary);
 }
 
 #bookCover {

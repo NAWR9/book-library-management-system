@@ -12,7 +12,8 @@
     </div>
   </div>
 
-  <div class="row mt-4">
+  <!-- Quick Actions Cards -->
+  <div class="row mt-4 mb-5">
     <div class="col-md-4 mb-3">
       <div class="card h-100">
         <div class="card-body">
@@ -20,7 +21,7 @@
             <i class="fas fa-book me-2"></i><span><%= t('dashboard.myBooks') %></span>
           </h5>
           <p class="card-text"><%= t('dashboard.manageBooks') %></p>
-          <a href="#" class="btn btn-primary"><%= t('dashboard.viewBooks') %></a>
+          <a href="/books" class="btn btn-primary"><%= t('dashboard.viewBooks') %></a>
         </div>
       </div>
     </div>
@@ -42,9 +43,68 @@
             <i class="fas fa-user-cog me-2"></i><span><%= t('dashboard.profile') %></span>
           </h5>
           <p class="card-text"><%= t('dashboard.updateAccount') %></p>
-          <a href="profile" class="btn btn-primary"><%= t('dashboard.editProfile') %></a>
+          <a href="/profile" class="btn btn-primary"><%= t('dashboard.editProfile') %></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Borrow History Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h3 class="h5 mb-0"><%= t('books.borrowHistory') %></h3>
+        </div>
+        <div class="card-body">
+          <% if (borrowHistory && borrowHistory.length > 0) { %>
+            <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th><%= t('books.title') %></th>
+                    <th><%= t('books.author') %></th>
+                    <th><%= t('books.status') %></th>
+                    <th><%= t('books.requestDate') %></th>
+                    <th><%= t('books.dueDate') %></th>
+                    <th><%= t('books.returnDate') %></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% borrowHistory.forEach(request => { %>
+                    <tr>
+                      <td>
+                        <a href="/books/<%= request.book._id %>"><%= request.book.title %></a>
+                      </td>
+                      <td><%= request.book.author %></td>
+                      <td>
+                        <% if (request.status === 'pending') { %>
+                          <span class="badge bg-warning text-dark"><%= t('books.statusPending') %></span>
+                        <% } else if (request.status === 'approved') { %>
+                          <span class="badge bg-success"><%= t('books.statusApproved') %></span>
+                        <% } else if (request.status === 'declined') { %>
+                          <span class="badge bg-danger"><%= t('books.statusDeclined') %></span>
+                        <% } else if (request.status === 'returned') { %>
+                          <span class="badge bg-secondary"><%= t('books.statusReturned') %></span>
+                        <% } %>
+                      </td>
+                      <td><%= request.formattedRequestDate %></td>
+                      <td><%= request.formattedDueDate || '-' %></td>
+                      <td><%= request.formattedReturnDate || '-' %></td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="alert alert-info">
+              <%= t('books.noBorrowHistory') %>
+            </div>
+          <% } %>
         </div>
       </div>
     </div>
   </div>
 </main>
+
+<script type="module" src="/js/pages/dashboard.js"></script>

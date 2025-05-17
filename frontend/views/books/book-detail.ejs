@@ -1,0 +1,115 @@
+<%- contentFor('body') %>
+
+<div class="container py-5">
+  <div class="row">
+    <div class="col-md-4">
+      <img id="bookCover" src="<%= book.coverImage || '/img/book-cover-placeholder.svg' %>" class="img-fluid rounded" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
+    </div>
+    <div class="col-md-8">
+      <h2 id="bookTitle"><%= book.title %></h2>
+      <p class="text-muted mb-3">
+        <span id="bookAuthors"><%= book.author %></span>
+        <% if (book.publisher) { %>
+          <small id="bookPublisher" class="d-block"><%= t('books.publisher') %>: <%= book.publisher %></small>
+        <% } %>
+      </p>
+      
+      <div class="mb-3">
+        <h5><%= t('books.description') %></h5>
+        <div id="bookDescription" class="description-text">
+          <% if (htmlLang === 'ar' && book.description_ar) { %>
+            <%= book.description_ar %>
+          <% } else if (htmlLang === 'en' && book.description_en) { %>
+            <%= book.description_en %>
+          <% } else { %>
+            <%= book.description || t('books.noDescription') %>
+          <% } %>
+        </div>
+      </div>
+      
+      <div class="row mb-3">
+        <div class="col-sm-6">
+          <p><strong><%= t('books.publicationDate') %>:</strong> <span id="bookPublishedDate">
+            <%= book.publicationDate ? new Date(book.publicationDate).toLocaleDateString() : '-' %>
+          </span></p>
+        </div>
+        <div class="col-sm-6">
+          <p><strong><%= t('books.pageCount') %>:</strong> <span id="bookPageCount"><%= book.pageCount || '-' %></span></p>
+        </div>
+      </div>
+      
+      <div class="mb-3">
+        <% if (book.categories && book.categories.length > 0) { %>
+          <p><strong><%= t('books.category') %>:</strong> <span id="bookCategories"><%= book.categories.join(", ") %></span></p>
+        <% } %>
+        <p><strong><%= t('books.isbn') %>:</strong> <span id="bookIsbn"><%= book.isbn || '-' %></span></p>
+      </div>
+      
+      <!-- Alert for borrow request feedback -->
+      <div id="borrowMsg" class="alert d-none" role="alert"></div>
+      
+      <!-- User Borrow Status - only shown if user has borrowed this book -->
+      <% if (user && user.role !== 'admin' && userBorrowStatus) { %>
+        <div class="borrow-status my-3">
+          <h5><%= t('books.borrowStatus') %>:</h5>
+          <% if (userBorrowStatus === 'pending') { %>
+            <span class="badge bg-warning text-dark"><%= t('books.statusPending') %></span>
+            <p class="small mt-2"><%= t('books.pendingDescription') %></p>
+          <% } else if (userBorrowStatus === 'approved') { %>
+            <span class="badge bg-success"><%= t('books.statusApproved') %></span>
+            <p class="small mt-2"><%= t('books.approvedDescription') %></p>
+          <% } else if (userBorrowStatus === 'declined') { %>
+            <span class="badge bg-danger"><%= t('books.statusDeclined') %></span>
+            <p class="small mt-2"><%= t('books.declinedDescription') %></p>
+          <% } else if (userBorrowStatus === 'returned') { %>
+            <span class="badge bg-secondary"><%= t('books.statusReturned') %></span>
+            <p class="small mt-2"><%= t('books.returnedDescription') %></p>
+          <% } %>
+        </div>
+      <% } %>
+      
+      <!-- Borrow button - only shown for logged in non-admin users who haven't borrowed this book yet -->
+      <% if (user && user.role !== 'admin' && (!userBorrowStatus || userBorrowStatus === 'returned' || userBorrowStatus === 'declined')) { %>
+        <div class="borrow-section mt-3">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="borrowDuration"><%= t('books.borrowDuration') %>:</label>
+                <select id="borrowDuration" class="form-select">
+                  <option value="7"><%= t('books.oneWeek') %></option>
+                  <option value="14" selected><%= t('books.twoWeeks') %></option>
+                  <option value="21"><%= t('books.threeWeeks') %></option>
+                  <option value="30"><%= t('books.oneMonth') %></option>
+                </select>
+                <small class="form-text text-muted"><%= t('books.durationNote') %></small>
+              </div>
+            </div>
+            <div class="col-md-6 d-flex align-items-end">
+              <button id="borrowBtn" class="btn btn-primary mb-3 w-100" data-book-id="<%= book._id %>">
+                <%= t('books.borrowBook') %>
+              </button>
+            </div>
+          </div>
+        </div>
+      <% } %>
+      
+      <div class="mt-4">
+        <a href="/books" class="btn btn-outline-secondary"><%= t('books.backToList') %></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden elements with translations for JavaScript -->
+<div class="d-none">
+  <span data-i18n="books.borrowBook"><%= t('books.borrowBook') %></span>
+  <span data-i18n="books.requestSubmitted"><%= t('books.requestSubmitted') %></span>
+  <span data-i18n="books.borrowSuccess"><%= t('books.borrowSuccess') %></span>
+  <span data-i18n="books.alreadyRequested"><%= t('books.alreadyRequested') %></span>
+  <span data-i18n="books.notAvailable"><%= t('books.notAvailable') %></span>
+  <span data-i18n="books.bookNotFound"><%= t('books.bookNotFound') %></span>
+  <span data-i18n="auth.loading"><%= t('auth.loading') %></span>
+</div>
+
+<!-- Add the script reference -->
+<script type="module" src="/js/pages/book-detail.js"></script> 
