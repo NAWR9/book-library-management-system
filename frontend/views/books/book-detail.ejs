@@ -40,7 +40,20 @@
       
       <div class="mb-3">
         <% if (book.categories && book.categories.length > 0) { %>
-          <p><strong><%= t('books.category') %>:</strong> <span id="bookCategories"><%= book.categories.join(", ") %></span></p>
+          <p><strong><%= t('books.category') %>:</strong> 
+            <span id="bookCategories">
+              <% book.categories.map((categoryKey, index) => { 
+                // Get the translation, and check if it starts with the prefix (which indicates missing translation)
+                let translation = t(`bookCategories.${categoryKey}`);
+                if (translation.startsWith('bookCategories.')) {
+                  // If no translation exists, format the raw key for display (convert snake_case to Title Case)
+                  translation = categoryKey.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                }
+              %>
+                <%= translation %><%= index < book.categories.length - 1 ? ', ' : '' %>
+              <% }) %>
+            </span>
+          </p>
         <% } %>
         <p><strong><%= t('books.isbn') %>:</strong> <span id="bookIsbn"><%= book.isbn || '-' %></span></p>
       </div>
