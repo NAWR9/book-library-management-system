@@ -15,6 +15,7 @@ const bookRoutes = require("./backend/src/routes/bookRoutes");
 const searchRoutes = require("./backend/src/routes/searchRoutes");
 const authRoutes = require("./backend/src/routes/authRoutes");
 const bookDetailsRoutes = require("./backend/src/routes/bookDetailsRoutes");
+const borrowRoutes = require("./backend/src/routes/borrowRoutes");
 
 const translateRoutes = require("./backend/src/routes/translateRoutes");
 const Book = require("./backend/src/models/Book");
@@ -145,7 +146,13 @@ app.use("/api/books", (req, res, next) => {
   next();
 });
 
+// Debug middleware for API borrow routes
+app.use("/api/borrow", (req, res, next) => {
+  next();
+});
+
 app.use("/api/books", bookRoutes);
+app.use("/api/borrow", borrowRoutes);
 
 // Health check route
 app.get("/api/health", (req, res) => {
@@ -154,9 +161,13 @@ app.get("/api/health", (req, res) => {
 
 // Frontend routes (EJS views)
 app.get("/", (req, res) => {
+  // Get theme preference from cookie or default to light
+  const theme = req.cookies.theme || "light";
+
   res.render("pages/index", {
     title: req.t("titles.home"),
     pageScript: "index",
+    theme: theme,
   });
 });
 
@@ -213,12 +224,78 @@ app.get("/reset-password", (req, res) => {
   });
 });
 
-app.get("/dashboard", (req, res) => {
+app.get("/dashboard", async (req, res) => {
   if (!res.locals.user) return res.redirect("/login");
-  res.render("pages/dashboard", {
-    title: req.t("titles.dashboard"),
-    pageScript: "dashboard",
-  });
+
+  try {
+    // Only fetch borrow history for regular users, not admins
+    let formattedHistory = [];
+
+    if (res.locals.user.role !== "admin") {
+      // Get user's borrow history
+      const BorrowRequest = require("./backend/src/models/BorrowRequest");
+      const borrowHistory = await BorrowRequest.find({
+        user: res.locals.user.id,
+      })
+        .sort({ requestDate: -1 }) // Sort by requestDate in descending order (newest first)
+        .populate({
+          path: "book",
+          select: "title author coverImage isbn publisher publicationDate",
+        });
+
+      // Format dates for display
+      formattedHistory = borrowHistory.map((request) => {
+        // Handle case where book might be null (deleted book)
+        const bookData = request.book || {
+          _id: null,
+          title: "Book no longer available",
+          author: "Unknown",
+          coverImage: "/img/book-cover-placeholder.svg",
+          isbn: "",
+          publisher: "",
+          publicationDate: "",
+        };
+
+        return {
+          _id: request._id,
+          book: bookData,
+          status: request.status,
+          requestDate: request.requestDate,
+          dueDate: request.dueDate,
+          returnDate: request.returnDate,
+          requestedDuration: request.requestedDuration || 14,
+          notes: request.notes,
+          formattedRequestDate: new Date(
+            request.requestDate,
+          ).toLocaleDateString(),
+          formattedDueDate: request.dueDate
+            ? new Date(request.dueDate).toLocaleDateString()
+            : null,
+          formattedReturnDate: request.returnDate
+            ? new Date(request.returnDate).toLocaleDateString()
+            : null,
+          isOverdue:
+            request.status === "approved" &&
+            request.dueDate &&
+            new Date(request.dueDate) < new Date() &&
+            !request.returnDate,
+        };
+      });
+    }
+
+    res.render("pages/dashboard", {
+      title: req.t("titles.dashboard"),
+      pageScript: "dashboard",
+      borrowHistory: formattedHistory,
+    });
+  } catch (error) {
+    console.error("Error fetching borrow history:", error);
+    res.render("pages/dashboard", {
+      title: req.t("titles.dashboard"),
+      pageScript: "dashboard",
+      borrowHistory: [],
+    });
+  }
 });
 
 app.get("/profile", (req, res) => {
@@ -310,6 +387,83 @@ app.get("/books/:id/edit", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.redirect("/books");
+  }
+});
+
+// Book detail page route
+app.get("/books/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { lang = "en" } = req.query;
+
+    // Handle case where id might be "null" string from our fallback
+    if (id === "null") {
+      return res.status(404).render("error", {
+        title: req.t("errors.notFound"),
+        errorCode: 404,
+        errorMessage: req.t("errors.bookNotFound"),
+      });
+    }
+
+    // Fetch book details from database
+    const book = await Book.findById(id);
+
+    if (!book) {
+      return res.status(404).render("error", {
+        title: req.t("errors.notFound"),
+        errorCode: 404,
+        errorMessage: req.t("errors.bookNotFound"),
+      });
+    }
+
+    // Format book data for the template
+    const formattedBook = {
+      _id: book._id,
+      title: book.title,
+      author: book.author,
+      coverImage: book.coverImage || "/img/book-cover-placeholder.svg",
+      description:
+        lang === "ar"
+          ? book.description_ar || book.description_en
+          : book.description_en || book.description_ar,
+      description_en: book.description_en,
+      description_ar: book.description_ar,
+      availability: book.availability,
+      isbn: book.isbn,
+      publicationDate: book.publicationDate,
+      publisher: book.publisher,
+      pageCount: book.pageCount,
+      categories: book.categories,
+    };
+
+    // Check if the user has any existing borrow requests for this book
+    let userBorrowStatus = null;
+    if (res.locals.user && res.locals.user.role !== "admin") {
+      const BorrowRequest = require("./backend/src/models/BorrowRequest");
+      const latestRequest = await BorrowRequest.findOne({
+        user: res.locals.user.id,
+        book: id,
+      }).sort({ requestDate: -1 });
+
+      if (latestRequest) {
+        userBorrowStatus = latestRequest.status;
+      }
+    }
+
+    // Render the book detail page
+    res.render("books/book-detail", {
+      title: formattedBook.title,
+      pageScript: "book-detail",
+      book: formattedBook,
+      userBorrowStatus,
+    });
+  } catch (error) {
+    console.error("Error fetching book details:", error);
+    res.status(500).render("error", {
+      title: "Error",
+      errorCode: 500,
+      errorMessage: req.t("errors.serverError"),
+    });
   }
 });
 

@@ -1,6 +1,91 @@
 <%- contentFor('body') %>
 
-<div class="container mt-4">
-  <h1><%= t('homepage.welcomeToSystem') %></h1>
-  <p><%= t('homepage.systemDescription') %></p>
+<% if (!user) { %>
+<!-- Guest View (Not Logged In) -->
+<div class="py-5 bg-primary text-white">
+  <div class="container text-center">
+    <h1 class="display-4"><%= t('homepage.heroHeadline') %></h1>
+    <p class="lead"><%= t('homepage.heroSubtitle') %></p>
+    <div class="mt-4">
+      <a href="/login" class="btn btn-light btn-lg me-2"><%= t('homepage.loginButton') %></a>
+      <a href="/register" class="btn btn-outline-light btn-lg"><%= t('homepage.registerButton') %></a>
+    </div>
+  </div>
 </div>
+
+<div class="container py-5">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow">
+        <div class="card-body">
+          <h2 class="mb-4 text-center"><%= t('homepage.welcomeToSystem') %></h2>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item"><i class="fas fa-book me-2 text-primary"></i> <%= t('homepage.feature1') %></li>
+            <li class="list-group-item"><i class="fas fa-hand-holding-heart me-2 text-primary"></i> <%= t('homepage.feature2') %></li>
+            <li class="list-group-item"><i class="fas fa-laptop me-2 text-primary"></i> <%= t('homepage.feature3') %></li>
+            <li class="list-group-item"><i class="fas fa-bell me-2 text-primary"></i> <%= t('homepage.feature4') %></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% } else if (user.role === 'admin') { %>
+<!-- Admin View -->
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 mx-auto text-center">
+      <div class="card shadow">
+        <div class="card-body">
+          <h1 class="mb-4"><%= t('homepage.adminPlaceholder') %></h1>
+          <p class="lead mb-4"><%= t('homepage.systemDescription') %></p>
+          <a href="/books" class="btn btn-primary btn-lg">
+            <i class="fas fa-book-open me-2"></i> <%= t('homepage.manageBooks') %>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% } else { %>
+<!-- Student/Regular User View -->
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 mx-auto">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h2 class="mb-0"><%= t('homepage.welcome', { name: user.name.split(' ')[0] }) %></h2>
+        </div>
+        <div class="card-body">
+          <div class="row mt-4">
+            <div class="col-md-6 mb-3">
+              <div class="card h-100">
+                <div class="card-body text-center">
+                  <i class="fas fa-book display-4 text-primary mb-3"></i>
+                  <h3><%= t('homepage.browseBooks') %></h3>
+                  <p><%= t('homepage.feature1') %></p>
+                  <a href="/books" class="btn btn-primary mt-auto">
+                    <i class="fas fa-arrow-right me-2"></i> <%= t('homepage.browseBooks') %>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="card h-100">
+                <div class="card-body text-center">
+                  <i class="fas fa-history display-4 text-primary mb-3"></i>
+                  <h3><%= t('homepage.borrowHistory') %></h3>
+                  <p><%= t('homepage.feature2') %></p>
+                  <a href="/dashboard" class="btn btn-primary mt-auto">
+                    <i class="fas fa-arrow-right me-2"></i> <%= t('homepage.borrowHistory') %>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>

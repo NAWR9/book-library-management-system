@@ -22,7 +22,8 @@
                   <% }) %>
                 </div>
               <% } %>
-              <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
+              <div class="d-flex justify-content-between">
+                <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
               <% if (locals.user && (locals.user.role === 'admin' || locals.user.isAdmin)) { %>
                 <span class="btn-group mt-2 ms-1">
                   <a href="/books/<%= book.id %>/edit?lang=<%= locals.htmlLang %>" class="btn btn-sm btn-outline-secondary edit-book-card-btn" aria-label="<%= t('common.edit') %>">
@@ -33,6 +34,8 @@
                   </button>
                 </span>
               <% } %>
+                <a href="/books/<%= book.id %>" class="btn btn-sm btn-primary mt-2 full-details-link" onclick="event.stopPropagation();"><%= t('books.fullDetails') %></a>
+              </div>
             </div>
           </div>
         </div>
