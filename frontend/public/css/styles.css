@@ -193,6 +193,7 @@ body {
 
 /* book styles */
 .book-card {
+  position: relative;
   transition:
     transform 0.3s ease,
     box-shadow 0.3s ease;
@@ -209,6 +210,54 @@ body {
   height: 300px;
   object-fit: contain;
   background-color: gray;
+}
+
+.book-card .smart-search-btn {
+  display: none;
+  transition: opacity 0.2s;
+}
+.book-card:hover .smart-search-btn,
+.book-card:focus-within .smart-search-btn {
+  display: block;
+  opacity: 1;
+}
+.book-card.active .smart-search-btn {
+  display: block !important;
+  opacity: 1;
+}
+
+/* Default: English (LTR) - bottom right */
+.smart-search-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: none;
+}
+
+/* Show only when card is active */
+.book-card.active .smart-search-btn {
+  display: block;
+}
+
+/* Arabic (RTL) - bottom left */
+html[lang="ar"] .smart-search-btn {
+  right: auto;
+  left: 10px;
+}
+
+.smart-search-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10; /* Must be higher than the card's shadow */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: none;
+}
+
+.book-card.active .smart-search-btn {
+  display: block;
 }
 
 /* Book details modal styles */
@@ -256,27 +305,6 @@ body {
   background: var(--background, #fff);
   color: var(--text-color, #222);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-  transition:
-    background 0.3s,
-    color 0.3s;
-}
-.darkmode #smartSearchBox {
-  background: #231a38;
-  color: #f1f1f1;
-}
-
-/* ChatGPT-style bubble for Smart Search */
-.chat-response {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 180px; /* Set max height for scroll */
-  overflow-y: auto; /* Enable vertical scroll */
-  padding-right: 4px; /* Space for scrollbar */
-}
-
-.chat-bubble {
   background: #f4f6fb;
   color: #222;
   border-radius: 16px;
@@ -293,4 +321,30 @@ body {
 .darkmode .chat-bubble {
   background: #2a2342;
   color: #f1f1f1;
+}
+
+.card-body {
+  position: relative;
+}
+
+.smart-search-btn {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;      /* Bottom left for LTR */
+  z-index: 2;
+  display: none;
+}
+
+.book-card.active .smart-search-btn {
+  display: block !important;
+}
+
+html[lang="ar"] .smart-search-btn {
+  left: 10px;      /* For Arabic, also bottom left */
+  right: auto;
+}
+
+/* Optional: For RTL support, if needed */
+html[lang="ar"] .modal-footer {
+  flex-direction: row-reverse;
 }

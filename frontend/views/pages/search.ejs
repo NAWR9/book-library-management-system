@@ -37,7 +37,56 @@
   </form>
 
   <!-- Search Results -->
-  <div id="searchResults" class="row row-cols-1 row-cols-md-3 g-4"></div>
+  <div id="searchResults" class="row row-cols-1 row-cols-md-3 g-4">
+<% if (typeof books !== "undefined" && books.length > 0) { %>
+  <% books.forEach(function(book) { %>
+    <div class="col">
+      <div class="card book-card h-100 shadow-sm"
+           data-book-title="<%= book.title %>"
+           data-book-author="<%= book.author %>">
+        <img src="<%= book.cover %>" class="card-img-top" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
+        <div class="card-body position-relative">
+          <h5 class="card-title"><%= book.title %></h5>
+          <p class="card-text text-muted"><%= t('books.by') %> <%= book.author %></p>
+          <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
+          <!-- Smart Search Icon -->
+          <button class="smart-search-btn btn btn-light btn-sm rounded-circle"
+                  title="Smart Search"
+                  style="display:none;"
+                  onclick="event.stopPropagation(); toggleSmartSearchBoxInFooter('<%= book.title %>', '<%= book.author %>')">
+            <i class="fas fa-brain"></i>
+          </button>
+          <!-- Smart Search Box -->
+          <div class="smart-search-box card shadow" style="display:none; position:absolute; bottom:50px; left:10px; width:250px; z-index:100;">
+            <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
+              <span><strong>Smart Search</strong></span>
+              <button type="button" class="btn-close btn-sm" onclick="event.stopPropagation(); hideSmartSearchBox(this)"></button>
+            </div>
+            <div class="card-body py-2 px-3">
+              <div class="smart-search-response chat-response mb-3"></div>
+              <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary btn-sm" onclick="event.stopPropagation(); askSmartQuestion('about', this)">
+                  What's this book about?
+                </button>
+                <button class="btn btn-outline-info btn-sm" onclick="event.stopPropagation(); askSmartQuestion('author', this)">
+                  Who's the author?
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="event.stopPropagation(); askSmartQuestion('similar', this)">
+                  Similar books?
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+<% } else { %>
+  <div class="col-12">
+    <p class="text-center">No books found.</p>
+  </div>
+<% } %>
+  </div>
 </div>
 
 <!-- Smart Search Box (initially hidden) -->
@@ -63,8 +112,102 @@
 </div>
 
 <!-- Smart Search Floating Button (initially hidden) -->
-<div id="smartSearchFloatBtn" style="display:none; position:fixed;bottom:40px;right:40px;z-index:1050;">
+<!-- <div id="smartSearchFloatBtn" style="display:none; position:fixed;bottom:40px;right:40px;z-index:1050;">
   <button class="btn btn-primary rounded-circle" style="width:56px;height:56px;" onclick="toggleSmartSearchBox()">
     <i class="fas fa-brain"></i>
   </button>
+</div> -->
+
+<!-- Book Details Modal -->
+<div class="modal fade" id="bookDetailsModal" tabindex="-1" aria-labelledby="bookDetailsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bookDetailsModalLabel"><%= t('books.bookDetails') %></h5>
+        <!-- Smart Search Icon -->
+       
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<%= t('books.close') %>"></button>
+      </div>
+      <div class="modal-body">
+        <div id="bookDetailsLoading" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden"><%= t('books.loadingDetails') %></span>
+          </div>
+          <p class="mt-2"><%= t('books.loadingDetails') %></p>
+        </div>
+        <div id="bookDetailsContent" class="d-none">
+          <div class="row">
+            <div class="col-md-4">
+              <img id="bookCover" src="" class="img-fluid rounded" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
+            </div>
+            <div class="col-md-8">
+              <h4 id="bookTitle"></h4>
+              <p class="text-muted mb-3">
+                <span id="bookAuthors"></span>
+                <small id="bookPublisher" class="d-block"></small>
+              </p>
+              
+              <div class="mb-3">
+                <h5><%= t('books.description') %></h5>
+                <div id="bookDescription" class="description-text"></div>
+              </div>
+              
+              <div class="row mb-3">
+                <div class="col-sm-6">
+                  <p><strong><%= t('books.publicationDate') %>:</strong> <span id="bookPublishedDate"></span></p>
+                </div>
+                <div class="col-sm-6">
+                  <p><strong><%= t('books.pageCount') %>:</strong> <span id="bookPageCount"></span></p>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <p><strong><%= t('books.category') %>:</strong> <span id="bookCategories"></span></p>
+                <p><strong><%= t('books.isbn') %>:</strong> <span id="bookIsbn"></span></p>
+                <!-- Hidden translation labels for JS -->
+                <span class="d-none">
+                  <strong data-i18n="books.publisher"><%= t('books.publisher') %></strong>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="bookDetailsError" class="alert alert-danger d-none" role="alert"></div>
+      </div>
+      <div class="modal-footer d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-2">
+          <button id="smartSearchModalBtn"
+                  class="btn btn-light btn-sm rounded-circle"
+                  title="Smart Search"
+                  onclick="toggleSmartSearchBoxInFooter()">
+            <i class="fas fa-brain"></i>
+          </button>
+          <!-- Smart Search Box (hidden by default, shown next to icon) -->
+          <div id="smartSearchFooterBox" class="card shadow mb-0" style="display:none; min-width:220px; max-width:320px;">
+            <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
+              <span><strong>Smart Search</strong></span>
+              <button type="button" class="btn-close btn-sm" aria-label="Close" onclick="hideSmartSearchFooterBox()"></button>
+            </div>
+            <div class="card-body py-2 px-3">
+              <div id="smartSearchFooterResponse" class="chat-response mb-3"></div>
+              <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary btn-sm" onclick="askSmartQuestion('about', 'smartSearchFooterResponse')">
+                  What's this book about?
+                </button>
+                <button class="btn btn-outline-info btn-sm" onclick="askSmartQuestion('author', 'smartSearchFooterResponse')">
+                  Who's the author?
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" onclick="askSmartQuestion('similar', 'smartSearchFooterResponse')">
+                  Similar books?
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
