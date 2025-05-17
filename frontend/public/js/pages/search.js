@@ -117,7 +117,7 @@ window.askSmartQuestion = async function(type) {
     } else {
       document.getElementById("smartSearchResponse").innerHTML = "<span class='text-danger'>No answer found.</span>";
     }
-  } catch (err) {
+  } catch  {
     document.getElementById("smartSearchResponse").innerHTML = "<span class='text-danger'>Error fetching answer.</span>";
   }
 };
