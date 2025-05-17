@@ -29,16 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
     card.addEventListener("click", () => {
       const title = card.getAttribute("data-book-title");
       const author = card.getAttribute("data-book-author");
-      fetchAndDisplayBookDetails(title, author);
-
-      // Get book info from data attributes
-      smartSearchSelectedBook.title = card.getAttribute('data-book-title');
-      smartSearchSelectedBook.author = card.getAttribute('data-book-author');
-
-      // Show the floating Smart Search button
+      fetchAndDisplayBookDetails(title, author); // <-- This opens the modal
+      // ...Smart Search logic...
+      smartSearchSelectedBook.title = title;
+      smartSearchSelectedBook.author = author;
       document.getElementById('smartSearchFloatBtn').style.display = 'block';
-
-      // Optionally, hide the Smart Search box if open (for a new selection)
       document.getElementById('smartSearchBox').style.display = 'none';
     });
   });

@@ -10,7 +10,9 @@
     <div class="row row-cols-1 row-cols-md-3 g-4">
       <% books.forEach(book => { %>
         <div class="col">
-          <div class="card book-card h-100 shadow-sm" data-book-title="<%= book.title %>" data-book-author="<%= book.author %>">
+          <div class="card book-card h-100 shadow-sm"
+               data-book-title="<%= book.title %>"
+               data-book-author="<%= book.author %>">
             <img src="<%= book.cover %>" class="card-img-top" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
             <div class="card-body">
               <h5 class="card-title"><%= book.title %></h5>
