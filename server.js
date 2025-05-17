@@ -20,6 +20,8 @@ const borrowRoutes = require("./backend/src/routes/borrowRoutes");
 const translateRoutes = require("./backend/src/routes/translateRoutes");
 const Book = require("./backend/src/models/Book");
 
+const smartSearchRoutes = require("./backend/src/routes/smartSearchRoutes");
+
 const app = express();
 
 const API_BASE_URL =
@@ -63,6 +65,9 @@ app.use("/api/book-details", bookDetailsRoutes);
 
 // Translation Routes
 app.use("/api/translate", translateRoutes);
+
+//smart search
+app.use("/api/smart-search", smartSearchRoutes);
 
 // Set up EJS with layouts
 app.set("layout", "layout");

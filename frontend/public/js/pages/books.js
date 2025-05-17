@@ -104,8 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
       );
       const result = await response.json();
 
-      // Display the book details
-      displayBookDetails(result.data);
+      if (result.success) {
+        displayBookDetails(result.data);
+      } else {
+        showError(result.message || "Failed to fetch book details");
+      }
     } catch (error) {
       console.error("Error fetching book details:", error);
       showError(error.message);
@@ -277,3 +280,232 @@ document.addEventListener("DOMContentLoaded", () => {
       bookDetailsError.classList.add("d-none");
     });
 });
+
+// Toggle Smart Search box
+// window.toggleSmartSearchBox = function () {
+//   const box = document.getElementById("smartSearchBox");
+//   box.style.display =
+//     box.style.display === "none" || !box.style.display ? "block" : "none";
+// };
+
+window.hideSmartSearchBox = function () {
+  document.getElementById("smartSearchBox").style.display = "none";
+  document.getElementById("smartSearchFloatBtn").style.display = "none";
+};
+
+window.toggleSmartSearchBoxInFooter = function () {
+  const box = document.getElementById("smartSearchFooterBox");
+  box.style.display =
+    box.style.display === "none" || !box.style.display ? "block" : "none";
+};
+
+window.hideSmartSearchFooterBox = function () {
+  document.getElementById("smartSearchFooterBox").style.display = "none";
+};
+
+// Smart Search question handler
+function typeChatResponse(container, words, delay = 60) {
+  container.innerHTML = ""; // Clear previous content
+  let i = 0;
+  function typeNext() {
+    if (i < words.length) {
+      const span = document.createElement("span");
+      span.textContent = (i === 0 ? "" : " ") + words[i];
+      span.style.opacity = 0;
+      span.style.transition = "opacity 0.3s";
+      container.appendChild(span);
+      setTimeout(() => {
+        span.style.opacity = 1;
+      }, 10);
+      i++;
+      setTimeout(typeNext, delay);
+    }
+  }
+  typeNext();
+}
+
+window.askSmartQuestion = async function (type) {
+  const { title } = window.smartSearchSelectedBook;
+  const responseDiv = document.getElementById("smartSearchResponse");
+  if (!title) {
+    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Please select a book first.</div>`;
+    return;
+  }
+
+  responseDiv.innerHTML = `<div class="chat-bubble bg-light text-muted">Loading...</div>`;
+
+  try {
+    const res = await fetch(
+      `/api/smart-search?question=${encodeURIComponent(type)}&title=${encodeURIComponent(title)}`,
+    );
+    const data = await res.json();
+    if (data.success) {
+      responseDiv.innerHTML = `<div class="chat-bubble"></div>`;
+      const bubble = responseDiv.querySelector(".chat-bubble");
+      typeChatResponse(bubble, data.answer, 60); // 60ms per word
+    } else {
+      responseDiv.innerHTML = `<div class="chat-bubble bg-warning text-dark">${data.answer.join(" ")}</div>`;
+    }
+  } catch {
+    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Error fetching answer.</div>`;
+  }
+};
+
+window.askSmartQuestion = async function (
+  type,
+  responseContainerId = "smartSearchFooterResponse",
+) {
+  const { title, author } = window.smartSearchSelectedBook;
+  const responseDiv = document.getElementById(responseContainerId);
+  if (!title) {
+    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Please select a book first.</div>`;
+    return;
+  }
+
+  responseDiv.innerHTML = `<div class="chat-bubble bg-light text-muted">Loading...</div>`;
+
+  try {
+    const res = await fetch(
+      `/api/smart-search?question=${encodeURIComponent(type)}&title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}`,
+    );
+    const data = await res.json();
+    if (data.success) {
+      responseDiv.innerHTML = `<div class="chat-bubble"></div>`;
+      const bubble = responseDiv.querySelector(".chat-bubble");
+      typeChatResponse(bubble, data.answer, 60); // 60ms per word
+    } else {
+      responseDiv.innerHTML = `<div class="chat-bubble bg-warning text-dark">${Array.isArray(data.answer) ? data.answer.join(" ") : data.answer}</div>`;
+    }
+  } catch {
+    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Error fetching answer.</div>`;
+  }
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Track the currently selected book for Smart Search
+  window.smartSearchSelectedBook = { title: "", author: "" };
+
+  // Delegate click event for dynamically rendered cards (search page)
+  document.body.addEventListener("click", function (e) {
+    const card = e.target.closest(".book-card");
+    if (card) {
+      window.smartSearchSelectedBook.title =
+        card.getAttribute("data-book-title");
+      window.smartSearchSelectedBook.author =
+        card.getAttribute("data-book-author");
+      // document.getElementById("smartSearchFloatBtn").style.display = "block";
+      // document.getElementById("smartSearchBox").style.display = "none";
+    }
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Select all book cards
+  document.querySelectorAll(".book-card").forEach(function (card) {
+    card.addEventListener("click", function () {
+      // Get book info from data attributes
+      const title = card.getAttribute("data-book-title");
+      const author = card.getAttribute("data-book-author");
+      // Save selected book globally
+      window.smartSearchSelectedBook = { title, author };
+      // Show the Smart Search floating button
+      // document.getElementById("smartSearchFloatBtn").style.display = "block";
+      // // Hide the Smart Search box if open
+      // document.getElementById("smartSearchBox").style.display = "none";
+    });
+  });
+});
+
+document.querySelectorAll(".view-details-btn").forEach(function (btn) {
+  btn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    const card = btn.closest(".book-card");
+    const title = card.getAttribute("data-book-title");
+    const author = card.getAttribute("data-book-author");
+    window.smartSearchSelectedBook = { title, author };
+    // document.getElementById("smartSearchFloatBtn").style.display = "block";
+    // document.getElementById("smartSearchBox").style.display = "none";
+  });
+});
+
+document
+  .getElementById("bookDetailsModal")
+  .addEventListener("hidden.bs.modal", () => {
+    document.getElementById("smartSearchFloatBtn").style.display = "none";
+    document.getElementById("smartSearchBox").style.display = "none";
+  });
+
+document
+  .getElementById("bookDetailsModal")
+  .addEventListener("hidden.bs.modal", () => {
+    // Move focus to a safe element outside the modal
+    document.body.focus();
+    // Optionally, also hide Smart Search box if open
+    document.getElementById("smartSearchBox").style.display = "none";
+  });
+
+window.openSmartSearchModal = function (title, author) {
+  window.smartSearchSelectedBook = { title, author };
+  document.getElementById("smartSearchBox").style.display = "block";
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".book-card").forEach(function (card) {
+    card.addEventListener("click", function () {
+      // Remove 'active' from all cards
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
+      // Add 'active' to this card
+      card.classList.add("active");
+      // Set the selected book for Smart Search
+      const title = card.getAttribute("data-book-title");
+      const author = card.getAttribute("data-book-author");
+      window.smartSearchSelectedBook = { title, author };
+    });
+  });
+
+  // Hide Smart Search icon when clicking outside any card
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest(".book-card")) {
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
+    }
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".book-card").forEach(function (card) {
+    card.addEventListener("click", function () {
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
+      card.classList.add("active");
+      const title = card.getAttribute("data-book-title");
+      const author = card.getAttribute("data-book-author");
+      window.smartSearchSelectedBook = { title, author };
+    });
+  });
+
+  document.addEventListener("click", function (e) {
+    if (!e.target.closest(".book-card")) {
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
+    }
+  });
+});
+
+document
+  .getElementById("bookDetailsModal")
+  .addEventListener("hidden.bs.modal", () => {
+    document.getElementById("smartSearchFooterBox").style.display = "none";
+  });
+
+document
+  .getElementById("bookDetailsModal")
+  .addEventListener("hidden.bs.modal", () => {
+    const smartBox = document.getElementById("smartSearchFooterBox");
+    if (smartBox) smartBox.style.display = "none";
+  });
