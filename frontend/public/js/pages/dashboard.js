@@ -15,7 +15,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     init() {
       // Add any dashboard initialization code here
-      this.addBorrowHistoryInteractivity();
+      // Only add borrow history interactivity if the user is not an admin
+      if (document.querySelector(".table")) {
+        this.addBorrowHistoryInteractivity();
+      }
     }
 
     listenForThemeChanges() {

@@ -9,19 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const descriptionEn = document.getElementById("description_en");
   const descriptionAr = document.getElementById("description_ar");
 
-  // For backward compatibility
-  const categoriesEnHidden = document.createElement("input");
-  categoriesEnHidden.type = "hidden";
-  categoriesEnHidden.id = "categories_en";
-  categoriesEnHidden.name = "categories_en";
-  bookForm.appendChild(categoriesEnHidden);
-
-  const categoriesArHidden = document.createElement("input");
-  categoriesArHidden.type = "hidden";
-  categoriesArHidden.id = "categories_ar";
-  categoriesArHidden.name = "categories_ar";
-  bookForm.appendChild(categoriesArHidden);
-
   // Initialize a single category manager - we use the same categories for both languages
   let categoryManager;
   try {
@@ -49,31 +36,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Sync the selected categories to hidden fields when categories change
   function syncCategoriesToHiddenFields() {
     try {
-      if (
-        !categoryManager ||
-        typeof categoryManager.getSelectedCategories !== "function"
-      ) {
-        console.error(
-          "Category manager is not properly initialized for syncing",
-        );
-        return;
-      }
-
       const selectedCategories = categoryManager.getSelectedCategories();
-      if (!Array.isArray(selectedCategories)) {
-        console.error(
-          "Selected categories is not an array:",
-          selectedCategories,
-        );
-        return;
-      }
-
       const categoriesJson = JSON.stringify(selectedCategories);
-      console.log("Syncing categories to hidden fields:", selectedCategories);
-
-      // Update both English and Arabic hidden fields with the same categories
-      categoriesEnHidden.value = categoriesJson;
-      categoriesArHidden.value = categoriesJson;
 
       // Update the main categories hidden field
       const mainCategoriesField = document.getElementById("categories");
@@ -162,13 +126,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.success) {
         window.location.href = "/books";
       } else {
-        showToast("Error", result.message || "Failed to add book");
+        showToast(
+          window.i18nMessages.common.error,
+          result.message || window.i18nMessages.books.failedToAdd,
+        );
       }
     } catch (error) {
       console.error("Error adding book:", error);
       showToast(
-        "Error",
-        error.message || "Failed to add book. Please try again.",
+        window.i18nMessages.common.error,
+        error.message ||
+          `${window.i18nMessages.books.failedToAdd}. ${window.i18nMessages.common.tryAgain}`,
       );
     }
   });
@@ -215,7 +183,10 @@ document.addEventListener("DOMContentLoaded", () => {
   searchGoogleBtn.addEventListener("click", async () => {
     const query = googleSearchQuery.value.trim();
     if (!query) {
-      showToast("Error", "Please enter search text");
+      showToast(
+        window.i18nMessages.common.error,
+        window.i18nMessages.books.searchTextRequired,
+      );
       return;
     }
 
@@ -539,34 +510,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Helper function to display toast messages
   function showToast(title, message) {
     if (toast && toastTitle && toastMessage) {
-      // Use translations if available
-      const translatedTitle =
-        title === "Error" && window.i18nMessages?.common?.error
-          ? window.i18nMessages.common.error
-          : title;
-
-      // For known error messages, use translations if available
-      let translatedMessage = message;
-      if (
-        message === "Please enter search text" &&
-        window.i18nMessages?.books?.searchTextRequired
-      ) {
-        translatedMessage = window.i18nMessages.books.searchTextRequired;
-      } else if (
-        message === "Failed to add book" &&
-        window.i18nMessages?.books?.failedToAdd
-      ) {
-        translatedMessage = window.i18nMessages.books.failedToAdd;
-      } else if (
-        message === "Failed to add book. Please try again." &&
-        window.i18nMessages?.books?.failedToAdd &&
-        window.i18nMessages?.common?.tryAgain
-      ) {
-        translatedMessage = `${window.i18nMessages.books.failedToAdd}. ${window.i18nMessages.common.tryAgain}`;
-      }
-
-      toastTitle.textContent = translatedTitle;
-      toastMessage.textContent = translatedMessage;
+      // Set provided localized title and message
+      toastTitle.textContent = title;
+      toastMessage.textContent = message;
       toast.show();
     } else {
       alert(`${title}: ${message}`);

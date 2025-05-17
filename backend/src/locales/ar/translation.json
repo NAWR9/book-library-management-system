@@ -87,9 +87,6 @@
     "civil_engineering": "الهندسة المدنية",
     "linguistics": "علم اللغات"
   },
-  "ui": {
-    "selectCategory": "اختر تصنيفًا"
-  },
   "navbar": {
     "home": "الرئيسية",
     "books": "الكتب",
@@ -240,12 +237,15 @@
     "yes": "نعم",
     "no": "لا",
     "confirmCancel": "تأكيد الإلغاء",
-    "confirmAdd": "تأكيد إضافة الكتاب",
+    "confirmAdd": "تأكيد إضافة كتاب",
     "error": "خطأ",
     "success": "نجاح",
     "warning": "تحذير",
     "info": "معلومات",
-    "tryAgain": "يرجى المحاولة مرة أخرى."
+    "tryAgain": "يرجى المحاولة مرة أخرى.",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "confirmDelete": "تأكيد الحذف"
   },
   "books": {
     "bookLibrary": "مكتبة الكتب",
@@ -269,6 +269,8 @@
     "loadingDetails": "جاري تحميل تفاصيل الكتاب...",
     "noDescription": "لا يوجد وصف متاح.",
     "fetchError": "فشل في الحصول على تفاصيل الكتاب. يرجى المحاولة لاحقًا.",
+    "bookLanguage": "لغة الكتاب",
+    "languageRequired": "الرجاء اختيار لغة الكتاب",
     "viewDetails": "عرض التفاصيل",
     "fullDetails": "التفاصيل الكاملة",
     "borrowBook": "استعارة هذا الكتاب",
@@ -283,6 +285,7 @@
     "cancel": "إلغاء",
     "cancelConfirmMessage": "هل أنت متأكد من الإلغاء؟ ستفقد جميع المعلومات التي أدخلتها.",
     "submitConfirmMessage": "هل أنت متأكد من إضافة هذا الكتاب؟",
+    "deleteConfirmMessage": "هل أنت متأكد أنك تريد حذف هذا الكتاب؟",
     "manualEntry": "إدخال يدوي",
     "fetchFromGoogle": "تعبئة البيانات من كتب جوجل",
     "searchQuery": "استعلام البحث (العنوان، المؤلف، الرقم الدولي)",

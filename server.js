@@ -228,42 +228,60 @@ app.get("/dashboard", async (req, res) => {
   if (!res.locals.user) return res.redirect("/login");
 
   try {
-    // Get user's borrow history
-    const BorrowRequest = require("./backend/src/models/BorrowRequest");
-    const borrowHistory = await BorrowRequest.find({ user: res.locals.user.id })
-      .sort({ requestDate: -1 }) // Sort by requestDate in descending order (newest first)
-      .populate({
-        path: "book",
-        select: "title author coverImage isbn publisher publicationDate",
-      });
+    // Only fetch borrow history for regular users, not admins
+    let formattedHistory = [];
 
-    // Format dates for display
-    const formattedHistory = borrowHistory.map((request) => {
-      return {
-        _id: request._id,
-        book: request.book,
-        status: request.status,
-        requestDate: request.requestDate,
-        dueDate: request.dueDate,
-        returnDate: request.returnDate,
-        requestedDuration: request.requestedDuration || 14,
-        notes: request.notes,
-        formattedRequestDate: new Date(
-          request.requestDate,
-        ).toLocaleDateString(),
-        formattedDueDate: request.dueDate
-          ? new Date(request.dueDate).toLocaleDateString()
-          : null,
-        formattedReturnDate: request.returnDate
-          ? new Date(request.returnDate).toLocaleDateString()
-          : null,
-        isOverdue:
-          request.status === "approved" &&
-          request.dueDate &&
-          new Date(request.dueDate) < new Date() &&
-          !request.returnDate,
-      };
-    });
+    if (res.locals.user.role !== "admin") {
+      // Get user's borrow history
+      const BorrowRequest = require("./backend/src/models/BorrowRequest");
+      const borrowHistory = await BorrowRequest.find({
+        user: res.locals.user.id,
+      })
+        .sort({ requestDate: -1 }) // Sort by requestDate in descending order (newest first)
+        .populate({
+          path: "book",
+          select: "title author coverImage isbn publisher publicationDate",
+        });
+
+      // Format dates for display
+      formattedHistory = borrowHistory.map((request) => {
+        // Handle case where book might be null (deleted book)
+        const bookData = request.book || {
+          _id: null,
+          title: "Book no longer available",
+          author: "Unknown",
+          coverImage: "/img/book-cover-placeholder.svg",
+          isbn: "",
+          publisher: "",
+          publicationDate: "",
+        };
+
+        return {
+          _id: request._id,
+          book: bookData,
+          status: request.status,
+          requestDate: request.requestDate,
+          dueDate: request.dueDate,
+          returnDate: request.returnDate,
+          requestedDuration: request.requestedDuration || 14,
+          notes: request.notes,
+          formattedRequestDate: new Date(
+            request.requestDate,
+          ).toLocaleDateString(),
+          formattedDueDate: request.dueDate
+            ? new Date(request.dueDate).toLocaleDateString()
+            : null,
+          formattedReturnDate: request.returnDate
+            ? new Date(request.returnDate).toLocaleDateString()
+            : null,
+          isOverdue:
+            request.status === "approved" &&
+            request.dueDate &&
+            new Date(request.dueDate) < new Date() &&
+            !request.returnDate,
+        };
+      });
+    }
 
     res.render("pages/dashboard", {
       title: req.t("titles.dashboard"),
@@ -348,11 +366,44 @@ app.get("/books/new", (req, res) => {
   });
 });
 
+// Edit existing book page (admin only)
+app.get("/books/:id/edit", async (req, res) => {
+  if (!res.locals.user) return res.redirect("/login");
+  if (res.locals.user.role !== "admin") {
+    req.flash("error_msg", req.t("errors.adminOnly"));
+    return res.redirect("/books");
+  }
+  try {
+    const book = await Book.findById(req.params.id).lean();
+    if (!book) {
+      req.flash("error_msg", req.t("errors.bookNotFound"));
+      return res.redirect("/books");
+    }
+    res.render("pages/edit-book", {
+      title: req.t("titles.editBook"),
+      pageScript: "edit-book",
+      book,
+    });
+  } catch (error) {
+    console.error(error);
+    res.redirect("/books");
+  }
+});
+
 // Book detail page route
 app.get("/books/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { lang = "en" } = req.query;
+
+    // Handle case where id might be "null" string from our fallback
+    if (id === "null") {
+      return res.status(404).render("error", {
+        title: req.t("errors.notFound"),
+        errorCode: 404,
+        errorMessage: req.t("errors.bookNotFound"),
+      });
+    }
 
     // Fetch book details from database
     const book = await Book.findById(id);

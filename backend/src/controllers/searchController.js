@@ -1,11 +1,11 @@
 const Book = require("../models/Book");
 
 /**
- * Search books by title, author, genre, and category
+ * Search books by title, author, and category
  */
 const searchBooks = async (req, res) => {
   try {
-    const { title, author, genre, category } = req.query;
+    const { title, author, category } = req.query;
     let searchCriteria = {};
 
     if (title && author) {
@@ -26,12 +26,9 @@ const searchBooks = async (req, res) => {
         conditions.push({ author: new RegExp(author, "i") });
       }
 
-      if (genre && genre !== "All Genres") {
-        conditions.push({ genre: new RegExp(genre, "i") });
-      }
-
-      if (category && category !== "All Categories") {
-        conditions.push({ category: new RegExp(category, "i") });
+      // Filter by book.categories array matching the requested category key
+      if (category) {
+        conditions.push({ categories: category });
       }
 
       if (conditions.length > 0) {

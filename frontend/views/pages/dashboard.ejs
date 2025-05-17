@@ -50,6 +50,7 @@
   </div>
 
   <!-- Borrow History Section -->
+  <% if (user.role !== "admin") { %>
   <div class="row mb-4">
     <div class="col-12">
       <div class="card shadow-sm">
@@ -105,6 +106,7 @@
       </div>
     </div>
   </div>
+  <% } %>
 </main>
 
 <script type="module" src="/js/pages/dashboard.js"></script>

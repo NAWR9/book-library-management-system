@@ -1,0 +1,152 @@
+<%- contentFor('body') %>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h1 class="h4 mb-0"><%= t('books.editBook') %></h1>
+        </div>
+        <div class="card-body">
+          <form id="bookForm" class="needs-validation" novalidate>
+            <!-- Hidden book ID -->
+            <input type="hidden" id="bookId" name="id" value="<%= book._id %>" />
+            <!-- Fields similar to add-book.ejs but prefilled -->
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="title" name="title" value="<%= book.title %>" required>
+                  <label for="title"><%= t('books.bookTitle') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.titleRequired') %></div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-floating mb-3">
+                  <input type="text" class="form-control" id="author" name="author" value="<%= book.author %>" required>
+                  <label for="author"><%= t('books.author') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.authorRequired') %></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Language Tabs -->
+            <ul class="nav nav-tabs mb-4" id="languageTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="english-tab" data-bs-toggle="tab" data-bs-target="#english" type="button" role="tab">
+                  <%= t('books.english') %>
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="arabic-tab" data-bs-toggle="tab" data-bs-target="#arabic" type="button" role="tab">
+                  <%= t('books.arabic') %>
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="languageTabsContent">
+              <div class="tab-pane fade show active" id="english" role="tabpanel">
+                <div class="form-floating mb-3">
+                  <textarea class="form-control" id="description_en" name="description_en" style="height:150px"><%= book.description_en %></textarea>
+                  <label for="description_en"><%= t('books.description') %></label>
+                </div>
+              </div>
+              <div class="tab-pane fade" id="arabic" role="tabpanel">
+                <div class="form-floating mb-3">
+                  <textarea class="form-control" id="description_ar" name="description_ar" style="height:150px" dir="rtl"><%= book.description_ar %></textarea>
+                  <label for="description_ar"><%= t('books.description') %></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Categories -->
+            <div class="mb-4 mt-4">
+              <h5 class="mb-3"><%= t('books.categories') %></h5>
+              <div class="category-selection-card p-3 border rounded mb-3">
+                <div class="selected-categories-header mb-2">
+                  <small class="text-muted"><%= t('books.selectedCategories') %></small>
+                </div>
+                <div class="selected-categories mb-3" id="selected_categories_container"></div>
+                <div class="category-selection-container">
+                  <div class="input-group mb-2">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="category_search" placeholder="<%= t('books.search') %>">
+                  </div>
+                  <select class="form-select category-select" id="category_select" multiple></select>
+                  <input type="hidden" id="categories" name="categories" value='<%- JSON.stringify(book.categories) %>'>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Details -->
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="date" class="form-control" id="publicationDate" name="publicationDate" value="<%= book.publicationDate.toISOString().slice(0,10) %>" required>
+                  <label for="publicationDate"><%= t('books.publicationDate') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.dateRequired') %></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="publisher" name="publisher" value="<%= book.publisher %>">
+                  <label for="publisher"><%= t('books.publisher') %></label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="pageCount" name="pageCount" min="1" value="<%= book.pageCount %>">
+                  <label for="pageCount"><%= t('books.pageCount') %></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="isbn" name="isbn" value="<%= book.isbn %>">
+                  <label for="isbn"><%= t('books.isbn') %></label>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="bookCount" name="bookCount" min="1" value="<%= book.bookCount %>" required>
+                  <label for="bookCount"><%= t('books.bookCount') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.countRequired') %></div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <input type="text" class="form-control" id="coverImage" name="coverImage" value="<%= book.coverImage %>">
+                  <label for="coverImage"><%= t('books.coverImageUrl') %></label>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <div class="form-floating">
+                  <select class="form-select" id="language" name="language" required>
+                    <option value="english" <%= book.language === 'english' ? 'selected' : '' %>><%= t('books.english') %></option>
+                    <option value="arabic" <%= book.language === 'arabic' ? 'selected' : '' %>><%= t('books.arabic') %></option>
+                  </select>
+                  <label for="language"><%= t('books.bookLanguage') %> *</label>
+                  <div class="invalid-feedback"><%= t('books.languageRequired') %></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="availability" name="availability" <%= book.availability ? 'checked' : '' %>>
+              <label class="form-check-label" for="availability"><%= t('books.available') %></label>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between">
+              <a href="/books" class="btn btn-outline-secondary"><%= t('common.cancel') || 'Cancel' %></a>
+              <button type="button" id="submitBtn" class="btn btn-primary"><%= t('books.saveChanges') || 'Save Changes' %></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
