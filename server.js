@@ -277,10 +277,10 @@ app.get("/dashboard", async (req, res) => {
           ).toLocaleDateString(),
           formattedDueDate: request.dueDate
             ? new Date(request.dueDate).toLocaleDateString()
-            : null,
+            : "-",
           formattedReturnDate: request.returnDate
             ? new Date(request.returnDate).toLocaleDateString()
-            : null,
+            : "-",
           isOverdue:
             request.status === "approved" &&
             request.dueDate &&
@@ -288,6 +288,9 @@ app.get("/dashboard", async (req, res) => {
             !request.returnDate,
         };
       });
+
+      // After mapping formattedHistory, log for debugging
+      console.log("User borrowHistory:", formattedHistory);
     }
 
     // Compute admin stats if user is admin

@@ -125,11 +125,11 @@
               <thead>
                 <tr>
                   <th><%= t('dashboard.userName') %></th>
-                  <th><%= t('dashboard.contact') %></th>
+                  <th class="text-center" style="width: 15%;"><%= t('dashboard.contact') %></th>
                   <th><%= t('dashboard.bookTitle') %></th>
                   <th><%= t('dashboard.author') %></th>
-                  <th><%= t('dashboard.requestDate') %></th>
-                  <th><%= t('dashboard.actions') %></th>
+                  <th class="text-center" style="width: 12%;"><%= t('dashboard.requestDate') %></th>
+                  <th class="text-center" style="width: 15%;"><%= t('dashboard.actions') %></th>
                 </tr>
               </thead>
               <tbody id="pending-requests-body">
@@ -141,7 +141,85 @@
       </div>
     </div>
   </div>
+  <!-- Loans Section with tabs -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark p-0">
+          <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" id="tab-active" href="#activeLoansTab" data-bs-toggle="tab"><%= t('dashboard.activeLoans') %></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="tab-flagged" href="#flaggedLoansTab" data-bs-toggle="tab"><%= t('dashboard.flaggedLoans') %></a>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="activeLoansTab">
+              <div class="table-responsive active-loans-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th><%= t('dashboard.userName') %></th>
+                      <th class="text-center" style="width: 15%;"><%= t('dashboard.contact') %></th>
+                      <th><%= t('dashboard.bookTitle') %></th>
+                      <th><%= t('dashboard.author') %></th>
+                      <th class="text-center" style="width: 12%;"><%= t('dashboard.dueDate') %></th>
+                      <th class="text-center" style="width: 12%;"><%= t('dashboard.daysRemaining') %></th>
+                      <th class="text-center" style="width: 15%;"><%= t('dashboard.actions') %></th>
+                    </tr>
+                  </thead>
+                  <tbody id="active-loans-body">
+                    <!-- Filled by dashboard.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="flaggedLoansTab">
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th><%= t('dashboard.userName') %></th>
+                      <th class="text-center" style="width: 15%;"><%= t('dashboard.contact') %></th>
+                      <th><%= t('dashboard.bookTitle') %></th>
+                      <th><%= t('dashboard.author') %></th>
+                      <th class="text-center" style="width: 12%;"><%= t('dashboard.requestDate') %></th>
+                      <th class="text-center" style="width: 12%;"><%= t('dashboard.dueDate') %></th>
+                      <th class="text-center" style="width: 12%;"><%= t('books.status') %></th>
+                    </tr>
+                  </thead>
+                  <tbody id="flagged-loans-body">
+                    <!-- Filled by dashboard.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <% } %>
+
+  <!-- Confirm Action Modal -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmModalLabel"><%= t('common.confirm') %></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="<%= t('common.cancel') %>"></button>
+        </div>
+        <div class="modal-body" id="confirmModalBody"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><%= t('common.cancel') %></button>
+          <button type="button" class="btn btn-primary" id="confirmModalConfirmButton"><%= t('common.yes') %></button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Borrow History Section -->
   <% if (user.role !== "admin") { %>
@@ -185,7 +263,15 @@
                       </td>
                       <td><%= request.formattedRequestDate %></td>
                       <td><%= request.formattedDueDate || '-' %></td>
-                      <td><%= request.formattedReturnDate || '-' %></td>
+                      <td>
+                        <% if (request.returnDate) { %>
+                          <%= request.formattedReturnDate %>
+                        <% } else if (request.dueDate) { %>
+                          <%= request.formattedDueDate %>
+                        <% } else { %>
+                          -
+                        <% } %>
+                      </td>
                     </tr>
                   <% }); %>
                 </tbody>
@@ -202,3 +288,10 @@
   </div>
   <% } %>
 </main>
+
+<!-- Load Bootstrap JS for dropdowns -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Bootstrap dropdowns if needed
+  });
+</script>

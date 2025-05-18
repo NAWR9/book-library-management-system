@@ -1,3 +1,5 @@
+/* global bootstrap */
+
 /**
  * Dashboard page functionality
  */
@@ -77,6 +79,29 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize dashboard
   new Dashboard();
 
+  // Confirmation modal helper
+  const confirmModalEl = document.getElementById("confirmModal");
+  const bsConfirmModal = confirmModalEl
+    ? new bootstrap.Modal(confirmModalEl)
+    : null;
+  function showConfirmModal(message) {
+    return new Promise((resolve) => {
+      if (!bsConfirmModal) {
+        resolve(window.confirm(message));
+        return;
+      }
+      document.getElementById("confirmModalBody").textContent = message;
+      const confirmBtn = document.getElementById("confirmModalConfirmButton");
+      function onConfirm() {
+        confirmBtn.removeEventListener("click", onConfirm);
+        resolve(true);
+        bsConfirmModal.hide();
+      }
+      confirmBtn.addEventListener("click", onConfirm);
+      bsConfirmModal.show();
+    });
+  }
+
   // Fetch and render admin stats if on admin dashboard
   if (document.getElementById("stat-total-books")) {
     fetch(`${window.API_BASE_URL}/api/admin/stats`, { credentials: "include" })
@@ -123,12 +148,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fetch(`${window.API_BASE_URL}/api/admin/requests/pending`, {
       credentials: "include",
     })
-      .then((res) => {
-        console.log("Pending requests HTTP status:", res.status);
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((result) => {
-        console.log("Pending requests API returned:", result);
         pendingBody.innerHTML = "";
         // Prepare action button labels
         const approveLabel =
@@ -186,18 +207,217 @@ document.addEventListener("DOMContentLoaded", () => {
         const action = btn.classList.contains("btn-approve")
           ? "approve"
           : "decline";
-        fetch(`/api/admin/requests/${id}/${action}`, { method: "PATCH" })
-          .then((res) => res.json())
-          .then((resp) => {
-            if (resp.success) {
-              // Remove the row from table
-              btn.closest("tr").remove();
-            } else {
-              console.warn("Action failed");
-            }
+        const msg =
+          action === "approve"
+            ? window.i18nMessages.dashboard.confirmApprove
+            : window.i18nMessages.dashboard.confirmDecline;
+        showConfirmModal(msg).then((confirmed) => {
+          if (!confirmed) return;
+          fetch(`/api/admin/requests/${id}/${action}`, {
+            method: "PATCH",
+            credentials: "include",
           })
-          .catch((err) => console.error("Error updating request:", err));
+            .then((res) => res.json())
+            .then((resp) => {
+              if (resp.success) {
+                btn.closest("tr").remove();
+              } else {
+                console.warn("Action failed");
+              }
+            })
+            .catch((err) => console.error("Error updating request:", err));
+        });
       }
     });
+  }
+
+  // After handling pending borrow requests, add active loans fetch
+  const loansBody = document.getElementById("active-loans-body");
+  if (loansBody) {
+    fetch(`${window.API_BASE_URL}/api/admin/loans/active`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.success) {
+          loansBody.innerHTML = "";
+          const loans = result.data.filter(
+            (loan) => !["lost", "damaged"].includes(loan.status),
+          );
+          if (loans.length === 0) {
+            loansBody.innerHTML = `
+              <tr><td colspan="7" class="text-center">${window.i18nMessages.dashboard.noActiveLoans}</td></tr>
+            `;
+          } else {
+            loans.forEach((loan) => {
+              const tr = document.createElement("tr");
+              tr.innerHTML = `
+                <td>${loan.user.name}</td>
+                <td>${loan.user.email || loan.user.phoneNumber}</td>
+                <td>${loan.book.title}</td>
+                <td>${loan.book.author}</td>
+                <td>${new Date(loan.dueDate).toLocaleDateString()}</td>
+                <td>${loan.daysRemaining}</td>
+                <td>
+                  <div class="dropdown" data-bs-boundary="viewport">
+                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      ${window.i18nMessages.dashboard.actions}
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><button class="dropdown-item btn-return" data-id="${loan.id}">${window.i18nMessages.dashboard.returnLoan}</button></li>
+                      <li><button class="dropdown-item btn-reminder" data-id="${loan.id}">${window.i18nMessages.dashboard.sendReminder}</button></li>
+                      <li><button class="dropdown-item btn-renew" data-id="${loan.id}">${window.i18nMessages.dashboard.renewLoan}</button></li>
+                      <li><button class="dropdown-item btn-lost" data-id="${loan.id}">${window.i18nMessages.dashboard.flagLost}</button></li>
+                      <li><button class="dropdown-item btn-damaged" data-id="${loan.id}">${window.i18nMessages.dashboard.flagDamaged}</button></li>
+                    </ul>
+                  </div>
+                </td>
+              `;
+              loansBody.appendChild(tr);
+            });
+          }
+        } else {
+          console.error("Error fetching active loans:", result.message);
+        }
+      })
+      .catch((err) => console.error("Error fetching active loans:", err));
+
+    loansBody.addEventListener("click", (e) => {
+      const btn = e.target;
+      const id = btn.getAttribute("data-id");
+      // Return
+      if (btn.classList.contains("btn-return")) {
+        showConfirmModal(window.i18nMessages.dashboard.confirmReturnLoan).then(
+          (confirmed) => {
+            if (!confirmed) return;
+            fetch(`${window.API_BASE_URL}/api/admin/loans/${id}/return`, {
+              method: "PATCH",
+              credentials: "include",
+            })
+              .then((res) => res.json())
+              .then((resp) => {
+                if (resp.success) btn.closest("tr").remove();
+              })
+              .catch((err) => console.error(err));
+          },
+        );
+      }
+      // Reminder
+      if (btn.classList.contains("btn-reminder")) {
+        showConfirmModal(
+          window.i18nMessages.dashboard.confirmSendReminder,
+        ).then((confirmed) => {
+          if (!confirmed) return;
+          fetch(`${window.API_BASE_URL}/api/admin/loans/${id}/reminder`, {
+            method: "POST",
+            credentials: "include",
+          })
+            .then((res) => res.json())
+            .then((resp) => {
+              if (resp.success) {
+                location.reload();
+              }
+            })
+            .catch((err) => console.error(err));
+        });
+      }
+      // Renew
+      if (btn.classList.contains("btn-renew")) {
+        showConfirmModal(window.i18nMessages.dashboard.confirmRenewLoan).then(
+          (confirmed) => {
+            if (!confirmed) return;
+            fetch(`${window.API_BASE_URL}/api/admin/loans/${id}/renew`, {
+              method: "PATCH",
+              credentials: "include",
+            })
+              .then((res) => res.json())
+              .then((resp) => {
+                if (resp.success) {
+                  location.reload();
+                }
+              })
+              .catch((err) => console.error(err));
+          },
+        );
+      }
+      // Lost
+      if (btn.classList.contains("btn-lost")) {
+        showConfirmModal(window.i18nMessages.dashboard.confirmFlagLost).then(
+          (confirmed) => {
+            if (!confirmed) return;
+            fetch(`${window.API_BASE_URL}/api/admin/loans/${id}/lost`, {
+              method: "PATCH",
+              credentials: "include",
+            })
+              .then((res) => res.json())
+              .then((resp) => {
+                if (resp.success) btn.closest("tr").remove();
+              })
+              .catch((err) => console.error(err));
+          },
+        );
+      }
+      // Damaged
+      if (btn.classList.contains("btn-damaged")) {
+        showConfirmModal(window.i18nMessages.dashboard.confirmFlagDamaged).then(
+          (confirmed) => {
+            if (!confirmed) return;
+            fetch(`${window.API_BASE_URL}/api/admin/loans/${id}/damaged`, {
+              method: "PATCH",
+              credentials: "include",
+            })
+              .then((res) => res.json())
+              .then((resp) => {
+                if (resp.success) btn.closest("tr").remove();
+              })
+              .catch((err) => console.error(err));
+          },
+        );
+      }
+    });
+  }
+
+  // Fetch and render flagged loans for admin
+  const flaggedBody = document.getElementById("flagged-loans-body");
+  if (flaggedBody) {
+    fetch(`${window.API_BASE_URL}/api/admin/loans/flagged`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        flaggedBody.innerHTML = "";
+        if (!result.success) {
+          const errMsg =
+            result.message ||
+            window.i18nMessages.dashboard.errorFetchingRequests;
+          flaggedBody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">${errMsg}</td></tr>`;
+          return;
+        }
+        const loans = result.data;
+        if (loans.length === 0) {
+          flaggedBody.innerHTML = `<tr><td colspan="7" class="text-center">${window.i18nMessages.dashboard.noFlaggedLoans}</td></tr>`;
+        } else {
+          loans.forEach((loan) => {
+            const tr = document.createElement("tr");
+            const statusLabel =
+              loan.status === "lost"
+                ? window.i18nMessages.dashboard.statusLost
+                : window.i18nMessages.dashboard.statusDamaged;
+            const badgeClass =
+              loan.status === "lost" ? "bg-danger" : "bg-warning text-dark";
+            tr.innerHTML = `
+              <td>${loan.user.name}</td>
+              <td>${loan.user.email || loan.user.phoneNumber}</td>
+              <td>${loan.book.title}</td>
+              <td>${loan.book.author}</td>
+              <td>${new Date(loan.requestDate).toLocaleDateString()}</td>
+              <td>${loan.dueDate ? new Date(loan.dueDate).toLocaleDateString() : "-"}</td>
+              <td><span class="badge ${badgeClass}">${statusLabel}</span></td>
+            `;
+            flaggedBody.appendChild(tr);
+          });
+        }
+      })
+      .catch((err) => console.error("Error fetching flagged loans:", err));
   }
 });

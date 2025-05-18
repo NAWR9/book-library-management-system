@@ -6,6 +6,13 @@ const {
   getPendingBorrowRequests,
   approveBorrowRequest,
   declineBorrowRequest,
+  getActiveLoans,
+  returnBorrowRequest,
+  sendLoanReminder,
+  renewLoanRequest,
+  flagLoanLost,
+  flagLoanDamaged,
+  getFlaggedLoans,
 } = require("../controllers/adminController");
 
 // GET /api/admin/stats - Admin dashboard statistics
@@ -33,6 +40,47 @@ router.patch(
   protect,
   authorize(["admin"]),
   declineBorrowRequest,
+);
+
+// GET active loans
+router.get("/loans/active", protect, authorize(["admin"]), getActiveLoans);
+
+// GET flagged loans (lost or damaged)
+router.get("/loans/flagged", protect, authorize(["admin"]), getFlaggedLoans);
+
+// Mark a loan as returned
+router.patch(
+  "/loans/:id/return",
+  protect,
+  authorize(["admin"]),
+  returnBorrowRequest,
+);
+
+// Send reminder for a loan
+router.post(
+  "/loans/:id/reminder",
+  protect,
+  authorize(["admin"]),
+  sendLoanReminder,
+);
+
+// Renew a loan
+router.patch(
+  "/loans/:id/renew",
+  protect,
+  authorize(["admin"]),
+  renewLoanRequest,
+);
+
+// Flag loan as lost
+router.patch("/loans/:id/lost", protect, authorize(["admin"]), flagLoanLost);
+
+// Flag loan as damaged
+router.patch(
+  "/loans/:id/damaged",
+  protect,
+  authorize(["admin"]),
+  flagLoanDamaged,
 );
 
 module.exports = router;
