@@ -49,6 +49,100 @@
     </div>
   </div>
 
+  <% if (user.role === "admin") { %>
+  <div class="row mb-5">
+    <div class="col-12">
+      <h2 class="mb-4"><%= t('dashboard.adminOverview') %></h2>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title"><%= t('dashboard.totalBooks') %></h5>
+          <p id="stat-total-books" class="card-text">...</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title"><%= t('dashboard.availableBooks') %></h5>
+          <p id="stat-available-books" class="card-text">...</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title"><%= t('dashboard.borrowedBooks') %></h5>
+          <p id="stat-borrowed-books" class="card-text">...</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h5 class="card-title"><%= t('dashboard.totalUsers') %></h5>
+          <p id="stat-total-users" class="card-text">...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mb-4">
+    <div class="col-md-6 mb-3">
+      <div class="card">
+        <div class="card-header">
+          <%= t('dashboard.borrowRequests') %>
+        </div>
+        <ul class="list-group list-group-flush" id="stat-borrow-requests">
+          <li class="list-group-item"><%= t('books.statusPending') %>: <span class="badge bg-warning text-dark" id="req-pending">...</span></li>
+          <li class="list-group-item"><%= t('books.statusApproved') %>: <span class="badge bg-success" id="req-approved">...</span></li>
+          <li class="list-group-item"><%= t('books.statusDeclined') %>: <span class="badge bg-danger" id="req-declined">...</span></li>
+          <li class="list-group-item"><%= t('books.statusReturned') %>: <span class="badge bg-secondary" id="req-returned">...</span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-6 mb-3">
+      <div class="card">
+        <div class="card-header">
+          <%= t('dashboard.categories') %>
+        </div>
+        <ul class="list-group list-group-flush" id="stat-categories">
+          <!-- Categories breakdown here -->
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- Pending Borrow Requests Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+          <h3 class="h5 mb-0"><%= t('dashboard.pendingRequests') %></h3>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th><%= t('dashboard.userName') %></th>
+                  <th><%= t('dashboard.contact') %></th>
+                  <th><%= t('dashboard.bookTitle') %></th>
+                  <th><%= t('dashboard.author') %></th>
+                  <th><%= t('dashboard.requestDate') %></th>
+                  <th><%= t('dashboard.actions') %></th>
+                </tr>
+              </thead>
+              <tbody id="pending-requests-body">
+                <!-- Filled by dashboard.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
   <!-- Borrow History Section -->
   <% if (user.role !== "admin") { %>
   <div class="row mb-4">
@@ -108,5 +202,3 @@
   </div>
   <% } %>
 </main>
-
-<script type="module" src="/js/pages/dashboard.js"></script>

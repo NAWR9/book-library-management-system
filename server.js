@@ -16,6 +16,7 @@ const searchRoutes = require("./backend/src/routes/searchRoutes");
 const authRoutes = require("./backend/src/routes/authRoutes");
 const bookDetailsRoutes = require("./backend/src/routes/bookDetailsRoutes");
 const borrowRoutes = require("./backend/src/routes/borrowRoutes");
+const adminRoutes = require("./backend/src/routes/adminRoutes");
 
 const translateRoutes = require("./backend/src/routes/translateRoutes");
 const Book = require("./backend/src/models/Book");
@@ -137,6 +138,7 @@ mongoose
 
 // API Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Debug middleware for API books route
 app.use("/api/books", (req, res, next) => {
@@ -283,10 +285,62 @@ app.get("/dashboard", async (req, res) => {
       });
     }
 
+    // Compute admin stats if user is admin
+    let stats = null;
+    if (res.locals.user.role === "admin") {
+      const BorrowRequest = require("./backend/src/models/BorrowRequest");
+      const User = require("./backend/src/models/User");
+      // Total books and availability
+      const totalBooks = await Book.countDocuments();
+      const allBooks = await Book.find();
+      const totalAvailableBooks = allBooks.reduce(
+        (sum, b) => sum + b.availableBooks(),
+        0,
+      );
+      const totalBorrowedBooks = allBooks.reduce(
+        (sum, b) => sum + (b.bookCount - b.availableBooks()),
+        0,
+      );
+      // Borrow requests by status
+      const pendingRequests = await BorrowRequest.countDocuments({
+        status: "pending",
+      });
+      const approvedRequests = await BorrowRequest.countDocuments({
+        status: "approved",
+      });
+      const declinedRequests = await BorrowRequest.countDocuments({
+        status: "declined",
+      });
+      const returnedRequests = await BorrowRequest.countDocuments({
+        status: "returned",
+      });
+      // User count
+      const totalUsers = await User.countDocuments();
+      // Category breakdown
+      const categoryCounts = await Book.aggregate([
+        { $unwind: "$categories" },
+        { $group: { _id: "$categories", count: { $sum: 1 } } },
+      ]);
+      stats = {
+        totalBooks,
+        totalAvailableBooks,
+        totalBorrowedBooks,
+        borrowRequests: {
+          pending: pendingRequests,
+          approved: approvedRequests,
+          declined: declinedRequests,
+          returned: returnedRequests,
+        },
+        totalUsers,
+        categoryCounts,
+      };
+    }
+
     res.render("pages/dashboard", {
       title: req.t("titles.dashboard"),
       pageScript: "dashboard",
       borrowHistory: formattedHistory,
+      stats,
     });
   } catch (error) {
     console.error("Error fetching borrow history:", error);
@@ -294,6 +348,7 @@ app.get("/dashboard", async (req, res) => {
       title: req.t("titles.dashboard"),
       pageScript: "dashboard",
       borrowHistory: [],
+      stats: null,
     });
   }
 });
