@@ -99,8 +99,12 @@ EMAIL_PASSWORD=app_password
 EMAIL_FROM=noreply@library.com
 EMAIL_FROM_NAME=University Library
 
-# AI API KEY (smart search)
+# AI API Key (smart search)
 GROQ_API_KEY=API_KEY_HERE
+
+# Google API Key (autofill)
+GOOGLE_BOOKS_API_KEY=API_KEY_HERE
+
 ```
 
 ---
