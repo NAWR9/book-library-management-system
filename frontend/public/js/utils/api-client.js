@@ -35,7 +35,7 @@ export async function checkApiConnection() {
 
 /**
  * Search for books with the provided criteria
- * @param {Object} criteria - Search criteria object (title, author, categories)
+ * @param {Object} criteria - Search criteria object (title, author, category)
  * @returns {Promise<Array>} - Array of books matching search criteria
  */
 export async function searchBooks(criteria) {
@@ -44,10 +44,8 @@ export async function searchBooks(criteria) {
     const params = new URLSearchParams();
     if (criteria.title) params.append("title", criteria.title);
     if (criteria.author) params.append("author", criteria.author);
-    // Use categories array filter
-    if (criteria.categories && Array.isArray(criteria.categories)) {
-      criteria.categories.forEach((cat) => params.append("categories", cat));
-    }
+    // Filter by single category
+    if (criteria.category) params.append("category", criteria.category);
 
     // Make API request
     const response = await fetch(`${window.API_BASE_URL}/api/search?${params}`);

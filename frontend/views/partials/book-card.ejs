@@ -1,0 +1,22 @@
+<div class="col">
+  <div class="card book-card h-100 shadow-sm"
+       data-book-title="<%= book.title %>"
+       data-book-author="<%= book.author %>">
+    <img src="<%= book.cover || book.coverImage || '/img/book-cover-placeholder.svg' %>" class="card-img-top" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
+    <div class="card-body position-relative">
+      <h5 class="card-title"><%= book.title %></h5>
+      <p class="card-text text-muted"><%= t('books.by') %> <%= book.author %></p>
+      <% if (book.categories && book.categories.length) { %>
+        <div class="mb-2">
+          <% book.categories.forEach(function(categoryKey) { %>
+            <span class="badge bg-secondary"><%= t('bookCategories.' + categoryKey) %></span>
+          <% }) %>
+        </div>
+      <% } %>
+      <div class="d-flex justify-content-between">
+        <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
+        <a href="/books/<%= book.id || book._id %>" class="btn btn-sm btn-primary mt-2 full-details-link" onclick="event.stopPropagation();"><%= t('books.fullDetails') %></a>
+      </div>
+    </div>
+  </div>
+</div>

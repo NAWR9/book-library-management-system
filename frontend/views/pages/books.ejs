@@ -7,47 +7,32 @@
       <a href="/books/new" class="btn btn-primary">+ <%= t('books.addBook') %></a>
     </div>
     <% } %>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-      <% books.forEach(book => { %>
-        <div class="col">
-          <div class="card book-card h-100 shadow-sm"
-               data-book-title="<%= book.title %>"
-               data-book-author="<%= book.author %>">
-            <img src="<%= book.cover %>" class="card-img-top" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
-            <div class="card-body position-relative">
-              <h5 class="card-title"><%= book.title %></h5>
-              <p class="card-text text-muted"><%= t('books.by') %> <%= book.author %></p>
-              <% if (book.categories && book.categories.length) { %>
-                <div class="mb-2">
-                  <% book.categories.forEach(categoryKey => { %>
-                    <span class="badge bg-secondary"><%= t('bookCategories.' + categoryKey) %></span>
-                  <% }) %>
-                </div>
-              <% } %>
-              <div class="d-flex justify-content-between">
-                <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
-              <% if (locals.user && (locals.user.role === 'admin' || locals.user.isAdmin)) { %>
-                <span class="btn-group mt-2 ms-1">
-                  <a href="/books/<%= book.id %>/edit?lang=<%= locals.htmlLang %>" class="btn btn-sm btn-outline-secondary edit-book-card-btn" aria-label="<%= t('common.edit') %>">
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  <button class="btn btn-sm btn-outline-danger delete-book-card-btn" data-id="<%= book.id %>" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" aria-label="<%= t('common.delete') %>">
-                    <i class="fas fa-trash-alt"></i>
-                  </button>
-                </span>
-              <% } %>
-                <a href="/books/<%= book.id %>" class="btn btn-sm btn-primary mt-2 full-details-link" onclick="event.stopPropagation();"><%= t('books.fullDetails') %></a>
-              </div>
-              <!-- Smart Search Icon (hidden by default, shown on click) -->
-              <button class="smart-search-btn btn btn-light btn-sm rounded-circle"
-                      title="Smart Search"
-                      style="display:none;"
-                      onclick="event.stopPropagation(); openSmartSearchModal('<%= book.title %>', '<%= book.author %>')">
-                <i class="fas fa-brain"></i>
-              </button>
-            </div>
-          </div>
+    <div class="text-end mb-3">
+      <form id="booksSearchForm" class="row g-3 align-items-end">
+        <% const categoriesList = t('bookCategories', { returnObjects: true }); %>
+        <div class="col-md-4">
+          <input type="text" id="booksSearchTitle" class="form-control" placeholder="<%= t('books.bookTitle') %>">
         </div>
+        <div class="col-md-4">
+          <input type="text" id="booksSearchAuthor" class="form-control" placeholder="<%= t('books.author') %>">
+        </div>
+        <div class="col-md-3">
+          <select id="booksSearchCategory" class="form-select">
+            <option value=""><%= t('books.category') %></option>
+            <% for (const key in categoriesList) { %>
+              <option value="<%= key %>"><%= categoriesList[key] %></option>
+            <% } %>
+          </select>
+        </div>
+        <div class="col-md-1">
+          <button type="submit" class="btn btn-primary"><%= t('common.search') %></button>
+        </div>
+      </form>
+    </div>
+    <div id="booksNoResults" class="d-none mb-4"><p class="text-center text-muted"><%= t('books.noBooksFoundMatching') %></p></div>
+    <div id="booksGrid" class="row row-cols-1 row-cols-md-3 g-4">
+      <% books.forEach(book => { %>
+        <%- include('../partials/book-card', { book: book }) %>
       <% }) %>
     </div>
 </div>

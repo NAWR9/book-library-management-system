@@ -1,4 +1,5 @@
 /* global bootstrap */
+import { searchBooks } from "../utils/api-client.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const bookCards = document.querySelectorAll(".book-card");
@@ -84,6 +85,72 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
   });
+
+  // Inline search in books page
+  const booksSearchForm = document.getElementById("booksSearchForm");
+  const booksGrid = document.getElementById("booksGrid");
+  const booksNoResults = document.getElementById("booksNoResults");
+  if (booksSearchForm && booksGrid && booksNoResults) {
+    booksSearchForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("booksSearchTitle").value.trim();
+      const author = document.getElementById("booksSearchAuthor").value.trim();
+      const category = document.getElementById("booksSearchCategory").value;
+      try {
+        const books = await searchBooks({ title, author, category });
+        booksGrid.innerHTML = "";
+        if (books.length === 0) {
+          booksNoResults.classList.remove("d-none");
+        } else {
+          booksNoResults.classList.add("d-none");
+          books.forEach((book) => {
+            const imgSrc =
+              book.cover ||
+              book.coverImage ||
+              "/img/book-cover-placeholder.svg";
+            const badges = (book.categories || [])
+              .map(
+                (cat) =>
+                  `<span class="badge bg-secondary me-1">${window.i18nMessages.bookCategories?.[cat] || cat}</span>`,
+              )
+              .join("");
+            const col = document.createElement("div");
+            col.className = "col";
+            col.innerHTML = `
+              <div class="card book-card h-100 shadow-sm" data-book-title="${book.title}" data-book-author="${book.author}">
+                <img src="${imgSrc}" class="card-img-top" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
+                <div class="card-body position-relative">
+                  <h5 class="card-title">${book.title}</h5>
+                  <p class="card-text text-muted">${window.i18nMessages.books.by} ${book.author}</p>
+                  ${badges ? `<div class="mb-2">${badges}</div>` : ""}
+                  <div class="d-flex justify-content-between">
+                    <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn">${window.i18nMessages.books.viewDetails}</button>
+                    <a href="/books/${book.id || book._id}" class="btn btn-sm btn-primary mt-2 full-details-link" onclick="event.stopPropagation();">${window.i18nMessages.books.fullDetails}</a>
+                  </div>
+                </div>
+              </div>`;
+            booksGrid.appendChild(col);
+          });
+          // Attach event listeners for new cards
+          booksGrid.querySelectorAll(".book-card").forEach((card) => {
+            const title = card.getAttribute("data-book-title");
+            const author = card.getAttribute("data-book-author");
+            card.addEventListener("click", () =>
+              fetchAndDisplayBookDetails(title, author),
+            );
+            const btn = card.querySelector(".view-details-btn");
+            if (btn)
+              btn.addEventListener("click", (ev) => {
+                ev.stopPropagation();
+                fetchAndDisplayBookDetails(title, author);
+              });
+          });
+        }
+      } catch (err) {
+        console.error("Books inline search error:", err);
+      }
+    });
+  }
 
   // Function to fetch and display book details
   const fetchAndDisplayBookDetails = async (title, author) => {

@@ -283,9 +283,11 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "delete": "Delete",
+    "search": "Search",
     "confirmCancel": "Confirm Cancel",
     "confirmAdd": "Confirm Add Book",
-    "confirmDelete": "Confirm Delete"
+    "confirmDelete": "Confirm Delete",
+    "noBooksFound": "No books found."
   },
   "errors": {
     "pageNotFound": "Page not found",
@@ -373,7 +375,9 @@
     "returnDate": "Return Date",
     "actions": "Actions",
     "status": "Status",
-    "overdue": "Overdue"
+    "overdue": "Overdue",
+    "noBooksFound": "No books found.",
+    "noBooksFoundMatching": "No books found matching your search criteria."
   },
   "categoryGroups": {
     "general": "General",
