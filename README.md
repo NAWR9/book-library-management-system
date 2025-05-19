@@ -1,6 +1,6 @@
-﻿# Book Library Management System
+﻿# 📚 UniStack (University Book Library Management System)
 
-A Web-based library management system built with Node.js, Express, and MongoDB.
+A bilingual (English / Arabic) web platform that lets university students **search, borrow, and review** library books online while giving librarians full control over the catalogue.
 
 ## Technologies
 
@@ -26,104 +26,138 @@ A Web-based library management system built with Node.js, Express, and MongoDB.
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
 
-## Features (Planned)
+## Distinctive features
 
-- Book management (Add, Edit, Delete, View)
-- User management
-- Book borrowing and returning system
-- Search functionality
-- Authentication and Authorization
-- Password reset functionality
+> - 🔍 Smart AI search assistant
+> - 📚 Smart autofill book descriptions using google books API
+> - 🌙 Dark / Light mode
+> - 🌐 Full RTL/LTR & i18n support
 
-## Project Structure
+---
+
+## 🎯 Project Goals
+
+1. Replace manual library workflows with a responsive self‑service portal.
+2. Demonstrate clean MVC architecture, RESTful APIs, and secure auth.
+3. Showcase best‑practice **ES6**, **translation**, and **theme** patterns.
+
+---
+
+## 🗺️ System Flow Chart
+
+![Flow Chart](docs/flowchart/unistack_flow_chart.png) <!-- Replace with your own image or link -->
+
+---
+
+## 📦 Repository Structure
 
 ```
-book-library-management-system/
-├── backend/
-│   ├── README.md
-│   ├── package-lock.json
-│   ├── package.json
-│   └── src/
-│       ├── controllers/
-│       ├── middleware/
-│       ├── models/
-│       ├── routes/
-│       └── utils/
-├── frontend/
-│   ├── public/
-│   │   ├── css/
-│   │   ├── img/
-│   │   └── js/
-│   │       ├── utils/
-│   │       └── pages/
-│   └── views/
-│       ├── layout.ejs
-│       ├── partials/
-│       │   ├── navbar.ejs
-│       │   └── footer.ejs
-│       └── pages/
-│           └── auth/
-├── eslint.config.mjs
-├── .prettierrc
-├── .prettierignore
-├── .env
-├── server.js
-├── package.json
-├── package-lock.json
-├── README.md
-└── README-i18n.md
+.
+├── backend
+│   ├── src/
+│   │   ├── controllers
+│   │   ├── models
+│   │   ├── routes
+│   │   └── middleware
+│   └── server.js
+├── frontend
+│   ├── public/   # CSS, JS, images
+│   └── views/    # EJS templates
+└── README.md
 ```
 
-## Prerequisites
+---
 
-- Node.js (v14 or higher)
-- MongoDB
-- npm or yarn
+## 🚀 Getting Started (Local)
 
-## Setup Instructions
+```bash
+# 1) Clone & install
+git clone https://github.com/NAWR9/book-library-management-system.git
+cd book-library-management-system
+npm install            # installs root tools (eslint / prettier)
 
-1. Clone the repository:
+# 2) Setup environment
+cp .env.example .env   # fill in vars
+npm install
+npm run dev            # nodemon on http://localhost:5000
 
-   ```bash
-   git clone https://github.com/NAWR9/book-library-management-system.git
-   cd book-library-management-system
-   ```
+```
 
-2. Install backend dependencies:
+### .env example
 
-   ```bash
-   cd backend
-   npm install
-   ```
+```env
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/library
+JWT_SECRET=replace_me
 
-3. Create a `.env` file in the backend directory with your configuration:
+# Email (password reset)
+EMAIL_HOST=smtp.example.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your@example.com
+EMAIL_PASSWORD=app_password
+EMAIL_FROM=noreply@library.com
+EMAIL_FROM_NAME=University Library
 
-   ```
-   PORT=3000
-   MONGODB_URI=mongodb://localhost:27017/library
-   JWT_SECRET=your_jwt_secret_key
+# AI API KEY (smart search)
+GROQ_API_KEY=API_KEY_HERE
+```
 
-   # Frontend URL for password reset links
-   FRONTEND_URL=http://localhost:3000
+---
 
-   # Email Configuration for Password Reset
-   EMAIL_HOST=smtp.example.com
-   EMAIL_PORT=587
-   EMAIL_SECURE=false
-   EMAIL_USER=your_email@example.com
-   EMAIL_PASSWORD=your_email_password
-   EMAIL_FROM=noreply@yourlibrary.com
-   EMAIL_FROM_NAME=University Library
-   ```
+## 🖥️ Screenshots
 
-4. Start the backend development server:
+| Light Mode                                          | Dark Mode                                          |
+| --------------------------------------------------- | -------------------------------------------------- |
+| ![Light](docs/screenshots/unistack_1.png)           | ![Dark](docs/screenshots/unistack_2.png)           |
+| Admin Dashboard                                     | User Dashboard                                     |
+| ![Admin Dashboard](docs/screenshots/unistack_3.png) | ![User Dashboard](docs/screenshots/unistack_4.png) |
+| Borrow                                              | Book Details                                       |
+| ![Borrow](docs/screenshots/unistack_6.png)          | ![Book Details](docs/screenshots/unistack_5.png)   |
 
-   ```bash
-   npm run dev
-   ```
+---
 
-5. Open the frontend/index.html file in your browser or set up a local server for the frontend
+## ✨ Current Features
 
-## License
+- User / admin registration & JWT login
+- Role‑based navbar
+- Book CRUD (admin)
+- Student borrow requests (pending/approved/returned)
+- Password reset via email
+- Responsive design with RTL flip
+- Dark / Light theme toggle
+- Full English / Arabic translation via i18next
 
-This project is licensed under the MIT License.
+---
+
+## 🔮 Future Work
+
+- **AI Search Assistant** – let users describe a story or ask for “a short sci‑fi novel about space exploration”; OpenAI will return keywords → MongoDB query → suggestions.
+- **Gamification** – award points & badges for reading streaks, reviews, and on‑time returns.
+- PWA offline support & push notifications
+
+---
+
+## 👥 Team
+
+| Name                          | GitHub                                                 |
+| ----------------------------- | ------------------------------------------------------ |
+| Osamah Sadeq Shubaita         | [@NAWR9](https://github.com/NAWR9)                     |
+| Mohammed Abdullah Alosaimi    | [@moabos](https://github.com/moabos)                   |
+| Abdulrhman Abdulwasie Anwar   | [@Abdulrhmansaleh](https://github.com/Abdulrhmansaleh) |
+| Abdulmajeed Abdullah Alsakran | [@absakran01](https://github.com/absakran01)           |
+| Ahmed Abdullah Alzaid         | [@AhmedAlzaid](https://github.com/AhmedAlzaid)         |
+
+---
+
+## 📝 License
+
+MIT
+
+---
+
+## 📚 Resources
+
+- Imam University CS346 Web Development Course Materials
+- i18next documentation
+- MongoDB University Tutorials
