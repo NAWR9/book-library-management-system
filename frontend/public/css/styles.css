@@ -287,7 +287,65 @@ html[dir="rtl"] .modal-header .btn-close {
 .darkmode .form-control,
 .darkmode .form-select {
   background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--border);
+}
 
+.darkmode .form-control:focus,
+.darkmode .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.25rem rgba(107, 76, 166, 0.25);
+}
+
+.darkmode .form-text {
+  color: var(--text-secondary) !important;
+}
+
+/* Alert styling in dark mode */
+.darkmode .alert-info {
+  background-color: rgba(90, 169, 214, 0.15);
+  color: var(--info);
+  border-color: rgba(90, 169, 214, 0.3);
+}
+
+.darkmode .alert-success {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: var(--success);
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.darkmode .alert-warning {
+  background-color: rgba(230, 184, 0, 0.15);
+  color: var(--warning);
+  border-color: rgba(230, 184, 0, 0.3);
+}
+
+.darkmode .alert-danger {
+  background-color: rgba(207, 102, 121, 0.15);
+  color: var(--error);
+  border-color: rgba(207, 102, 121, 0.3);
+}
+
+.darkmode .table-danger {
+  background-color: rgba(207, 102, 121, 0.2) !important;
+}
+
+/* Dark mode button styles */
+.darkmode .btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.darkmode .btn-primary:hover {
+  color: white;
+  background-color: #1c65d9; /* Slightly darker blue on hover */
+  border-color: #1c65d9;
+}
+
+/* Login and Register buttons in dark mode */
+.darkmode .btn-light {
+  color: var(--text-color);
   background-color: var(--surface);
   border-color: var(--border);
 }
@@ -342,7 +400,7 @@ html[dir="rtl"] .modal-header .btn-close {
 }
 
 .book-card:hover {
-  transform: translateY(-5px);
+  transform: scale(1.05);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
@@ -367,43 +425,38 @@ html[dir="rtl"] .modal-header .btn-close {
   opacity: 1;
 }
 
-/* Default: English (LTR) - bottom right */
+/* Remove any duplicate .smart-search-btn styles first */
+
 .smart-search-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  z-index: 10;
+  z-index: 2; /* Lower z-index so it stays behind the card */
+  width: 32px;
+  height: 32px;
+  padding: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
+  opacity: 0;
+  pointer-events: none; /* Make it unclickable when hidden */
+  transition: opacity 0.2s ease;
 }
 
-/* Show button on hover with fade */
+/* Show button only when card is specifically hovered */
 .book-card:hover .smart-search-btn {
   opacity: 1;
+  pointer-events: auto; /* Make it clickable when visible */
 }
 
-/* Keep button visible when card is active */
+/* Keep button hidden when card is active */
 .book-card.active .smart-search-btn {
-  opacity: 1;
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* RTL support */
 html[lang="ar"] .smart-search-btn {
   right: auto;
   left: 10px;
-}
-
-.smart-search-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10; /* Must be higher than the card's shadow */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  display: none;
-}
-
-.book-card.active .smart-search-btn {
-  display: block;
 }
 
 /* Book details modal styles */
@@ -481,31 +534,26 @@ html[lang="ar"] .smart-search-btn {
   position: relative;
 }
 
-/* Smart search button styles */
 .smart-search-btn {
   position: absolute;
-
+  bottom: 10px;
+  left: 10px; /* Bottom left for LTR */
+  z-index: 2;
+  display: none;
 }
 
-/* Keep button hidden when card is active */
 .book-card.active .smart-search-btn {
-  opacity: 0;
-  pointer-events: none;
+  display: block !important;
 }
 
-/* RTL support */
 html[lang="ar"] .smart-search-btn {
-
+  left: 10px; /* For Arabic, also bottom left */
   right: auto;
-  left: 10px;
 }
 
-/* Remove any display toggles */
-.book-card .smart-search-btn,
-.book-card:hover .smart-search-btn,
-.book-card:focus-within .smart-search-btn,
-.book-card.active .smart-search-btn {
-  display: block;
+/* Optional: For RTL support, if needed */
+html[lang="ar"] .modal-footer {
+  flex-direction: row-reverse;
 }
 
 /* Links in dark mode */
