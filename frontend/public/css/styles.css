@@ -1,6 +1,6 @@
 :root {
-  --primary: #4a2c82; /* University purple */
-  --secondary: #ffc107; /* University gold */
+  --primary: #0d6efd; /* University blue */
+  --secondary: #20c997; /* Teal */
   --dark: #1d1d1d;
   --light: #f8f9fa;
 }
@@ -11,16 +11,27 @@ body {
 }
 
 .navbar-custom {
-  background-color: var(--primary);
+  background-color: var(--light);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-custom .navbar-brand,
 .navbar-custom .nav-link {
-  color: white;
+  color: var(--primary);
 }
 
 .navbar-custom .nav-link:hover {
   color: var(--secondary);
+}
+
+/* Navbar toggler (hamburger menu) styling for light mode */
+.navbar-custom .navbar-toggler {
+  border-color: var(--primary);
+  background-color: transparent;
+}
+
+.navbar-custom .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(13, 110, 253, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 .auth-hero {
@@ -117,6 +128,12 @@ body {
   left: 0;
 }
 
+/* Position modal close button on left in RTL */
+html[dir="rtl"] .modal-header .btn-close {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+}
+
 /* Language switcher styles */
 .language-switcher .dropdown-item {
   display: flex;
@@ -139,22 +156,41 @@ body {
 
 /* darkmode */
 .darkmode {
-  --primary: #231a38;
-  --secondary: #ffdb70;
-  --dark: #1d1d1d;
+  --primary: #3d8bfd; /* Lighter blue for better contrast */
+  --secondary: #25d8a5; /* Lighter teal for dark mode */
+  --dark: #1e1e1e; /* Dark but not pure black */
   --light: #f8f9fa;
-  --background: #121212;
-  --text-color: #f1f1f1;
+  --background: #121212; /* True dark background */
+  --text-color: #e0e0e0; /* Softer white for text */
+  --text-secondary: #bdbdbd; /* Dimmed text for secondary info */
+  --surface: #252525; /* Card/element background */
+  --border: #3e3e3e; /* Subtle border color */
+  --input-bg: #2a2a2a; /* Dark input background */
+  --accent: #7e57c2; /* Vibrant but not harsh accent */
+  --error: #cf6679; /* Softer red for errors */
+  --success: #4caf50; /* Success green */
+  --warning: #e6b800; /* Warning amber */
+  --info: #5aa9d6; /* Info blue */
 
-  background-color: #00000082;
+  background-color: var(--background);
   color: var(--text-color); /* applies text color globally */
 }
-.cta-button {
-  background-color: var(--accent-color);
+
+.darkmode h1,
+.darkmode h2,
+.darkmode h3,
+.darkmode h4,
+.darkmode h5,
+.darkmode h6 {
+  color: #f5f5f5; /* Slightly brighter for headings */
+  font-weight: 500; /* Lighter font weight for headers */
 }
-.text-muted {
-  color: inherit !important;
+
+.darkmode .text-muted,
+.darkmode .form-text {
+  color: var(--text-secondary) !important;
 }
+
 #theme-switch {
   height: 50px;
   width: 50px;
@@ -168,27 +204,190 @@ body {
   top: 20px;
   right: 20px;
 }
+
 #theme-switch svg {
   fill: var(--primary-color);
 }
+
 #theme-switch svg:last-child {
   display: none;
 }
+
 .darkmode #theme-switch svg:first-child {
   display: none;
 }
+
 .darkmode #theme-switch svg:last-child {
   display: block;
 }
+
 .darkmode .card {
-  background-color: var(--dark);
+  background-color: var(--surface);
   color: var(--text-color);
-  border: 1px solid var(--primary);
+  border: 1px solid var(--border);
 }
 
 .darkmode .card-body {
-  background-color: var(--background);
+  background-color: var(--surface);
   color: var(--text-color);
+}
+
+.darkmode .card-header {
+  background-color: var(--primary);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Borrow history and status dark mode styles */
+.darkmode .table {
+  color: var(--text-color);
+}
+
+.darkmode .table > thead {
+  background-color: var(--primary);
+  color: var(--light);
+}
+
+.darkmode .table > thead th {
+  border-color: rgba(255, 255, 255, 0.2);
+  font-weight: 500;
+}
+
+/* Target the specific header in the borrow history table */
+.darkmode .card-header.bg-primary {
+  background-color: #0d6efd !important; /* Keep the blue color from the screenshot */
+}
+
+/* Fix the table header in dark mode by overriding Bootstrap styles */
+.darkmode .table-striped > thead > tr > th,
+.darkmode .table > thead > tr > th,
+.darkmode .table thead th,
+.darkmode table.table thead th {
+  background-color: var(--dark) !important;
+  color: var(--light) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.darkmode .table-striped > tbody > tr:nth-of-type(odd) > * {
+  color: var(--text-color);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.darkmode .table-striped > tbody > tr:nth-of-type(even) > * {
+  background-color: var(--surface);
+}
+
+.darkmode .borrow-status {
+  background-color: var(--surface);
+  border-radius: 8px;
+  padding: 15px;
+  border: 1px solid var(--border);
+}
+
+.darkmode .form-control,
+.darkmode .form-select {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--border);
+}
+
+.darkmode .form-control:focus,
+.darkmode .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.25rem rgba(107, 76, 166, 0.25);
+}
+
+.darkmode .form-text {
+  color: var(--text-secondary) !important;
+}
+
+/* Alert styling in dark mode */
+.darkmode .alert-info {
+  background-color: rgba(90, 169, 214, 0.15);
+  color: var(--info);
+  border-color: rgba(90, 169, 214, 0.3);
+}
+
+.darkmode .alert-success {
+  background-color: rgba(76, 175, 80, 0.15);
+  color: var(--success);
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.darkmode .alert-warning {
+  background-color: rgba(230, 184, 0, 0.15);
+  color: var(--warning);
+  border-color: rgba(230, 184, 0, 0.3);
+}
+
+.darkmode .alert-danger {
+  background-color: rgba(207, 102, 121, 0.15);
+  color: var(--error);
+  border-color: rgba(207, 102, 121, 0.3);
+}
+
+.darkmode .table-danger {
+  background-color: rgba(207, 102, 121, 0.2) !important;
+}
+
+/* Dark mode button styles */
+.darkmode .btn-primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.darkmode .btn-primary:hover {
+  color: white;
+  background-color: #1c65d9; /* Slightly darker blue on hover */
+  border-color: #1c65d9;
+}
+
+/* Login and Register buttons in dark mode */
+.darkmode .btn-light {
+  color: var(--text-color);
+  background-color: var(--surface);
+  border-color: var(--border);
+}
+
+.darkmode .btn-light:hover {
+  color: white;
+  background-color: #3e3e3e;
+}
+
+.darkmode .btn-outline-light {
+  color: white;
+  border-color: white;
+}
+
+.darkmode .btn-outline-light:hover {
+  color: var(--dark);
+  background-color: white;
+}
+
+.darkmode .btn-outline-secondary {
+  color: #e0e0e0;
+  border-color: #757575;
+}
+
+.darkmode .btn-outline-secondary:hover {
+  color: var(--dark);
+  background-color: #9e9e9e;
+  border-color: #9e9e9e;
+}
+
+.darkmode .btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.darkmode .btn-outline-primary:hover {
+  background-color: var(--primary);
+  color: #e0e0e0;
+}
+
+.cta-button {
+  background-color: var(--accent-color);
 }
 
 /* book styles */
@@ -201,7 +400,7 @@ body {
 }
 
 .book-card:hover {
-  transform: scale(1.05);
+  transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
@@ -229,19 +428,27 @@ body {
 /* Default: English (LTR) - bottom right */
 .smart-search-btn {
   position: absolute;
-  bottom: 10px;
+  top: 10px;
   right: 10px;
   z-index: 10;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  display: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  transform: none !important;
+  will-change: transform;
 }
 
-/* Show only when card is active */
+/* Show button on hover with fade */
+.book-card:hover .smart-search-btn {
+  opacity: 1;
+}
+
+/* Keep button visible when card is active */
 .book-card.active .smart-search-btn {
-  display: block;
+  opacity: 1;
 }
 
-/* Arabic (RTL) - bottom left */
+/* RTL support */
 html[lang="ar"] .smart-search-btn {
   right: auto;
   left: 10px;
@@ -252,7 +459,7 @@ html[lang="ar"] .smart-search-btn {
   top: 10px;
   right: 10px;
   z-index: 10; /* Must be higher than the card's shadow */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   display: none;
 }
 
@@ -278,8 +485,16 @@ html[lang="ar"] .smart-search-btn {
 }
 
 .darkmode #bookDetailsModal .modal-content {
-  background-color: var(--dark);
+  background-color: var(--surface);
   color: var(--text-color);
+}
+
+.darkmode #bookDetailsModal .modal-header {
+  border-bottom-color: var(--border);
+}
+
+.darkmode #bookDetailsModal .modal-footer {
+  border-top-color: var(--border);
 }
 
 #bookCover {
@@ -327,24 +542,43 @@ html[lang="ar"] .smart-search-btn {
   position: relative;
 }
 
+/* Smart search button styles */
 .smart-search-btn {
   position: absolute;
-  bottom: 10px;
-  left: 10px;      /* Bottom left for LTR */
-  z-index: 2;
-  display: none;
+  top: 10px;
+  right: 10px;
+  z-index: 2; /* Lower z-index so it stays behind the card */
+  width: 32px;
+  height: 32px;
+  padding: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  pointer-events: none; /* Make it unclickable when hidden */
+  transition: opacity 0.2s ease;
 }
 
+/* Show button only when card is specifically hovered */
+.book-card:hover .smart-search-btn {
+  opacity: 1;
+  pointer-events: auto; /* Make it clickable when visible */
+}
+
+/* Keep button hidden when card is active */
 .book-card.active .smart-search-btn {
-  display: block !important;
+  opacity: 0;
+  pointer-events: none;
 }
 
+/* RTL support */
 html[lang="ar"] .smart-search-btn {
-  left: 10px;      /* For Arabic, also bottom left */
   right: auto;
+  left: 10px;
 }
 
-/* Optional: For RTL support, if needed */
-html[lang="ar"] .modal-footer {
-  flex-direction: row-reverse;
+/* Remove any display toggles */
+.book-card .smart-search-btn,
+.book-card:hover .smart-search-btn,
+.book-card:focus-within .smart-search-btn,
+.book-card.active .smart-search-btn {
+  display: block;
 }
