@@ -425,38 +425,38 @@ html[dir="rtl"] .modal-header .btn-close {
   opacity: 1;
 }
 
-/* Default: English (LTR) - bottom right */
-.smart-search-btn {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  z-index: 10;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  display: none;
-}
-
-/* Show only when card is active */
-.book-card.active .smart-search-btn {
-  display: block;
-}
-
-/* Arabic (RTL) - bottom left */
-html[lang="ar"] .smart-search-btn {
-  right: auto;
-  left: 10px;
-}
+/* Remove any duplicate .smart-search-btn styles first */
 
 .smart-search-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  z-index: 10; /* Must be higher than the card's shadow */
+  z-index: 2; /* Lower z-index so it stays behind the card */
+  width: 32px;
+  height: 32px;
+  padding: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  display: none;
+  opacity: 0;
+  pointer-events: none; /* Make it unclickable when hidden */
+  transition: opacity 0.2s ease;
 }
 
+/* Show button only when card is specifically hovered */
+.book-card:hover .smart-search-btn {
+  opacity: 1;
+  pointer-events: auto; /* Make it clickable when visible */
+}
+
+/* Keep button hidden when card is active */
 .book-card.active .smart-search-btn {
-  display: block;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* RTL support */
+html[lang="ar"] .smart-search-btn {
+  right: auto;
+  left: 10px;
 }
 
 /* Book details modal styles */
