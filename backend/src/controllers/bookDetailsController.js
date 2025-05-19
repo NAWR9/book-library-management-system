@@ -562,7 +562,7 @@ const searchGoogleBooks = async (req, res) => {
         cover_image: volumeInfo.imageLinks
           ? volumeInfo.imageLinks.thumbnail
           : "",
-        tags: volumeInfo.categories || [],
+        categories: volumeInfo.categories || [],
       };
     });
 

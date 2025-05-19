@@ -30,14 +30,14 @@ async function smartSearchBookInfo(userQuestion, bookTitle) {
       {
         model: "llama3-8b-8192", // or use "llama3-70b-8192"
         messages: [{ role: "user", content: questionText }],
-        temperature: 0.7
+        temperature: 0.7,
       },
       {
         headers: {
-          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-          "Content-Type": "application/json"
-        }
-      }
+          Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+      },
     );
 
     return response.data.choices[0].message.content;

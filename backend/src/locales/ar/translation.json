@@ -87,9 +87,6 @@
     "civil_engineering": "الهندسة المدنية",
     "linguistics": "علم اللغات"
   },
-  "ui": {
-    "selectCategory": "اختر تصنيفًا"
-  },
   "navbar": {
     "home": "الرئيسية",
     "books": "الكتب",
@@ -104,8 +101,21 @@
     "arabic": "العربية"
   },
   "homepage": {
-    "welcomeToSystem": "مرحبًا بك في نظام إدارة المكتبة",
-    "systemDescription": "هذا نظام إلكتروني لإدارة الكتب وعمليات المكتبة."
+    "welcomeToSystem": "مرحبًا بك في نظام المكتبة الجامعية",
+    "systemDescription": "هذا هو نظام قائم على الويب لإدارة الكتب وعمليات المكتبة.",
+    "heroHeadline": "نظام إدارة المكتبة الجامعية",
+    "heroSubtitle": "الوصول إلى آلاف الموارد الأكاديمية في متناول يديك",
+    "feature1": "تصفح مجموعتنا الواسعة من الكتب الأكاديمية",
+    "feature2": "استعارة الكتب عبر الإنترنت بنقرات قليلة فقط",
+    "feature3": "الوصول إلى الموارد الرقمية ومواد البحث",
+    "feature4": "الحصول على إشعارات حول تواريخ الاستحقاق والإضافات الجديدة",
+    "loginButton": "تسجيل الدخول",
+    "registerButton": "تسجيل",
+    "welcome": "مرحبًا، {{name}}",
+    "browseBooks": "تصفح الكتب",
+    "borrowHistory": "سجل الاستعارة الخاص بي",
+    "adminPlaceholder": "مرحبًا بك في لوحة تحكم المسؤول",
+    "manageBooks": "إدارة الكتب"
   },
   "dashboard": {
     "welcome": "مرحبًا",
@@ -220,18 +230,22 @@
   "errors": {
     "pageNotFound": "الصفحة التي تبحث عنها غير موجودة",
     "serverError": "حدث خطأ غير متوقع",
-    "adminOnly": "يمكن للمسؤولين فقط الوصول إلى هذه الصفحة"
+    "adminOnly": "يمكن للمسؤولين فقط الوصول إلى هذه الصفحة",
+    "bookNotFound": "لم يتم العثور على الكتاب المطلوب"
   },
   "common": {
     "yes": "نعم",
     "no": "لا",
     "confirmCancel": "تأكيد الإلغاء",
-    "confirmAdd": "تأكيد إضافة الكتاب",
+    "confirmAdd": "تأكيد إضافة كتاب",
     "error": "خطأ",
     "success": "نجاح",
     "warning": "تحذير",
     "info": "معلومات",
-    "tryAgain": "يرجى المحاولة مرة أخرى."
+    "tryAgain": "يرجى المحاولة مرة أخرى.",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "confirmDelete": "تأكيد الحذف"
   },
   "books": {
     "bookLibrary": "مكتبة الكتب",
@@ -255,12 +269,23 @@
     "loadingDetails": "جاري تحميل تفاصيل الكتاب...",
     "noDescription": "لا يوجد وصف متاح.",
     "fetchError": "فشل في الحصول على تفاصيل الكتاب. يرجى المحاولة لاحقًا.",
+    "bookLanguage": "لغة الكتاب",
+    "languageRequired": "الرجاء اختيار لغة الكتاب",
     "viewDetails": "عرض التفاصيل",
+    "fullDetails": "التفاصيل الكاملة",
+    "borrowBook": "استعارة هذا الكتاب",
+    "backToList": "العودة إلى الكتب",
+    "requestSubmitted": "تم تقديم الطلب",
+    "bookNotFound": "الكتاب غير موجود",
+    "borrowSuccess": "تم تقديم طلب استعارة الكتاب بنجاح",
+    "alreadyRequested": "لديك بالفعل طلب نشط لهذا الكتاب",
+    "notAvailable": "الكتاب غير متاح للاستعارة",
     "bookCount": "عدد النسخ",
     "saveBook": "حفظ الكتاب",
     "cancel": "إلغاء",
     "cancelConfirmMessage": "هل أنت متأكد من الإلغاء؟ ستفقد جميع المعلومات التي أدخلتها.",
     "submitConfirmMessage": "هل أنت متأكد من إضافة هذا الكتاب؟",
+    "deleteConfirmMessage": "هل أنت متأكد أنك تريد حذف هذا الكتاب؟",
     "manualEntry": "إدخال يدوي",
     "fetchFromGoogle": "تعبئة البيانات من كتب جوجل",
     "searchQuery": "استعلام البحث (العنوان، المؤلف، الرقم الدولي)",
@@ -307,7 +332,31 @@
     "clickToSelect": "انقر لتحديد أو إلغاء تحديد التصنيفات",
     "noMatchFound": "لم يتم العثور على تطابق",
     "selectedCategories": "التصنيفات المحددة",
-    "categoriesSharedBetweenLanguages": "التصنيفات مشتركة بين إصدارات اللغة"
+    "categoriesSharedBetweenLanguages": "التصنيفات مشتركة بين إصدارات اللغة",
+    "borrowDuration": "مدة الاستعارة",
+    "oneWeek": "أسبوع واحد (7 أيام)",
+    "twoWeeks": "أسبوعين (14 يوم)",
+    "threeWeeks": "ثلاثة أسابيع (21 يوم)",
+    "oneMonth": "شهر واحد (30 يوم)",
+    "durationNote": "اختر المدة التي ترغب في استعارة الكتاب خلالها. تخضع الموافقة لسياسة المكتبة.",
+    "invalidDuration": "يجب أن تكون مدة الاستعارة المطلوبة بين 1 و 30 يومًا",
+    "borrowStatus": "حالة الاستعارة",
+    "statusPending": "بانتظار الموافقة",
+    "statusApproved": "تمت الموافقة",
+    "statusDeclined": "مرفوض",
+    "statusReturned": "تم الإرجاع",
+    "pendingDescription": "طلبك في انتظار موافقة موظفي المكتبة.",
+    "approvedDescription": "تمت الموافقة على طلبك. يمكنك استلام الكتاب من المكتبة.",
+    "declinedDescription": "تم رفض طلبك. يرجى الاتصال بموظفي المكتبة لمزيد من المعلومات.",
+    "returnedDescription": "لقد قمت بإرجاع هذا الكتاب. يمكنك طلبه مرة أخرى إذا لزم الأمر.",
+    "borrowHistory": "سجل الاستعارة",
+    "noBorrowHistory": "لم تقم باستعارة أي كتب حتى الآن.",
+    "requestDate": "تاريخ الطلب",
+    "dueDate": "تاريخ الاستحقاق",
+    "returnDate": "تاريخ الإرجاع",
+    "actions": "إجراءات",
+    "status": "الحالة",
+    "overdue": "متأخر"
   },
   "categoryGroups": {
     "general": "عام",

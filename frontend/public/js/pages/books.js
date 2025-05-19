@@ -1,5 +1,4 @@
 /* global bootstrap */
-// import { authGet } from "../utils/auth-fetch.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const bookCards = document.querySelectorAll(".book-card");
@@ -12,36 +11,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const currentLanguage = document.documentElement.lang || "en";
 
-  // Track the currently selected book for Smart Search
-  let smartSearchSelectedBook = { title: "", author: "" };
+  let currentBookId = null;
+  const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+  const deleteConfirmModal = new bootstrap.Modal(
+    document.getElementById("deleteConfirmModal"),
+  );
 
-  // Add click event listeners to all book cards
+  // Global delete handler uses currentBookId set by card or modal
+  confirmDeleteBtn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`/api/books/${currentBookId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const result = await response.json();
+      if (result.success) {
+        deleteConfirmModal.hide();
+        window.location.reload();
+      } else {
+        alert(result.message || window.i18nMessages.books.failedToAdd);
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert(err.message || window.i18nMessages.common.tryAgain);
+    }
+  });
+
+  // Add click event listeners to all book cards (only on the View Details button)
   bookCards.forEach((card) => {
     const viewDetailsBtn = card.querySelector(".view-details-btn");
+    const fullDetailsLink = card.querySelector(".full-details-link");
 
     viewDetailsBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       const title = card.getAttribute("data-book-title");
       const author = card.getAttribute("data-book-author");
       fetchAndDisplayBookDetails(title, author);
-
-      // Also set Smart Search book and show the button
-      smartSearchSelectedBook.title = title;
-      smartSearchSelectedBook.author = author;
-      // document.getElementById("smartSearchFloatBtn").style.display = "block";
-      // document.getElementById("smartSearchBox").style.display = "none";
     });
 
+    // Ensure full details link doesn't trigger the modal
+    if (fullDetailsLink) {
+      fullDetailsLink.addEventListener("click", (e) => {
+        e.stopPropagation();
+        // The link will handle the navigation naturally
+      });
+    }
+
+    // Clicking on card anywhere else opens details
     card.addEventListener("click", () => {
       const title = card.getAttribute("data-book-title");
       const author = card.getAttribute("data-book-author");
-      fetchAndDisplayBookDetails(title, author); // <-- This opens the modal
-      // ...Smart Search logic...
-      smartSearchSelectedBook.title = title;
-      smartSearchSelectedBook.author = author;
-      // document.getElementById("smartSearchFloatBtn").style.display = "block";
-      // // document.getElementById("smartSearchBox").style.display = "none";
+      fetchAndDisplayBookDetails(title, author);
     });
+
+    // Admin edit book card button
+    const editCardBtn = card.querySelector(".edit-book-card-btn");
+    if (editCardBtn) {
+      editCardBtn.addEventListener("click", (e) => {
+        // Prevent card click; let anchor href handle navigation
+        e.stopPropagation();
+      });
+    }
+    // Admin delete book card button
+    const deleteCardBtn = card.querySelector(".delete-book-card-btn");
+    if (deleteCardBtn) {
+      deleteCardBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        currentBookId = deleteCardBtn.getAttribute("data-id");
+        deleteConfirmModal.show();
+      });
+    }
   });
 
   // Function to fetch and display book details
@@ -57,19 +98,14 @@ document.addEventListener("DOMContentLoaded", () => {
         lang: currentLanguage,
       });
 
-      const response = await fetch(`/api/book-details?${params}`);
+      // Fetch book details
+      const response = await fetch(
+        `${window.API_BASE_URL}/api/book-details?${params}`,
+      );
       const result = await response.json();
 
       if (result.success) {
         displayBookDetails(result.data);
-
-        // Set the selected book for Smart Search
-        window.smartSearchSelectedBook = { title, author };
-
-        // Show the Smart Search floating button
-        // document.getElementById("smartSearchFloatBtn").style.display = "block";
-        // // Hide the Smart Search box if open
-        // document.getElementById("smartSearchBox").style.display = "none";
       } else {
         showError(result.message || "Failed to fetch book details");
       }
@@ -171,7 +207,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const categoriesElement = document.getElementById("bookCategories");
     if (bookData.categories && bookData.categories.length > 0) {
-      categoriesElement.textContent = bookData.categories.join(", ");
+      // Map keys to translations
+      const translated = bookData.categories.map((key) => {
+        return (
+          window.i18nMessages?.bookCategories?.[key] ||
+          key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+        );
+      });
+      categoriesElement.textContent = translated.join(", ");
     } else if (bookData.genre || bookData.category) {
       categoriesElement.textContent = bookData.genre || bookData.category;
     } else {
@@ -193,8 +236,20 @@ document.addEventListener("DOMContentLoaded", () => {
       isbnElement.textContent = "-";
     }
 
+    // Track current book id for deletion
+    currentBookId = bookData._id;
+
     hideLoading();
     bookDetailsContent.classList.remove("d-none");
+
+    // Admin Edit button handler
+    const editBtn = document.getElementById("editBookBtn");
+    if (editBtn) {
+      editBtn.onclick = () => {
+        // Redirect to edit page for this book
+        window.location.href = `/books/${bookData._id}/edit?lang=${currentLanguage}`;
+      };
+    }
   };
 
   // Helper function to show loading state
@@ -240,7 +295,8 @@ window.hideSmartSearchBox = function () {
 
 window.toggleSmartSearchBoxInFooter = function () {
   const box = document.getElementById("smartSearchFooterBox");
-  box.style.display = (box.style.display === "none" || !box.style.display) ? "block" : "none";
+  box.style.display =
+    box.style.display === "none" || !box.style.display ? "block" : "none";
 };
 
 window.hideSmartSearchFooterBox = function () {
@@ -295,7 +351,10 @@ window.askSmartQuestion = async function (type) {
   }
 };
 
-window.askSmartQuestion = async function (type, responseContainerId = "smartSearchFooterResponse") {
+window.askSmartQuestion = async function (
+  type,
+  responseContainerId = "smartSearchFooterResponse",
+) {
   const { title, author } = window.smartSearchSelectedBook;
   const responseDiv = document.getElementById(responseContainerId);
   if (!title) {
@@ -307,7 +366,7 @@ window.askSmartQuestion = async function (type, responseContainerId = "smartSear
 
   try {
     const res = await fetch(
-      `/api/smart-search?question=${encodeURIComponent(type)}&title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}`
+      `/api/smart-search?question=${encodeURIComponent(type)}&title=${encodeURIComponent(title)}&author=${encodeURIComponent(author)}`,
     );
     const data = await res.json();
     if (data.success) {
@@ -342,7 +401,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", function () {
   // Select all book cards
-  document.querySelectorAll(".book-card").forEach(function(card) {
+  document.querySelectorAll(".book-card").forEach(function (card) {
     card.addEventListener("click", function () {
       // Get book info from data attributes
       const title = card.getAttribute("data-book-title");
@@ -357,7 +416,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-document.querySelectorAll(".view-details-btn").forEach(function(btn) {
+document.querySelectorAll(".view-details-btn").forEach(function (btn) {
   btn.addEventListener("click", function (e) {
     e.stopPropagation();
     const card = btn.closest(".book-card");
@@ -369,28 +428,34 @@ document.querySelectorAll(".view-details-btn").forEach(function(btn) {
   });
 });
 
-document.getElementById("bookDetailsModal").addEventListener("hidden.bs.modal", () => {
-  document.getElementById("smartSearchFloatBtn").style.display = "none";
-  document.getElementById("smartSearchBox").style.display = "none";
-});
+document
+  .getElementById("bookDetailsModal")
+  .addEventListener("hidden.bs.modal", () => {
+    document.getElementById("smartSearchFloatBtn").style.display = "none";
+    document.getElementById("smartSearchBox").style.display = "none";
+  });
 
-document.getElementById("bookDetailsModal").addEventListener("hidden.bs.modal", () => {
-  // Move focus to a safe element outside the modal
-  document.body.focus();
-  // Optionally, also hide Smart Search box if open
-  document.getElementById("smartSearchBox").style.display = "none";
-});
+document
+  .getElementById("bookDetailsModal")
+  .addEventListener("hidden.bs.modal", () => {
+    // Move focus to a safe element outside the modal
+    document.body.focus();
+    // Optionally, also hide Smart Search box if open
+    document.getElementById("smartSearchBox").style.display = "none";
+  });
 
-window.openSmartSearchModal = function(title, author) {
+window.openSmartSearchModal = function (title, author) {
   window.smartSearchSelectedBook = { title, author };
   document.getElementById("smartSearchBox").style.display = "block";
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".book-card").forEach(function(card) {
+  document.querySelectorAll(".book-card").forEach(function (card) {
     card.addEventListener("click", function () {
       // Remove 'active' from all cards
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
       // Add 'active' to this card
       card.classList.add("active");
       // Set the selected book for Smart Search
@@ -401,17 +466,21 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Hide Smart Search icon when clicking outside any card
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     if (!e.target.closest(".book-card")) {
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
     }
   });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".book-card").forEach(function(card) {
+  document.querySelectorAll(".book-card").forEach(function (card) {
     card.addEventListener("click", function () {
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
       card.classList.add("active");
       const title = card.getAttribute("data-book-title");
       const author = card.getAttribute("data-book-author");
@@ -419,20 +488,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     if (!e.target.closest(".book-card")) {
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
     }
   });
 });
 
-document.getElementById("bookDetailsModal").addEventListener("hidden.bs.modal", () => {
-  document.getElementById("smartSearchFooterBox").style.display = "none";
-});
+document
+  .getElementById("bookDetailsModal")
+  .addEventListener("hidden.bs.modal", () => {
+    document.getElementById("smartSearchFooterBox").style.display = "none";
+  });
 
-document.getElementById("bookDetailsModal").addEventListener("hidden.bs.modal", () => {
-  const smartBox = document.getElementById("smartSearchFooterBox");
-  if (smartBox) smartBox.style.display = "none";
-});
-
-
+document
+  .getElementById("bookDetailsModal")
+  .addEventListener("hidden.bs.modal", () => {
+    const smartBox = document.getElementById("smartSearchFooterBox");
+    if (smartBox) smartBox.style.display = "none";
+  });

@@ -7,11 +7,13 @@
     const enableDarkmode = () => {
       document.body.classList.add('darkmode')
       localStorage.setItem('darkmode', 'active')
+      document.cookie = "theme=dark; path=/; max-age=31536000" // Set cookie for 1 year
     }
 
     const disableDarkmode = () => {
       document.body.classList.remove('darkmode')
       localStorage.setItem('darkmode', null)
+      document.cookie = "theme=light; path=/; max-age=31536000" // Set cookie for 1 year
     }
 
     if (darkmode === "active") enableDarkmode()
@@ -33,8 +35,8 @@
   <div class="container">
     <a class="navbar-brand" href="/">
       <img
-        src="/img/university-logo.png"
-        alt="University Library"
+        src="/img/unistack.png"
+        alt="UniStack"
         class="university-logo"
       />
     </a>

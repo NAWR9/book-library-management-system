@@ -1,3 +1,5 @@
+/* global bootstrap */
+
 import { searchBooks } from "../utils/api-client.js";
 
 // Only define typeChatResponse once at the top level
@@ -94,9 +96,11 @@ document.addEventListener("DOMContentLoaded", function () {
       )
       .join("");
 
-    document.querySelectorAll(".book-card").forEach(function(card) {
+    document.querySelectorAll(".book-card").forEach(function (card) {
       card.addEventListener("click", function () {
-        document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+        document
+          .querySelectorAll(".book-card")
+          .forEach((c) => c.classList.remove("active"));
         card.classList.add("active");
         const title = card.getAttribute("data-book-title");
         const author = card.getAttribute("data-book-author");
@@ -105,9 +109,11 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
-    document.addEventListener("click", function(e) {
+    document.addEventListener("click", function (e) {
       if (!e.target.closest(".book-card")) {
-        document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+        document
+          .querySelectorAll(".book-card")
+          .forEach((c) => c.classList.remove("active"));
       }
     });
   }
@@ -133,7 +139,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const card = e.target.closest(".book-card");
     if (card && card.parentElement.parentElement.id === "searchResults") {
       // Remove 'active' from all cards
-      document.querySelectorAll("#searchResults .book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll("#searchResults .book-card")
+        .forEach((c) => c.classList.remove("active"));
       // Add 'active' to this card
       card.classList.add("active");
       // Set the selected book for Smart Search
@@ -144,9 +152,11 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Hide Smart Search icon when clicking outside any card
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     if (!e.target.closest(".book-card")) {
-      document.querySelectorAll("#searchResults .book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll("#searchResults .book-card")
+        .forEach((c) => c.classList.remove("active"));
     }
   });
 
@@ -161,9 +171,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  document.querySelectorAll(".book-card").forEach(function(card) {
+  document.querySelectorAll(".book-card").forEach(function (card) {
     card.addEventListener("click", function () {
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
       card.classList.add("active");
       const title = card.getAttribute("data-book-title");
       const author = card.getAttribute("data-book-author");
@@ -171,35 +183,45 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     if (!e.target.closest(".book-card")) {
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
     }
   });
 
   // Delegate click event for dynamically rendered cards
-  document.getElementById("searchResults").addEventListener("click", function (e) {
-    const card = e.target.closest(".book-card");
-    if (card) {
-      document.querySelectorAll("#searchResults .book-card").forEach(c => c.classList.remove("active"));
-      card.classList.add("active");
-      const title = card.getAttribute("data-book-title");
-      const author = card.getAttribute("data-book-author");
-      window.smartSearchSelectedBook = { title, author };
-    }
-  });
+  document
+    .getElementById("searchResults")
+    .addEventListener("click", function (e) {
+      const card = e.target.closest(".book-card");
+      if (card) {
+        document
+          .querySelectorAll("#searchResults .book-card")
+          .forEach((c) => c.classList.remove("active"));
+        card.classList.add("active");
+        const title = card.getAttribute("data-book-title");
+        const author = card.getAttribute("data-book-author");
+        window.smartSearchSelectedBook = { title, author };
+      }
+    });
 
   // Hide Smart Search icon when clicking outside any card
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     if (!e.target.closest(".book-card")) {
-      document.querySelectorAll("#searchResults .book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll("#searchResults .book-card")
+        .forEach((c) => c.classList.remove("active"));
     }
   });
 
-  document.querySelectorAll(".book-card").forEach(function(card) {
+  document.querySelectorAll(".book-card").forEach(function (card) {
     card.addEventListener("click", function () {
       // Remove 'active' from all cards
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
       // Add 'active' to this card
       card.classList.add("active");
       // Set the selected book for Smart Search
@@ -210,17 +232,21 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Hide Smart Search icon when clicking outside any card
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     if (!e.target.closest(".book-card")) {
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
     }
   });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".book-card").forEach(function(card) {
+  document.querySelectorAll(".book-card").forEach(function (card) {
     card.addEventListener("click", function () {
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
       card.classList.add("active");
       const title = card.getAttribute("data-book-title");
       const author = card.getAttribute("data-book-author");
@@ -229,9 +255,11 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Hide Smart Search icon when clicking outside any card
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     if (!e.target.closest(".book-card")) {
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
     }
   });
 });
@@ -276,7 +304,7 @@ window.askSmartQuestion = async function (type) {
   }
 };
 
-window.openSmartSearchModal = function(title, author) {
+window.openSmartSearchModal = function (title, author) {
   window.smartSearchSelectedBook = { title, author };
   document.getElementById("smartSearchBox").style.display = "block";
   // Optionally, position the box near the card or keep it floating
@@ -284,7 +312,9 @@ window.openSmartSearchModal = function(title, author) {
 
 // Fetch and display book details in modal (reuse from books.js)
 async function fetchAndDisplayBookDetails(title, author) {
-  const bookDetailsModal = new bootstrap.Modal(document.getElementById("bookDetailsModal"));
+  const bookDetailsModal = new bootstrap.Modal(
+    document.getElementById("bookDetailsModal"),
+  );
   const bookDetailsLoading = document.getElementById("bookDetailsLoading");
   const bookDetailsContent = document.getElementById("bookDetailsContent");
   const bookDetailsError = document.getElementById("bookDetailsError");
@@ -295,7 +325,11 @@ async function fetchAndDisplayBookDetails(title, author) {
   bookDetailsModal.show();
 
   try {
-    const params = new URLSearchParams({ title, author, lang: document.documentElement.lang || "en" });
+    const params = new URLSearchParams({
+      title,
+      author,
+      lang: document.documentElement.lang || "en",
+    });
     const response = await fetch(`/api/book-details?${params}`);
     const result = await response.json();
 
@@ -307,7 +341,8 @@ async function fetchAndDisplayBookDetails(title, author) {
     } else {
       bookDetailsLoading.classList.add("d-none");
       bookDetailsError.classList.remove("d-none");
-      bookDetailsError.textContent = result.message || "Failed to fetch book details";
+      bookDetailsError.textContent =
+        result.message || "Failed to fetch book details";
     }
   } catch (error) {
     bookDetailsLoading.classList.add("d-none");
@@ -399,7 +434,7 @@ function displayBookDetails(bookData) {
     bookData.industryIdentifiers.length > 0
   ) {
     const isbn = bookData.industryIdentifiers.find(
-      (id) => id.type === "ISBN_13" || id.type === "ISBN_10"
+      (id) => id.type === "ISBN_13" || id.type === "ISBN_10",
     );
     isbnElement.textContent = isbn ? isbn.identifier : "-";
   } else {
@@ -411,19 +446,23 @@ function displayBookDetails(bookData) {
   document.getElementById("bookDetailsContent").classList.remove("d-none");
 }
 
-document.querySelectorAll(".book-card").forEach(function(card) {
+document.querySelectorAll(".book-card").forEach(function (card) {
   card.addEventListener("click", function () {
-    document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+    document
+      .querySelectorAll(".book-card")
+      .forEach((c) => c.classList.remove("active"));
     card.classList.add("active");
     // ...set smartSearchSelectedBook, etc...
   });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  document.querySelectorAll(".book-card").forEach(function(card) {
+  document.querySelectorAll(".book-card").forEach(function (card) {
     card.addEventListener("click", function () {
       // Remove 'active' from all cards
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
       // Add 'active' to this card
       card.classList.add("active");
       // Set the selected book for Smart Search
@@ -434,39 +473,43 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Hide Smart Search icon when clicking outside any card
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     if (!e.target.closest(".book-card")) {
-      document.querySelectorAll(".book-card").forEach(c => c.classList.remove("active"));
+      document
+        .querySelectorAll(".book-card")
+        .forEach((c) => c.classList.remove("active"));
     }
   });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
   // Card click handler
-  document.querySelector("#searchResults").addEventListener("click", function(e) {
-    const card = e.target.closest(".book-card");
-    if (card) {
-      // Remove active class from all cards
-      document.querySelectorAll(".book-card").forEach(c => {
-        c.classList.remove("active");
-        // Hide all smart search boxes
-        const searchBox = c.querySelector(".smart-search-box");
-        if (searchBox) searchBox.style.display = "none";
-      });
-      
-      // Add active class to clicked card
-      card.classList.add("active");
-      
-      const title = card.getAttribute("data-book-title");
-      const author = card.getAttribute("data-book-author");
-      window.smartSearchSelectedBook = { title, author };
-    }
-  });
+  document
+    .querySelector("#searchResults")
+    .addEventListener("click", function (e) {
+      const card = e.target.closest(".book-card");
+      if (card) {
+        // Remove active class from all cards
+        document.querySelectorAll(".book-card").forEach((c) => {
+          c.classList.remove("active");
+          // Hide all smart search boxes
+          const searchBox = c.querySelector(".smart-search-box");
+          if (searchBox) searchBox.style.display = "none";
+        });
+
+        // Add active class to clicked card
+        card.classList.add("active");
+
+        const title = card.getAttribute("data-book-title");
+        const author = card.getAttribute("data-book-author");
+        window.smartSearchSelectedBook = { title, author };
+      }
+    });
 
   // Hide smart search when clicking outside
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", function (e) {
     if (!e.target.closest(".book-card")) {
-      document.querySelectorAll(".book-card").forEach(c => {
+      document.querySelectorAll(".book-card").forEach((c) => {
         c.classList.remove("active");
         const searchBox = c.querySelector(".smart-search-box");
         if (searchBox) searchBox.style.display = "none";
@@ -476,28 +519,32 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Add this function to handle closing the Smart Search box
-window.hideSmartSearchFooterBox = function() {
-    const box = document.getElementById("smartSearchFooterBox");
-    if (box) {
-        box.style.display = "none";
-    }
+window.hideSmartSearchFooterBox = function () {
+  const box = document.getElementById("smartSearchFooterBox");
+  if (box) {
+    box.style.display = "none";
+  }
 };
 
 // Toggle Smart Search box
-window.toggleSmartSearchBoxInFooter = function() {
+window.toggleSmartSearchBoxInFooter = function () {
   const box = document.getElementById("smartSearchFooterBox");
-  box.style.display = box.style.display === "none" || !box.style.display ? "block" : "none";
+  box.style.display =
+    box.style.display === "none" || !box.style.display ? "block" : "none";
 };
 
 // Hide Smart Search box
-window.hideSmartSearchBox = function(closeBtn) {
+window.hideSmartSearchBox = function (closeBtn) {
   const searchBox = closeBtn.closest(".smart-search-box");
   searchBox.style.display = "none";
 };
 
 // Ask Smart Search question
-window.askSmartQuestion = async function(type, responseContainerId = "smartSearchFooterResponse") {
-  const { title} = window.smartSearchSelectedBook;
+window.askSmartQuestion = async function (
+  type,
+  responseContainerId = "smartSearchFooterResponse",
+) {
+  const { title } = window.smartSearchSelectedBook;
   const responseDiv = document.getElementById(responseContainerId);
   if (!title) {
     responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Please select a book first.</div>`;
@@ -508,10 +555,10 @@ window.askSmartQuestion = async function(type, responseContainerId = "smartSearc
 
   try {
     const res = await fetch(
-      `/api/smart-search?question=${encodeURIComponent(type)}&title=${encodeURIComponent(title)}`
+      `/api/smart-search?question=${encodeURIComponent(type)}&title=${encodeURIComponent(title)}`,
     );
     const data = await res.json();
-    
+
     if (data.success) {
       responseDiv.innerHTML = `<div class="chat-bubble"></div>`;
       const bubble = responseDiv.querySelector(".chat-bubble");
