@@ -1,5 +1,6 @@
 const axios = require("axios");
 require("dotenv").config();
+const Book = require("../models/Book");
 
 /**
  * Function to handle limited book queries using Groq's LLaMA model
@@ -8,6 +9,27 @@ require("dotenv").config();
  * @returns {Promise<string>} - LLM-generated response
  */
 async function smartSearchBookInfo(userQuestion, bookTitle) {
+  // Gather additional book context if available
+  let bookContext = "";
+  try {
+    const book = await Book.findOne({
+      title: new RegExp(`^${bookTitle}$`, "i"),
+    }).lean();
+    if (book) {
+      const categories =
+        (book.categories || [])
+          .map((cat) => cat.replace(/_/g, " "))
+          .join(", ") || "None";
+      const desc =
+        book.description_en ||
+        book.description_ar ||
+        "No description available.";
+      bookContext = `Book Details:\nTitle: ${book.title}\nAuthor: ${book.author}\nCategories: ${categories}\nDescription: ${desc}\n\n`;
+    }
+  } catch (err) {
+    console.error("Error fetching book context:", err);
+  }
+
   let questionText = "";
 
   switch (userQuestion) {
@@ -25,11 +47,16 @@ async function smartSearchBookInfo(userQuestion, bookTitle) {
   }
 
   try {
+    const messages = [];
+    if (bookContext) {
+      messages.push({ role: "system", content: bookContext });
+    }
+    messages.push({ role: "user", content: questionText });
     const response = await axios.post(
       "https://api.groq.com/openai/v1/chat/completions",
       {
         model: "llama3-8b-8192", // or use "llama3-70b-8192"
-        messages: [{ role: "user", content: questionText }],
+        messages,
         temperature: 0.7,
       },
       {
