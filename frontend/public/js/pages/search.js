@@ -109,6 +109,24 @@ document.addEventListener("DOMContentLoaded", function () {
           .forEach((c) => c.classList.remove("active"));
       }
     });
+
+    // Allow clicking anywhere on the card to open details
+    document.querySelectorAll("#searchResults .book-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const title = card.getAttribute("data-book-title");
+        const author = card.getAttribute("data-book-author");
+        fetchAndDisplayBookDetails(title, author);
+      });
+    });
+
+    // Allow clicking anywhere on the card to open details modal
+    searchResults.querySelectorAll(".book-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const title = card.getAttribute("data-book-title");
+        const author = card.getAttribute("data-book-author");
+        fetchAndDisplayBookDetails(title, author);
+      });
+    });
   }
 
   // Track the currently selected book for Smart Search
@@ -122,8 +140,10 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   window.hideSmartSearchBox = function () {
-    document.getElementById("smartSearchBox").style.display = "none";
-    document.getElementById("smartSearchFloatBtn").style.display = "none";
+    const sb = document.getElementById("smartSearchBox");
+    if (sb) sb.style.display = "none";
+    const fb = document.getElementById("smartSearchFloatBtn");
+    if (fb) fb.style.display = "none";
   };
 
   // Smart Search question handler
@@ -309,4 +329,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const box = document.getElementById("smartSearchFooterBox");
     if (box) box.style.display = "none";
   };
+
+  // Ensure clicking anywhere on dynamically rendered cards opens the details modal
+  const searchContainer = document.getElementById("searchResults");
+  if (searchContainer) {
+    searchContainer.addEventListener("click", function (e) {
+      const card = e.target.closest(".book-card");
+      if (card) {
+        const title = card.getAttribute("data-book-title");
+        const author = card.getAttribute("data-book-author");
+        fetchAndDisplayBookDetails(title, author);
+      }
+    });
+  }
 });

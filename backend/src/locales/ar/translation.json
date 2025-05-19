@@ -327,6 +327,8 @@
     "notAvailable": "الكتاب غير متاح للاستعارة",
     "bookCount": "عدد النسخ",
     "saveBook": "حفظ الكتاب",
+    "saveChanges": "حفظ التغييرات",
+    "editBook": "تعديل الكتاب",
     "cancel": "إلغاء",
     "cancelConfirmMessage": "هل أنت متأكد من الإلغاء؟ ستفقد جميع المعلومات التي أدخلتها.",
     "submitConfirmMessage": "هل أنت متأكد من إضافة هذا الكتاب؟",

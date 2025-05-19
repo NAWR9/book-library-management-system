@@ -45,12 +45,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const viewDetailsBtn = card.querySelector(".view-details-btn");
     const fullDetailsLink = card.querySelector(".full-details-link");
 
-    viewDetailsBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const title = card.getAttribute("data-book-title");
-      const author = card.getAttribute("data-book-author");
-      fetchAndDisplayBookDetails(title, author);
-    });
+    if (viewDetailsBtn) {
+      viewDetailsBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const title = card.getAttribute("data-book-title");
+        const author = card.getAttribute("data-book-author");
+        fetchAndDisplayBookDetails(title, author);
+      });
+    }
 
     // Ensure full details link doesn't trigger the modal
     if (fullDetailsLink) {

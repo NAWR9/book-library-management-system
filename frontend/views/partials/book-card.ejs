@@ -13,10 +13,20 @@
           <% }) %>
         </div>
       <% } %>
-      <div class="d-flex justify-content-between">
-        <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
-        <a href="/books/<%= book.id || book._id %>" class="btn btn-sm btn-primary mt-2 full-details-link" onclick="event.stopPropagation();"><%= t('books.fullDetails') %></a>
+      <div class="d-flex justify-content-between align-items-center">
+        <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn" onclick="event.stopPropagation();"><%= t('books.viewDetails') %></button>
+        <% if (locals.user && (locals.user.role === 'admin' || locals.user.isAdmin)) { %>
+          <span class="btn-group">
+            <a href="/books/<%= book.id || book._id %>/edit?lang=<%= locals.htmlLang %>" class="btn btn-sm btn-outline-secondary" aria-label="<%= t('common.edit') %>">
+              <i class="fas fa-edit"></i>
+            </a>
+            <button class="btn btn-sm btn-outline-danger delete-book-card-btn" data-id="<%= book.id || book._id %>" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" aria-label="<%= t('common.delete') %>">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </span>
+        <% } %>
+        <a href="/books/<%= book.id || book._id %>" class="btn btn-sm btn-primary" onclick="event.stopPropagation();"><%= t('books.fullDetails') %></a>
       </div>
     </div>
-  </div>
+  </div> <!-- /.card -->
 </div>
