@@ -5,34 +5,25 @@
   
   <!-- Search Form -->
   <form id="searchForm" class="mb-4">
+    <% const categoriesList = t('bookCategories', { returnObjects: true }); %>
     <div class="row g-3">
-      <div class="col-md-3">
-        <input type="text" id="title" class="form-control" placeholder="Search by Title">
+      <div class="col-md-4">
+        <input type="text" id="title" class="form-control" placeholder="<%= t('books.bookTitle') %>">
       </div>
-      <div class="col-md-3">
-        <input type="text" id="author" class="form-control" placeholder="Search by Author">
+      <div class="col-md-4">
+        <input type="text" id="author" class="form-control" placeholder="<%= t('books.author') %>">
       </div>
-      <div class="col-md-2">
-        <select id="genre" class="form-select">
-          <option value="">All Genres</option>
-          <option value="Fiction">Fiction</option>
-          <option value="Non-Fiction">Non-Fiction</option>
-          <option value="Science">Science</option>
-          <option value="History">History</option>
-        </select>
-      </div>
-      <div class="col-md-2">
+      <div class="col-md-4">
         <select id="category" class="form-select">
-          <option value="">All Categories</option>
-          <option value="Academic">Academic</option>
-          <option value="Novel">Novel</option>
-          <option value="Biography">Biography</option>
-          <option value="Children">Children</option>
+          <option value=""><%= t('books.category') %></option>
+          <% for (const key in categoriesList) { %>
+            <option value="<%= key %>"><%= categoriesList[key] %></option>
+          <% } %>
         </select>
       </div>
     </div>
     <div class="text-end mt-3">
-      <button type="submit" class="btn btn-primary">Search</button>
+      <button type="submit" class="btn btn-primary"><%= t('common.search') %></button>
     </div>
   </form>
 
@@ -40,83 +31,13 @@
   <div id="searchResults" class="row row-cols-1 row-cols-md-3 g-4">
 <% if (typeof books !== "undefined" && books.length > 0) { %>
   <% books.forEach(function(book) { %>
-    <div class="col">
-      <div class="card book-card h-100 shadow-sm"
-           data-book-title="<%= book.title %>"
-           data-book-author="<%= book.author %>">
-        <img src="<%= book.cover %>" class="card-img-top" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
-        <div class="card-body position-relative">
-          <h5 class="card-title"><%= book.title %></h5>
-          <p class="card-text text-muted"><%= t('books.by') %> <%= book.author %></p>
-          <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn"><%= t('books.viewDetails') %></button>
-          <!-- Smart Search Icon -->
-          <button class="smart-search-btn btn btn-light btn-sm rounded-circle"
-                  title="Smart Search"
-                  style="display:none;"
-                  onclick="event.stopPropagation(); toggleSmartSearchBoxInFooter('<%= book.title %>', '<%= book.author %>')">
-            <i class="fas fa-brain"></i>
-          </button>
-          <!-- Smart Search Box -->
-          <div class="smart-search-box card shadow" style="display:none; position:absolute; bottom:50px; left:10px; width:250px; z-index:100;">
-            <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
-              <span><strong>Smart Search</strong></span>
-              <button type="button" class="btn-close btn-sm" onclick="event.stopPropagation(); hideSmartSearchBox(this)"></button>
-            </div>
-            <div class="card-body py-2 px-3">
-              <div class="smart-search-response chat-response mb-3"></div>
-              <div class="d-grid gap-2">
-                <button class="btn btn-outline-primary btn-sm" onclick="event.stopPropagation(); askSmartQuestion('about', this)">
-                  What's this book about?
-                </button>
-                <button class="btn btn-outline-info btn-sm" onclick="event.stopPropagation(); askSmartQuestion('author', this)">
-                  Who's the author?
-                </button>
-                <button class="btn btn-outline-secondary btn-sm" onclick="event.stopPropagation(); askSmartQuestion('similar', this)">
-                  Similar books?
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <%- include('../partials/book-card', { book: book }) %>
   <% }) %>
 <% } else { %>
-  <div class="col-12">
-    <p class="text-center">No books found.</p>
-  </div>
+  <div class="col-12 text-center"><%= t('books.noBooksFound') %></div>
 <% } %>
   </div>
 </div>
-
-<!-- Smart Search Box (initially hidden) -->
-<div id="smartSearchBox" class="card shadow" style="display:none; position:fixed; bottom:110px; right:40px; width:320px; z-index:1060;">
-  <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
-    <span><strong>Smart Search</strong></span>
-    <button type="button" class="btn-close btn-sm" aria-label="Close" onclick="hideSmartSearchBox()"></button>
-  </div>
-  <div class="card-body py-2 px-3">
-    <div id="smartSearchResponse" class="chat-response mb-3"></div>
-    <div class="d-grid gap-2">
-      <button class="btn btn-outline-primary btn-sm" onclick="askSmartQuestion('about')">
-        What's this book about?
-      </button>
-      <button class="btn btn-outline-info btn-sm" onclick="askSmartQuestion('author')">
-        Who's the author?
-      </button>
-      <button class="btn btn-outline-secondary btn-sm" onclick="askSmartQuestion('similar')">
-        Similar books?
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Smart Search Floating Button (initially hidden) -->
-<!-- <div id="smartSearchFloatBtn" style="display:none; position:fixed;bottom:40px;right:40px;z-index:1050;">
-  <button class="btn btn-primary rounded-circle" style="width:56px;height:56px;" onclick="toggleSmartSearchBox()">
-    <i class="fas fa-brain"></i>
-  </button>
-</div> -->
 
 <!-- Book Details Modal -->
 <div class="modal fade" id="bookDetailsModal" tabindex="-1" aria-labelledby="bookDetailsModalLabel" aria-hidden="true">

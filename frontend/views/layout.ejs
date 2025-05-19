@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/styles.css" />
+    <link rel="icon" href="/img/unistack.svg" type="image/svg+xml">
+    <link rel="icon" href="/img/unistack.png" sizes="32x32" type="image/png">
     <link rel="stylesheet" href="/css/category-input.css" />
     <% if (locals.pageStyles) { %><%- pageStyles %><% } %>
   </head>
@@ -109,7 +111,13 @@
             category: t('books.category'),
             unknownTitle: t('books.unknownTitle', 'Unknown Title'),
             unknownAuthor: t('books.unknownAuthor', 'Unknown Author'),
-            unknownDate: t('books.unknownDate', 'Unknown Date')
+            unknownDate: t('books.unknownDate', 'Unknown Date'),
+            by: t('books.by'),
+            viewDetails: t('books.viewDetails'),
+            fullDetails: t('books.fullDetails'),
+            noDescription: t('books.noDescription'),
+            noBooksFound: t('books.noBooksFound'),
+            noBooksFoundMatching: t('books.noBooksFoundMatching')
           },
           
           // UI elements translations
@@ -160,5 +168,7 @@
         });
       });
     </script>
+    <!-- Shared Delete Confirmation Modal -->
+    <%- include('./partials/delete-confirm-modal') %>
   </body>
 </html>

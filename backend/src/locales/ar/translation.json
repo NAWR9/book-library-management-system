@@ -289,7 +289,8 @@
     "cancel": "إلغاء",
     "confirm": "تأكيد",
     "delete": "حذف",
-    "confirmDelete": "تأكيد الحذف"
+    "confirmDelete": "تأكيد الحذف",
+    "search": "بحث"
   },
   "books": {
     "bookLibrary": "مكتبة الكتب",
@@ -326,6 +327,8 @@
     "notAvailable": "الكتاب غير متاح للاستعارة",
     "bookCount": "عدد النسخ",
     "saveBook": "حفظ الكتاب",
+    "saveChanges": "حفظ التغييرات",
+    "editBook": "تعديل الكتاب",
     "cancel": "إلغاء",
     "cancelConfirmMessage": "هل أنت متأكد من الإلغاء؟ ستفقد جميع المعلومات التي أدخلتها.",
     "submitConfirmMessage": "هل أنت متأكد من إضافة هذا الكتاب؟",
@@ -397,7 +400,9 @@
     "returnDate": "تاريخ الإرجاع",
     "actions": "إجراءات",
     "status": "الحالة",
-    "overdue": "متأخر"
+    "overdue": "متأخر",
+    "noBooksFound": "لا توجد كتب.",
+    "noBooksFoundMatching": "لا توجد كتب تطابق معايير البحث الخاصة بك."
   },
   "categoryGroups": {
     "general": "عام",
