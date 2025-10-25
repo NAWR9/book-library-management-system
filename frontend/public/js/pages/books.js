@@ -12,6 +12,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const currentLanguage = document.documentElement.lang || "en";
 
+  // Basic HTML escaper to mitigate XSS when injecting via innerHTML
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
   let currentBookId = null;
   const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
   const deleteConfirmModal = new bootstrap.Modal(
@@ -118,16 +128,20 @@ document.addEventListener("DOMContentLoaded", () => {
               .join("");
             const col = document.createElement("div");
             col.className = "col";
+            const safeTitle = escapeHtml(book.title);
+            const safeAuthor = escapeHtml(book.author);
+            const safeImg = escapeHtml(imgSrc);
+            const safeId = escapeHtml(book.id || book._id);
             col.innerHTML = `
-              <div class="card book-card h-100 shadow-sm" data-book-title="${book.title}" data-book-author="${book.author}">
-                <img src="${imgSrc}" class="card-img-top" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
+              <div class="card book-card h-100 shadow-sm" data-book-title="${safeTitle}" data-book-author="${safeAuthor}">
+                <img src="${safeImg}" class="card-img-top" alt="Book Cover" onerror="this.src='/img/book-cover-placeholder.svg'">
                 <div class="card-body position-relative">
-                  <h5 class="card-title">${book.title}</h5>
-                  <p class="card-text text-muted">${window.i18nMessages.books.by} ${book.author}</p>
+                  <h5 class="card-title">${safeTitle}</h5>
+                  <p class="card-text text-muted">${window.i18nMessages.books.by} ${safeAuthor}</p>
                   ${badges ? `<div class="mb-2">${badges}</div>` : ""}
                   <div class="d-flex justify-content-between">
                     <button class="btn btn-sm btn-outline-primary mt-2 view-details-btn">${window.i18nMessages.books.viewDetails}</button>
-                    <a href="/books/${book.id || book._id}" class="btn btn-sm btn-primary mt-2 full-details-link" onclick="event.stopPropagation();">${window.i18nMessages.books.fullDetails}</a>
+                    <a href="/books/${safeId}" class="btn btn-sm btn-primary mt-2 full-details-link" onclick="event.stopPropagation();">${window.i18nMessages.books.fullDetails}</a>
                   </div>
                 </div>
               </div>`;
@@ -249,7 +263,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const description = bookData.description;
 
     if (description) {
-      descriptionElement.innerHTML = description;
+      // Avoid XSS: render description as plain text
+      descriptionElement.textContent = description;
     } else {
       descriptionElement.textContent =
         document.documentElement.lang === "ar"
@@ -393,15 +408,25 @@ function typeChatResponse(container, words, delay = 60) {
   typeNext();
 }
 
+// Safely set a response bubble with textContent
+function setResponseBubble(container, className, text) {
+  // Clear and append a safe bubble element
+  container.replaceChildren();
+  const bubble = document.createElement("div");
+  bubble.className = `chat-bubble ${className}`.trim();
+  bubble.textContent = text;
+  container.appendChild(bubble);
+}
+
 window.askSmartQuestion = async function (type) {
   const { title } = window.smartSearchSelectedBook;
   const responseDiv = document.getElementById("smartSearchResponse");
   if (!title) {
-    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Please select a book first.</div>`;
+    setResponseBubble(responseDiv, "bg-danger text-white", "Please select a book first.");
     return;
   }
 
-  responseDiv.innerHTML = `<div class="chat-bubble bg-light text-muted">Loading...</div>`;
+  setResponseBubble(responseDiv, "bg-light text-muted", "Loading...");
 
   try {
     const res = await fetch(
@@ -409,14 +434,20 @@ window.askSmartQuestion = async function (type) {
     );
     const data = await res.json();
     if (data.success) {
-      responseDiv.innerHTML = `<div class="chat-bubble"></div>`;
-      const bubble = responseDiv.querySelector(".chat-bubble");
+      responseDiv.replaceChildren();
+      const bubble = document.createElement("div");
+      bubble.className = "chat-bubble";
+      responseDiv.appendChild(bubble);
       typeChatResponse(bubble, data.answer, 60); // 60ms per word
     } else {
-      responseDiv.innerHTML = `<div class="chat-bubble bg-warning text-dark">${data.answer.join(" ")}</div>`;
+      setResponseBubble(
+        responseDiv,
+        "bg-warning text-dark",
+        Array.isArray(data.answer) ? data.answer.join(" ") : String(data.answer || "Error"),
+      );
     }
   } catch {
-    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Error fetching answer.</div>`;
+    setResponseBubble(responseDiv, "bg-danger text-white", "Error fetching answer.");
   }
 };
 
@@ -427,11 +458,11 @@ window.askSmartQuestion = async function (
   const { title, author } = window.smartSearchSelectedBook;
   const responseDiv = document.getElementById(responseContainerId);
   if (!title) {
-    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Please select a book first.</div>`;
+    setResponseBubble(responseDiv, "bg-danger text-white", "Please select a book first.");
     return;
   }
 
-  responseDiv.innerHTML = `<div class="chat-bubble bg-light text-muted">Loading...</div>`;
+  setResponseBubble(responseDiv, "bg-light text-muted", "Loading...");
 
   try {
     const res = await fetch(
@@ -439,14 +470,20 @@ window.askSmartQuestion = async function (
     );
     const data = await res.json();
     if (data.success) {
-      responseDiv.innerHTML = `<div class="chat-bubble"></div>`;
-      const bubble = responseDiv.querySelector(".chat-bubble");
+      responseDiv.replaceChildren();
+      const bubble = document.createElement("div");
+      bubble.className = "chat-bubble";
+      responseDiv.appendChild(bubble);
       typeChatResponse(bubble, data.answer, 60); // 60ms per word
     } else {
-      responseDiv.innerHTML = `<div class="chat-bubble bg-warning text-dark">${Array.isArray(data.answer) ? data.answer.join(" ") : data.answer}</div>`;
+      setResponseBubble(
+        responseDiv,
+        "bg-warning text-dark",
+        Array.isArray(data.answer) ? data.answer.join(" ") : String(data.answer || "Error"),
+      );
     }
   } catch {
-    responseDiv.innerHTML = `<div class="chat-bubble bg-danger text-white">Error fetching answer.</div>`;
+    setResponseBubble(responseDiv, "bg-danger text-white", "Error fetching answer.");
   }
 };
 
